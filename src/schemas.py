@@ -10,7 +10,7 @@ class UserSchema(BaseModel):
     username: str = Field(min_length=5, max_length=25)
     email: EmailStr
     password: str = Field(min_length=6, max_length=30)
-    
+
     model_config = ConfigDict(
         json_schema_extra = {
             "title": "User Model",
@@ -22,24 +22,24 @@ class UserSchema(BaseModel):
             },
         }
     )
-    
+
 
 
 class UserUpdateSchema(BaseModel):
     username: str = Field(min_length=5, max_length=25)
-    
-    
+
+
 class UserResponseSchema(BaseModel):
     id: int
     username: str
     email: str
     is_active: bool | None
     created_at: datetime
-    
+
     model_config = ConfigDict(from_attributes = True)
-    
+
 class UserProfileSchema(BaseModel):
-    username: str 
+    username: str
     email: EmailStr
     avatar: str | None
     post_count: int | None
@@ -47,8 +47,8 @@ class UserProfileSchema(BaseModel):
     rates_count: int | None
     is_active: bool | None
     created_at: datetime
-    
-    
+
+
 class UserDb(BaseModel):
     id: int
     username: str
@@ -60,10 +60,11 @@ class UserDb(BaseModel):
     model_config = ConfigDict(from_attributes = True)
 
 
-class UserResponse(BaseModel):
+class UserResponseSchema(BaseModel):
     user: UserDb
     detail: str = "User successfully created"
-    
+
+
 class TokenModel(BaseModel):
     access_token: str
     refresh_token: str
@@ -72,7 +73,8 @@ class TokenModel(BaseModel):
 
 class RequestEmail(BaseModel):
     email: EmailStr
-    
+
+
 class RequestRole(BaseModel):
     email: EmailStr
     role: Role

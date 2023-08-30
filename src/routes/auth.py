@@ -35,7 +35,7 @@ from src.conf.messages import (
     USER_IS_LOGOUT,
 )
 
-router = APIRouter(prefix="/auth", tags=["authentication"])
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 security = HTTPBearer()
 
 
