@@ -1,13 +1,11 @@
-from typing import List
-
 from fastapi import Depends, HTTPException, status, Request
 
 from src.database.models import User, Role
 from src.services.auth import auth_service
 
-
+from src.conf.messages import OPERATION_FORBIDDEN
 class RoleChecker:
-    def __init__(self, allowed_roles: List[Role]):
+    def __init__(self, allowed_roles: list[Role]):
         self.allowed_roles = allowed_roles
 
     async def __call__(self, request: Request, current_user: User = Depends(auth_service.get_current_user)):

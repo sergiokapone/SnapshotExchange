@@ -12,7 +12,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.connect_db import get_db
 from src.repository import users as repository_users
 from src.conf.config import settings
-from src.conf.messages import FAIL_EMAIL_VERIFICATION, INVALID_SCOPE, NOT_VALIDATE_CREDENTIALS
+from src.conf.messages import (
+    FAIL_EMAIL_VERIFICATION,
+    INVALID_SCOPE,
+    NOT_VALIDATE_CREDENTIALS,
+)
 
 
 class Auth:
@@ -22,9 +26,9 @@ class Auth:
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
     redis_cache = redis.Redis(
-        host = settings.redis_host,
-        password = settings.redis_password,
-        username = settings.redis_username,
+        host=settings.redis_host,
+        password=settings.redis_password,
+        username=settings.redis_username,
         ssl=True,
         encoding="utf-8",
         # decode_responses=True
@@ -37,54 +41,76 @@ class Auth:
         return self.pwd_context.hash(password)
 
     # define a function to generate a new access token
-    async def create_access_token(self, data: dict, expires_delta: Optional[float] = None):
+    async def create_access_token(
+        self, data: dict, expires_delta: Optional[float] = None
+    ):
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.utcnow() + timedelta(seconds=expires_delta)
         else:
             expire = datetime.utcnow() + timedelta(minutes=15)
-        to_encode.update({"iat": datetime.utcnow(), "exp": expire, "scope": "access_token"})
-        encoded_access_token = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
+        to_encode.update(
+            {"iat": datetime.utcnow(), "exp": expire, "scope": "access_token"}
+        )
+        encoded_access_token = jwt.encode(
+            to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM
+        )
         return encoded_access_token
 
     # define a function to generate a new refresh token
-    async def create_refresh_token(self, data: dict, expires_delta: Optional[float] = None):
+    async def create_refresh_token(
+        self, data: dict, expires_delta: Optional[float] = None
+    ):
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.utcnow() + timedelta(seconds=expires_delta)
         else:
             expire = datetime.utcnow() + timedelta(days=7)
-        to_encode.update({"iat": datetime.utcnow(), "exp": expire, "scope": "refresh_token"})
-        encoded_refresh_token = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
+        to_encode.update(
+            {"iat": datetime.utcnow(), "exp": expire, "scope": "refresh_token"}
+        )
+        encoded_refresh_token = jwt.encode(
+            to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM
+        )
         return encoded_refresh_token
 
     def create_email_token(self, data: dict):
         to_encode = data.copy()
         expire = datetime.utcnow() + timedelta(days=3)
-        to_encode.update({"iat": datetime.utcnow(), "exp": expire, "scope": "email_token"})
+        to_encode.update(
+            {"iat": datetime.utcnow(), "exp": expire, "scope": "email_token"}
+        )
         token = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
         return token
 
     async def decode_refresh_token(self, refresh_token: str):
         try:
-            payload = jwt.decode(refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
-            if payload['scope'] == 'refresh_token':
-                email = payload['sub']
+            payload = jwt.decode(
+                refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHM]
+            )
+            if payload["scope"] == "refresh_token":
+                email = payload["sub"]
                 return email
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_SCOPE)
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_SCOPE
+            )
         except JWTError:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=NOT_VALIDATE_CREDENTIALS)
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=NOT_VALIDATE_CREDENTIALS,
+            )
 
-    async def get_current_user(self, token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+    async def get_current_user(
+        self, token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+    ):
         credentials_exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=NOT_VALIDATE_CREDENTIALS
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=NOT_VALIDATE_CREDENTIALS
         )
 
         try:
             # Decode JWT
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
-            if payload['scope'] == 'access_token':
+            if payload["scope"] == "access_token":
                 email = payload["sub"]
                 if email is None:
                     raise credentials_exception
@@ -94,19 +120,19 @@ class Auth:
             black_list_token = await repository_users.find_blacklisted_token(token, db)
             if black_list_token:
                 raise credentials_exception
-            
+
         except JWTError as e:
             raise credentials_exception
-        
+
         # get user from redis_cache
-        user = self.redis_cache.get(f'user:{email}')
+        user = self.redis_cache.get(f"user:{email}")
         if user is None:
             print("USER POSTGRES")
             user = await repository_users.get_user_by_email(email, db)
             if user is None:
                 raise credentials_exception
-            self.redis_cache.set(f'user:{email}', pickle.dumps(user))
-            self.redis_cache.expire(f'user:{email}', 900)
+            self.redis_cache.set(f"user:{email}", pickle.dumps(user))
+            self.redis_cache.expire(f"user:{email}", 900)
         else:
             print("USER CACHE")
             user = pickle.loads(user)
@@ -115,14 +141,18 @@ class Auth:
     async def get_email_from_token(self, token: str):
         try:
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
-            if payload['scope'] == 'email_token':
+            if payload["scope"] == "email_token":
                 email = payload["sub"]
                 return email
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_SCOPE)
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_SCOPE
+            )
         except JWTError as e:
             print(e)
-            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                                detail=FAIL_EMAIL_VERIFICATION)
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=FAIL_EMAIL_VERIFICATION,
+            )
 
 
 auth_service = Auth()
