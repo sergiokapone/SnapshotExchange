@@ -214,7 +214,7 @@ async def request_email(
     """
     user = await repository_users.get_user_by_email(body.email, db)
 
-    if user.confirmed:
+    if user and user.confirmed:
         return {"message": EMAIL_CONFIRMED}
 
     if user:
