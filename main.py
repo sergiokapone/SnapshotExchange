@@ -44,7 +44,7 @@ async def healthchecker(session: AsyncSession = Depends(get_db)):
         if not rows:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Database is not configured correctly",
+                detail=DB_CONFIG_ERROR,
             )
 
         return {"message": "You successfully connected to the database!"}
@@ -52,7 +52,7 @@ async def healthchecker(session: AsyncSession = Depends(get_db)):
         print(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error connecting to the database",
+            detail=DB_CONNECT_ERROR,
         )
 
 
