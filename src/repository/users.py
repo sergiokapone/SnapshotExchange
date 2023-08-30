@@ -62,7 +62,8 @@ async def edit_my_profile(file, new_username, user: User, db: AsyncSession) -> U
     :param db: Session: Access the database
     :return: A user object
     """
-    me = db.query(User).filter(User.id == user.id).first()
+    result = await db.execute(select(User).filter(User.id == user.id))
+    me = result.scalar_one_or_none()
     if new_username:
         me.username = new_username
         
