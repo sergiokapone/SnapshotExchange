@@ -22,10 +22,12 @@ class Auth:
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
     redis_cache = redis.Redis(
-        host=settings.redis_host,
-        port=settings.redis_port,
-        password=settings.redis_password,
-        db=0
+        host = settings.redis_host,
+        password = settings.redis_password,
+        username = settings.redis_username,
+        ssl=True,
+        encoding="utf-8",
+        decode_responses=True
     )
 
     def verify_password(self, plain_password, hashed_password):
