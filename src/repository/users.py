@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 
 from libgravatar import Gravatar
 import cloudinary
@@ -100,7 +99,7 @@ async def get_users_with_username(username: str, db: AsyncSession) -> list[User]
             username (str): The username to search for.
             db (Session): A database session object.
         Returns:
-            List[User]: A list of User objects that match the given criteria.
+            list[User]: A list of User objects that match the given criteria.
     
     :param username: str: Specify the type of data that is expected to be passed into the function
     :param db: Session: Pass the database session to the function
