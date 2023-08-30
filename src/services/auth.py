@@ -27,7 +27,7 @@ class Auth:
         username = settings.redis_username,
         ssl=True,
         encoding="utf-8",
-        decode_responses=True
+        # decode_responses=True
     )
 
     def verify_password(self, plain_password, hashed_password):
