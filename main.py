@@ -23,7 +23,7 @@ async def startup():
         username = settings.redis_username,
         ssl=True,
         encoding="utf-8",
-        decode_responses=True
+        # decode_responses=True
     )
     await FastAPILimiter.init(redis_cache)
 
