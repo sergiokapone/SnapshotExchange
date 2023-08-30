@@ -87,7 +87,10 @@ async def get_users(skip: int, limit: int, db: AsyncSession) -> list[User]:
     :param db: Session: Pass the database session to the function
     :return: A list of users
     """
-    return db.query(User).offset(skip).limit(limit).all()
+    query = select(User).offset(skip).limit(limit)
+    result = await db.execute(query)
+    all_users = result.scalars().all()
+    return all_users
 
 
 async def get_users_with_username(username: str, db: AsyncSession) -> list[User]:
@@ -124,33 +127,6 @@ async def get_user_profile(username: str, db: AsyncSession) -> User:
             )
         return user_profile
     return None
-
-
-async def get_all_commented_posts(user: User, db: AsyncSession):
-    """
-    The get_all_commented_posts function returns all posts that a user has commented on.
-    
-    :param user: User: Get the user object from the database
-    :param db: Session: Pass the database session to the function
-    :return: All posts that have been commented on by a user
-    """
-    return db.query(Post).join(Comment).filter(Comment.user_id == user.id).all()
-
-
-async def get_all_liked_posts(user: User, db: AsyncSession):
-    """
-    The get_all_liked_posts function returns all posts that a user has liked.
-        Args:
-            user (User): The User object to get the liked posts for.
-            db (Session): A database session to use for querying the database.
-        Returns:
-            List[Post]: A list of Post objects that have been liked by the specified User.
-    
-    :param user: User: Get the user's id
-    :param db: Session: Pass the database session to the function
-    :return: A list of posts that the user liked
-    """
-    return db.query(Post).join(Rating).filter(Rating.user_id == user.id).all()
 
 
 async def get_user_by_email(email: str, db: AsyncSession) -> User:
@@ -210,7 +186,7 @@ async def ban_user(email: str, db: AsyncSession) -> None:
     """
     user = await get_user_by_email(email, db)
     user.is_active = False
-    db.commit()
+    await db.commit()
 
 
 async def make_user_role(email: str, role: Role, db: AsyncSession) -> None:
