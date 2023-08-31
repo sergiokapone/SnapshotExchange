@@ -5,6 +5,7 @@ from src.repository import users as repository_users
 from src.database.models import User, Role
 
 from src.schemas import (
+    UserProfile,
     UserProfileSchema,
     UserResponseSchema,
     RequestEmail,
@@ -56,15 +57,15 @@ async def edit_my_profile(
     )
     return updated_user
 
-@router.get("/{username}", response_model=UserDb)
-async def username_profile(username: User, db: AsyncSession = Depends(get_db)):
-    user= await repository_users.get_user_by_username(username)
-    count_posts=
+@router.get("/{username}", response_model=UserProfile)
+async def username_profile(username: str, db: AsyncSession = Depends(get_db)):
+    user= await repository_users.get_user_by_username(username,db)
+    count_posts= await repository_users.get_users_posts(user.id,db)
     result_dict= {"username": user.username,
                   "created_at":user.created_at,
                   "avatar":user.avatar,
-                  "count_posts":}
-    return username
+                  "count_posts":count_posts}
+    return result_dict
 
 @router.get(
     "/get_all", response_model=list[UserDb], dependencies=[Depends(allowed_get_all_users)]

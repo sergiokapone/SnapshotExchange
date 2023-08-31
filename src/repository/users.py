@@ -106,9 +106,12 @@ async def get_users_with_username(username: str, db: AsyncSession) -> list[User]
     :param db: Session: Pass the database session to the function
     :return: A list of users
     """
-    return db.query(User).filter(func.lower(User.username).like(f'%{username.lower()}%')).all()
+    query = select(User).where(func.lower(User.username).like(f'%{username.lower()}%'))
+    result = await db.execute(query)
+    matching_users = result.scalars().all()
+    return matching_users
 
-async def get_users_posts(skip: int, limit: int, db: AsyncSession) -> list[User]:
+async def get_users_posts(id:int, db: AsyncSession) -> int:
     """
     The get_users function returns a list of users from the database.
     
@@ -117,10 +120,11 @@ async def get_users_posts(skip: int, limit: int, db: AsyncSession) -> list[User]
     :param db: Session: Pass the database session to the function
     :return: A list of users
     """
-    query = select(User).offset(skip).limit(limit)
+    query = select(Post).filter(Post.user_id==id)
     result = await db.execute(query)
-    all_users = result.scalars().all()
-    return all_users
+    all_posts = result.scalars().all()
+
+    return len(all_posts)
 
 
 async def get_user_profile(username: str, db: AsyncSession) -> User:

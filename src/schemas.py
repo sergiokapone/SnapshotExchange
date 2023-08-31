@@ -59,6 +59,13 @@ class UserDb(BaseModel):
 
     model_config = ConfigDict(from_attributes = True)
 
+class UserProfile(BaseModel):
+    username: str
+    avatar: str | None
+    created_at: datetime
+    count_posts : int 
+
+    model_config = ConfigDict(from_attributes = True)
 
 class UserResponseSchema(BaseModel):
     user: UserDb
