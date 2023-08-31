@@ -56,6 +56,15 @@ async def edit_my_profile(
     )
     return updated_user
 
+@router.get("/{username}", response_model=UserDb)
+async def username_profile(username: User, db: AsyncSession = Depends(get_db)):
+    user= await repository_users.get_user_by_username(username)
+    count_posts=
+    result_dict= {"username": user.username,
+                  "created_at":user.created_at,
+                  "avatar":user.avatar,
+                  "count_posts":}
+    return username
 
 @router.get(
     "/get_all", response_model=list[UserDb], dependencies=[Depends(allowed_get_all_users)]
