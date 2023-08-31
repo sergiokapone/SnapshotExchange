@@ -13,6 +13,7 @@ from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo
 from src.schemas import UserSchema, UserProfileSchema
 
 async def create_photo(rating: 0>= int <=5,photo:Photo, user:User,db:AsyncSession):
+    
     pass
 
 

@@ -34,6 +34,7 @@ class User(Base):
     description: Mapped[str] = mapped_column(String(500),nullable=True, unique=False)
     posts: Mapped['Post'] = relationship('Post', back_populates='user')
     ratings: Mapped['Rating'] = relationship('Rating', back_populates='user')
+    photo: Mapped['Photo'] = relationship('Photo', back_populates='user')
     
 
 class Post(Base):
@@ -51,7 +52,8 @@ class Photo(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     ratings: Mapped['Rating'] = relationship('Rating', back_populates='photo')
-
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+    user: Mapped['User'] = relationship('User', back_populates='photos')
     content: Mapped[str] = mapped_column(String(200))
 
 class Rating(Base):
