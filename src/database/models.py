@@ -52,6 +52,8 @@ class Photo(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     ratings: Mapped['Rating'] = relationship('Rating', back_populates='photo')
 
+    content: Mapped[str] = mapped_column(String(200))
+
 class Rating(Base):
     __tablename__ = "ratings"
 
