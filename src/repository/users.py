@@ -220,36 +220,16 @@ async def add_to_blacklist(token: str, db: AsyncSession) -> None:
     The add_to_blacklist function adds a token to the blacklist.
         Args:
             token (str): The JWT that is being blacklisted.
-            db (Session): The database session object used for querying and updating the database.
+            db (AsyncSession): The database session object used for querying and updating the database.
 
     :param token: str: Pass the token to be blacklisted
-    :param db: Session: Create a new session with the database
+    :param db: AsyncSession: Create a new session with the database
     :return: None
     """
     blacklist_token = BlacklistToken(token=token, blacklisted_on=datetime.now())
-    await db.add(blacklist_token)
+    db.add(blacklist_token)
     await db.commit()
     await db.refresh(blacklist_token)
-
-
-async def remove_from_blacklist(token: str, db: AsyncSession) -> None:
-    """
-    The remove_from_blacklist function removes a token from the blacklist.
-        Args:
-            token (str): The JWT to remove from the blacklist.
-            db (Session): A database session object.
-
-    :param token: str: Specify the token to be removed from the blacklist
-    :param db: Session: Access the database
-    :return: None
-    """
-
-    result = await db.execute(
-        select(BlacklistToken).filter(BlacklistToken.token == token)
-    )
-
-    blacklist_token = result.scalar_one_or_none()
-    await db.delete(blacklist_token)
 
 
 async def is_blacklisted_token(token: str, db: AsyncSession) -> bool:

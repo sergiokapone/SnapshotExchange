@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.models import User
 from src.services.email import send_email
 from src.database.connect_db import get_db
-from src.schemas import UserSchema, UserResponseSchema, TokenModel, RequestEmail
+from src.schemas import UserSchema, UserResponseSchema, TokenSchema, RequestEmail
 from src.repository import users as repository_users
 from src.services.auth import auth_service
 from src.conf.messages import (
@@ -78,7 +78,7 @@ async def signup(
     return {"user": new_user, "detail": SUCCESS_CREATE_USER}
 
 
-@router.post("/login", response_model=TokenModel)
+@router.post("/login", response_model=TokenSchema)
 async def login(
     body: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
@@ -133,7 +133,7 @@ async def logout(
     return {"message": USER_IS_LOGOUT}
 
 
-@router.get("/refresh_token", response_model=TokenModel)
+@router.get("/refresh_token", response_model=TokenSchema)
 async def refresh_token(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: AsyncSession = Depends(get_db),
