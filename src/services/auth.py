@@ -20,6 +20,7 @@ from src.conf.messages import (
 
 from src.conf.constants import TOKEN_LIFE_TIME
 
+
 class Auth:
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     SECRET_KEY = settings.secret_key
@@ -42,9 +43,7 @@ class Auth:
         return self.pwd_context.hash(password)
 
     # define a function to generate a new access token
-    async def create_access_token(
-        self, data: dict, expires_delta: int | None = None
-    ):
+    async def create_access_token(self, data: dict, expires_delta: int | None = None):
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.utcnow() + timedelta(minutes=TOKEN_LIFE_TIME)
@@ -118,7 +117,6 @@ class Auth:
             else:
                 raise credentials_exception
             # check token in blacklist
-            
             is_invalid_token = await repository_users.is_blacklisted_token(token, db)
             if is_invalid_token:
                 raise credentials_exception
@@ -155,5 +153,6 @@ class Auth:
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail=FAIL_EMAIL_VERIFICATION,
             )
-            
+
+
 auth_service = Auth()
