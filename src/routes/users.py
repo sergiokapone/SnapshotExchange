@@ -49,11 +49,12 @@ async def read_my_profile(current_user: User = Depends(auth_service.get_current_
 async def edit_my_profile(
     avatar: UploadFile = File(),
     new_username: str = Form(None),
+    new_description: str = Form(None),
     current_user: User = Depends(auth_service.get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     updated_user = await repository_users.edit_my_profile(
-        avatar, new_username, current_user, db
+        avatar,new_description, new_username, current_user, db
     )
     return updated_user
 

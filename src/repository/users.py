@@ -52,7 +52,7 @@ async def get_me(user: User, db: AsyncSession) -> User:
         return None
 
 
-async def edit_my_profile(file, new_username, user: User, db: AsyncSession) -> User:
+async def edit_my_profile(file,new_description, new_username, user: User, db: AsyncSession) -> User:
     """
     The edit_my_profile function allows a user to edit their profile.
 
@@ -66,7 +66,7 @@ async def edit_my_profile(file, new_username, user: User, db: AsyncSession) -> U
     me = result.scalar_one_or_none()
     if new_username:
         me.username = new_username
-
+        me.description=new_description
     init_cloudinary()
     cloudinary.uploader.upload(
         file.file,
@@ -78,8 +78,8 @@ async def edit_my_profile(file, new_username, user: User, db: AsyncSession) -> U
         width=250, height=250, crop="fill"
     )
     me.avatar = url
-    db.commit()
-    db.refresh(me)
+    await db.commit()
+    await db.refresh(me)
     return me
 
 
@@ -195,7 +195,7 @@ async def update_token(user: User, token: str | None, db: AsyncSession) -> None:
     :return: None, but the return type is specified as str | none
     """
     user.refresh_token = token
-    db.commit()
+    await db.commit()
 
 
 async def confirm_email(email: str, db: AsyncSession) -> None:
