@@ -1,9 +1,8 @@
 import pickle
-from typing import Optional
 
 import redis
 from jose import JWTError, jwt
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, status, Depends, Header
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
@@ -15,9 +14,11 @@ from src.conf.config import settings
 from src.conf.messages import (
     FAIL_EMAIL_VERIFICATION,
     INVALID_SCOPE,
+    INVALID_TOKEN,
     NOT_VALIDATE_CREDENTIALS,
 )
 
+from src.conf.constants import TOKEN_LIFE_TIME
 
 class Auth:
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -42,11 +43,11 @@ class Auth:
 
     # define a function to generate a new access token
     async def create_access_token(
-        self, data: dict, expires_delta: Optional[float] = None
+        self, data: dict, expires_delta: int | None = None
     ):
         to_encode = data.copy()
         if expires_delta:
-            expire = datetime.utcnow() + timedelta(seconds=expires_delta)
+            expire = datetime.utcnow() + timedelta(minutes=TOKEN_LIFE_TIME)
         else:
             expire = datetime.utcnow() + timedelta(minutes=15)
         to_encode.update(
@@ -59,7 +60,7 @@ class Auth:
 
     # define a function to generate a new refresh token
     async def create_refresh_token(
-        self, data: dict, expires_delta: Optional[float] = None
+        self, data: dict, expires_delta: float | None = None
     ):
         to_encode = data.copy()
         if expires_delta:
@@ -117,8 +118,9 @@ class Auth:
             else:
                 raise credentials_exception
             # check token in blacklist
-            black_list_token = await repository_users.find_blacklisted_token(token, db)
-            if black_list_token:
+            
+            is_invalid_token = await repository_users.is_blacklisted_token(token, db)
+            if is_invalid_token:
                 raise credentials_exception
 
         except JWTError as e:
@@ -127,14 +129,14 @@ class Auth:
         # get user from redis_cache
         user = self.redis_cache.get(f"user:{email}")
         if user is None:
-            print("USER POSTGRES")
+            print("--- USER POSTGRES ---")
             user = await repository_users.get_user_by_email(email, db)
             if user is None:
                 raise credentials_exception
             self.redis_cache.set(f"user:{email}", pickle.dumps(user))
             self.redis_cache.expire(f"user:{email}", 900)
         else:
-            print("USER CACHE")
+            print("--- USER CACHE ---")
             user = pickle.loads(user)
         return user
 
@@ -153,6 +155,37 @@ class Auth:
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail=FAIL_EMAIL_VERIFICATION,
             )
+            
+    # Decorator for token verification
+    async def is_valid_token(self, token: str = Header("Authorization")):
+        print("THIS IS TOKEN:", token)
+        try:
+            decoded_token = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
+
+            # Get the expiration time from the decoded token
+            expiration_time = decoded_token["exp"]
+
+            # Получаем текущее время            # Get the current time
+
+            current_time = datetime.datetime.utcnow()
+
+            # Comparing the current time with the expiration time
+            if current_time < datetime.datetime.fromtimestamp(expiration_time):
+                return True
+            else:
+                return False
+        except jwt.ExpiredSignatureError:
+            return False
+        except jwt.DecodeError:
+            return False
+        except jwt.InvalidTokenError:
+            return False
+
+
+
+
+
+
 
 
 auth_service = Auth()

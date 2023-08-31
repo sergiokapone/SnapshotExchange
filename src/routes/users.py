@@ -15,9 +15,7 @@ from src.schemas import (
 
 from src.services.auth import auth_service
 
-
 from src.services.roles import RoleChecker
-
 
 from src.conf.messages import (
     NOT_FOUND,
@@ -29,7 +27,10 @@ from src.conf.messages import (
 )
 
 
-router = APIRouter(prefix="/users", tags=["users"])
+router = APIRouter(prefix="/users", tags=["Users"])
+
+# Permissions to use routes by role
+
 allowed_get_user = RoleChecker([Role.admin, Role.moder, Role.user])
 allowed_create_user = RoleChecker([Role.admin, Role.moder, Role.user])
 allowed_get_all_users = RoleChecker([Role.admin])
@@ -50,7 +51,6 @@ async def edit_my_profile(
     current_user: User = Depends(auth_service.get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
- 
     updated_user = await repository_users.edit_my_profile(
         avatar, new_username, current_user, db
     )
@@ -58,12 +58,13 @@ async def edit_my_profile(
 
 
 @router.get(
-    "/get_all", response_model=list[UserDb], dependencies=[Depends(allowed_get_all_users)]
+    "/get_all",
+    response_model=list[UserDb],
+    dependencies=[Depends(allowed_get_all_users)],
 )
 async def read_all_users(
     skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)
 ):
-
     users = await repository_users.get_users(skip, limit, db)
     return users
 
@@ -98,7 +99,7 @@ async def make_role_by_email(body: RequestRole, db: AsyncSession = Depends(get_d
 
     if body.role == user.role:
         return {"message": USER_ROLE_EXISTS}
-    else:
+    else: 
         await repository_users.make_user_role(body.email, body.role, db)
 
         return {"message": f"{USER_CHANGE_ROLE_TO} {body.role.value}"}

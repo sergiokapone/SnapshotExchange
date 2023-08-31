@@ -65,7 +65,7 @@ class UserResponseSchema(BaseModel):
     detail: str = "User successfully created"
 
 
-class TokenModel(BaseModel):
+class TokenSchema(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"

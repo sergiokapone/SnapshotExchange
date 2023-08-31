@@ -11,9 +11,9 @@ Base = declarative_base()
 
 
 class Role(enum.Enum):
-    user = 'User'
-    moder = 'Moderator'
-    admin = 'Administrator'
+    user: str = 'User'
+    moder: str = 'Moderator'
+    admin: str = 'Administrator'
 
 
 class User(Base):
@@ -38,6 +38,6 @@ class User(Base):
 class BlacklistToken(Base):
     __tablename__ = 'blacklist_tokens'
 
-    id = Column(Integer, primary_key=True)
-    token = Column(String(500), unique=True, nullable=False)
-    blacklisted_on = Column(DateTime, default=func.now())
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    token: Mapped[str] = mapped_column(String(500), unique=True, nullable=False)
+    blacklisted_on : Mapped[date] = mapped_column(DateTime, default=func.now())
