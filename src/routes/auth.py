@@ -46,12 +46,7 @@ security = HTTPBearer()
     status_code=status.HTTP_201_CREATED,
 )
 
-def token_verification(token: bool = Depends(auth_service.is_token_valid)):
-    if token:
-        return token
-    else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-    
+   
 async def signup(
     body: UserSchema,
     background_tasks: BackgroundTasks,

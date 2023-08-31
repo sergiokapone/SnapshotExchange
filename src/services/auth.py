@@ -156,29 +156,4 @@ class Auth:
                 detail=FAIL_EMAIL_VERIFICATION,
             )
             
-    # Decorator for token verification
-    async def is_token_valid(self, token: str = Header("Authorization")) -> bool:
-        print("THIS IS TOKEN:", token)
-        try:
-            decoded_token = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
-
-            # Get the expiration time from the decoded token
-            expiration_time = decoded_token["exp"]
-
-            # Получаем текущее время            # Get the current time
-
-            current_time = datetime.datetime.utcnow()
-
-            # Comparing the current time with the expiration time
-            if current_time < datetime.datetime.fromtimestamp(expiration_time):
-                return True
-            else:
-                return False
-        except jwt.ExpiredSignatureError:
-            return False
-        except jwt.DecodeError:
-            return False
-        except jwt.InvalidTokenError:
-            return False
-
 auth_service = Auth()
