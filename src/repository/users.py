@@ -34,24 +34,7 @@ async def create_user(body: UserSchema, db: AsyncSession) -> User:
     print("Done")
     return new_user
 
-
-async def get_me(user: User, db: AsyncSession) -> User:
-    """
-    The get_me function returns the user object of the current logged in user.
-
-
-    :param user: User: Get the user id
-    :param db: Session: Access the database
-    :return: A user object
-    """
-    try:
-        result = await db.execute(select(User).filter(User.email == email))
-        user = result.scalar_one_or_none()
-        return user
-    except NoResultFound:
-        return None
-
-
+    
 async def edit_my_profile(file,new_description, new_username, user: User, db: AsyncSession) -> User:
     """
     The edit_my_profile function allows a user to edit their profile.
@@ -131,7 +114,6 @@ async def get_users_posts(id:int, db: AsyncSession) -> int:
     all_posts = result.scalars().all()
 
     return len(all_posts)
-
 
 async def get_user_profile(username: str, db: AsyncSession) -> User:
     user = db.query(User).filter(User.username == username).first()

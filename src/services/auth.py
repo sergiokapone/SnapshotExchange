@@ -157,7 +157,7 @@ class Auth:
             )
             
     # Decorator for token verification
-    async def is_valid_token(self, token: str = Header("Authorization")):
+    async def is_token_valid(self, token: str = Header("Authorization")) -> bool:
         print("THIS IS TOKEN:", token)
         try:
             decoded_token = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
@@ -180,12 +180,5 @@ class Auth:
             return False
         except jwt.InvalidTokenError:
             return False
-
-
-
-
-
-
-
 
 auth_service = Auth()

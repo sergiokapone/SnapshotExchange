@@ -56,12 +56,13 @@ class UserDb(BaseModel):
     avatar: str | None
     role: Role
     created_at: datetime
-    description:str
+    description: str| None
 
     model_config = ConfigDict(from_attributes = True)
 
 class UserProfile(BaseModel):
     username: str
+    email: str
     avatar: str | None
     created_at: datetime
     count_posts : int 

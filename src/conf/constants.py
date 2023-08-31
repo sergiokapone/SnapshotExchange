@@ -1,1 +1,1 @@
-TOKEN_LIFE_TIME = 1 # token life time im minutes
+TOKEN_LIFE_TIME = 60 # token life time im minutes
