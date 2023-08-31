@@ -31,7 +31,7 @@ class User(Base):
     role: Mapped[Enum] = mapped_column('role', Enum(Role), default=Role.user)
     confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
     is_active: Mapped[bool] =  mapped_column(Boolean, default=True)
-
+    description: Mapped[str] = mapped_column(String(500),nullable=True, unique=False)
     posts: Mapped['Post'] = relationship('Post', back_populates='user')
     
 

@@ -56,6 +56,7 @@ class UserDb(BaseModel):
     avatar: str | None
     role: Role
     created_at: datetime
+    description:str
 
     model_config = ConfigDict(from_attributes = True)
 
