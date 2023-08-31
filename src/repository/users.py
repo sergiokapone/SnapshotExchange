@@ -9,7 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from src.conf.config import init_cloudinary
 from src.conf.messages import USER_NOT_ACTIVE
-from src.database.models import User, Role, BlacklistToken
+from src.database.models import User, Role, BlacklistToken, Post
 from src.schemas import UserSchema, UserProfileSchema
 
 
@@ -34,25 +34,8 @@ async def create_user(body: UserSchema, db: AsyncSession) -> User:
     print("Done")
     return new_user
 
-
-async def get_me(user: User, db: AsyncSession) -> User:
-    """
-    The get_me function returns the user object of the current logged in user.
-
-
-    :param user: User: Get the user id
-    :param db: Session: Access the database
-    :return: A user object
-    """
-    try:
-        result = await db.execute(select(User).filter(User.email == email))
-        user = result.scalar_one_or_none()
-        return user
-    except NoResultFound:
-        return None
-
-
-async def edit_my_profile(file, new_username, user: User, db: AsyncSession) -> User:
+    
+async def edit_my_profile(file,new_description, new_username, user: User, db: AsyncSession) -> User:
     """
     The edit_my_profile function allows a user to edit their profile.
 
@@ -66,7 +49,7 @@ async def edit_my_profile(file, new_username, user: User, db: AsyncSession) -> U
     me = result.scalar_one_or_none()
     if new_username:
         me.username = new_username
-
+        me.description=new_description
     init_cloudinary()
     cloudinary.uploader.upload(
         file.file,
@@ -78,8 +61,8 @@ async def edit_my_profile(file, new_username, user: User, db: AsyncSession) -> U
         width=250, height=250, crop="fill"
     )
     me.avatar = url
-    db.commit()
-    db.refresh(me)
+    await db.commit()
+    await db.refresh(me)
     return me
 
 
@@ -98,6 +81,7 @@ async def get_users(skip: int, limit: int, db: AsyncSession) -> list[User]:
     return all_users
 
 
+
 async def get_users_with_username(username: str, db: AsyncSession) -> list[User]:
     """
     The get_users_with_username function returns a list of users with the given username.
@@ -111,12 +95,25 @@ async def get_users_with_username(username: str, db: AsyncSession) -> list[User]
     :param db: Session: Pass the database session to the function
     :return: A list of users
     """
-    return (
-        db.query(User)
-        .filter(func.lower(User.username).like(f"%{username.lower()}%"))
-        .all()
-    )
+    query = select(User).where(func.lower(User.username).like(f'%{username.lower()}%'))
+    result = await db.execute(query)
+    matching_users = result.scalars().all()
+    return matching_users
 
+async def get_users_posts(id:int, db: AsyncSession) -> int:
+    """
+    The get_users function returns a list of users from the database.
+    
+    :param skip: int: Skip the first n records in the database
+    :param limit: int: Limit the number of results returned
+    :param db: Session: Pass the database session to the function
+    :return: A list of users
+    """
+    query = select(Post).filter(Post.user_id==id)
+    result = await db.execute(query)
+    all_posts = result.scalars().all()
+
+    return len(all_posts)
 
 async def get_user_profile(username: str, db: AsyncSession) -> User:
     user = db.query(User).filter(User.username == username).first()
@@ -152,6 +149,22 @@ async def get_user_by_email(email: str, db: AsyncSession) -> User:
         return user
     except NoResultFound:
         return None
+    
+async def get_user_by_username(username: str, db: AsyncSession) -> User:
+    """
+    The get_user_by_email function takes in an email and a database session, then returns the user with that email.
+
+    :param email: str: Get the email from the user
+    :param db: Session: Pass a database session to the function
+    :return: A user object if the email is found in the database
+    """
+    try:
+        result = await db.execute(select(User).filter(User.username == username))
+        user = result.scalar_one_or_none()
+        return user
+    except NoResultFound:
+        return None
+
 
 
 async def update_token(user: User, token: str | None, db: AsyncSession) -> None:
@@ -164,7 +177,7 @@ async def update_token(user: User, token: str | None, db: AsyncSession) -> None:
     :return: None, but the return type is specified as str | none
     """
     user.refresh_token = token
-    db.commit()
+    await db.commit()
 
 
 async def confirm_email(email: str, db: AsyncSession) -> None:

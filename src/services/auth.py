@@ -1,191 +1,267 @@
-import pickle
+from datetime import datetime
 
-import redis
-from jose import JWTError, jwt
-from fastapi import HTTPException, status, Depends, Header
-from fastapi.security import OAuth2PasswordBearer
-from passlib.context import CryptContext
-from datetime import datetime, timedelta
+from libgravatar import Gravatar
+import cloudinary
+import cloudinary.uploader
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.exc import NoResultFound
 
-from src.database.connect_db import get_db
-from src.repository import users as repository_users
-from src.conf.config import settings
-from src.conf.messages import (
-    FAIL_EMAIL_VERIFICATION,
-    INVALID_SCOPE,
-    INVALID_TOKEN,
-    NOT_VALIDATE_CREDENTIALS,
-)
+from src.conf.config import init_cloudinary
+from src.conf.messages import USER_NOT_ACTIVE
+from src.database.models import User, Role, BlacklistToken, Post
+from src.schemas import UserSchema, UserProfileSchema
 
-from src.conf.constants import TOKEN_LIFE_TIME
 
-class Auth:
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    SECRET_KEY = settings.secret_key
-    ALGORITHM = settings.algorithm
-    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+async def create_user(body: UserSchema, db: AsyncSession) -> User:
+    avatar = None
+    try:
+        g = Gravatar(body.email)
+        avatar = g.get_image()
+    except Exception as e:
+        print(e)
 
-    redis_cache = redis.Redis(
-        host=settings.redis_host,
-        password=settings.redis_password,
-        username=settings.redis_username,
-        ssl=True,
-        encoding="utf-8",
-        # decode_responses=True
+    new_user = User(**body.dict())
+
+    users_result = await db.execute(select(User))
+    users_count = len(users_result.scalars().all())
+
+    if not users_count:  #  First user always admin
+        new_user.role = Role.admin
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+    print("Done")
+    return new_user
+
+    
+async def edit_my_profile(file,new_description, new_username, user: User, db: AsyncSession) -> User:
+    """
+    The edit_my_profile function allows a user to edit their profile.
+
+    :param file: Upload the image to cloudinary
+    :param new_username: Change the username of the user
+    :param user: User: Get the user object from the database
+    :param db: Session: Access the database
+    :return: A user object
+    """
+    result = await db.execute(select(User).filter(User.id == user.id))
+    me = result.scalar_one_or_none()
+    if new_username:
+        me.username = new_username
+        me.description=new_description
+    init_cloudinary()
+    cloudinary.uploader.upload(
+        file.file,
+        public_id=f"Photoshare/{me.username}",
+        overwrite=True,
+        invalidate=True,
+    )
+    url = cloudinary.CloudinaryImage(f"Photoshare/{me.username}").build_url(
+        width=250, height=250, crop="fill"
+    )
+    me.avatar = url
+    await db.commit()
+    await db.refresh(me)
+    return me
+
+
+async def get_users(skip: int, limit: int, db: AsyncSession) -> list[User]:
+    """
+    The get_users function returns a list of users from the database.
+
+    :param skip: int: Skip the first n records in the database
+    :param limit: int: Limit the number of results returned
+    :param db: Session: Pass the database session to the function
+    :return: A list of users
+    """
+    query = select(User).offset(skip).limit(limit)
+    result = await db.execute(query)
+    all_users = result.scalars().all()
+    return all_users
+
+
+
+async def get_users_with_username(username: str, db: AsyncSession) -> list[User]:
+    """
+    The get_users_with_username function returns a list of users with the given username.
+        Args:
+            username (str): The username to search for.
+            db (Session): A database session object.
+        Returns:
+            list[User]: A list of User objects that match the given criteria.
+
+    :param username: str: Specify the type of data that is expected to be passed into the function
+    :param db: Session: Pass the database session to the function
+    :return: A list of users
+    """
+    query = select(User).where(func.lower(User.username).like(f'%{username.lower()}%'))
+    result = await db.execute(query)
+    matching_users = result.scalars().all()
+    return matching_users
+
+async def get_users_posts(id:int, db: AsyncSession) -> int:
+    """
+    The get_users function returns a list of users from the database.
+    
+    :param skip: int: Skip the first n records in the database
+    :param limit: int: Limit the number of results returned
+    :param db: Session: Pass the database session to the function
+    :return: A list of users
+    """
+    query = select(Post).filter(Post.user_id==id)
+    result = await db.execute(query)
+    all_posts = result.scalars().all()
+
+    return len(all_posts)
+
+async def get_user_profile(username: str, db: AsyncSession) -> User:
+    user = db.query(User).filter(User.username == username).first()
+    if user:
+        post_count = db.query(Post).filter(Post.user_id == user.id).count()
+        comment_count = db.query(Comment).filter(Comment.user_id == user.id).count()
+        rates_count = db.query(Rating).filter(Rating.user_id == user.id).count()
+        user_profile = UserProfileModel(
+            username=user.username,
+            email=user.email,
+            avatar=user.avatar,
+            created_at=user.created_at,
+            is_active=user.is_active,
+            post_count=post_count,
+            comment_count=comment_count,
+            rates_count=rates_count,
+        )
+        return user_profile
+    return None
+
+
+async def get_user_by_email(email: str, db: AsyncSession) -> User:
+    """
+    The get_user_by_email function takes in an email and a database session, then returns the user with that email.
+
+    :param email: str: Get the email from the user
+    :param db: Session: Pass a database session to the function
+    :return: A user object if the email is found in the database
+    """
+    try:
+        result = await db.execute(select(User).filter(User.email == email))
+        user = result.scalar_one_or_none()
+        return user
+    except NoResultFound:
+        return None
+    
+async def get_user_by_username(username: str, db: AsyncSession) -> User:
+    """
+    The get_user_by_email function takes in an email and a database session, then returns the user with that email.
+
+    :param email: str: Get the email from the user
+    :param db: Session: Pass a database session to the function
+    :return: A user object if the email is found in the database
+    """
+    try:
+        result = await db.execute(select(User).filter(User.username == username))
+        user = result.scalar_one_or_none()
+        return user
+    except NoResultFound:
+        return None
+
+
+
+async def update_token(user: User, token: str | None, db: AsyncSession) -> None:
+    """
+    The update_token function updates the refresh token for a user.
+
+    :param user: User: Identify the user that is being updated
+    :param token: str | None: Store the token in the database
+    :param db: Session: Create a database session
+    :return: None, but the return type is specified as str | none
+    """
+    user.refresh_token = token
+    await db.commit()
+
+
+async def confirm_email(email: str, db: AsyncSession) -> None:
+    """
+    The confirmed_email function sets the confirmed field of a user to True.
+
+    :param email: str: Get the email of the user that is trying to confirm their account
+    :param db: Session: Pass the database session to the function
+    :return: None
+    """
+    user = await get_user_by_email(email, db)
+    user.confirmed = True
+    await db.commit()
+
+
+async def ban_user(email: str, db: AsyncSession) -> None:
+    """
+    The ban_user function takes in an email and a database session.
+    It then finds the user with that email, sets their is_active field to False,
+    and commits the change to the database.
+
+    :param email: str: Identify the user to be banned
+    :param db: Session: Pass in the database session
+    :return: None, because we don't need to return anything
+    """
+    user = await get_user_by_email(email, db)
+    user.is_active = False
+    await db.commit()
+
+
+async def make_user_role(email: str, role: Role, db: AsyncSession) -> None:
+    """
+    The make_user_role function takes in an email and a role, and then updates the user's role to that new one.
+    Args:
+    email (str): The user's email address.
+    role (Role): The new Role for the user.
+
+    :param email: str: Get the user by email
+    :param role: Role: Set the role of the user
+    :param db: Session: Pass the database session to the function
+    :return: None
+    """
+    user = await get_user_by_email(email, db)
+    user.role = role
+    db.commit()
+
+
+#### BLACKLIST #####
+
+
+async def add_to_blacklist(token: str, db: AsyncSession) -> None:
+    """
+    The add_to_blacklist function adds a token to the blacklist.
+        Args:
+            token (str): The JWT that is being blacklisted.
+            db (AsyncSession): The database session object used for querying and updating the database.
+
+    :param token: str: Pass the token to be blacklisted
+    :param db: AsyncSession: Create a new session with the database
+    :return: None
+    """
+    blacklist_token = BlacklistToken(token=token, blacklisted_on=datetime.now())
+    db.add(blacklist_token)
+    await db.commit()
+    await db.refresh(blacklist_token)
+
+
+async def is_blacklisted_token(token: str, db: AsyncSession) -> bool:
+    """
+    Function takes checks if a token is blacklisted.
+
+    Arguments:
+        token (str): token to be checked
+        db (Session): SQLAlchemy session object for accessing the database
+    Returns:
+        bool
+    """
+
+    result = await db.execute(
+        select(BlacklistToken).filter(BlacklistToken.token == token)
     )
 
-    def verify_password(self, plain_password, hashed_password):
-        return self.pwd_context.verify(plain_password, hashed_password)
+    blacklist_token = result.scalar_one_or_none()
 
-    def get_password_hash(self, password: str):
-        return self.pwd_context.hash(password)
-
-    # define a function to generate a new access token
-    async def create_access_token(
-        self, data: dict, expires_delta: int | None = None
-    ):
-        to_encode = data.copy()
-        if expires_delta:
-            expire = datetime.utcnow() + timedelta(minutes=TOKEN_LIFE_TIME)
-        else:
-            expire = datetime.utcnow() + timedelta(minutes=15)
-        to_encode.update(
-            {"iat": datetime.utcnow(), "exp": expire, "scope": "access_token"}
-        )
-        encoded_access_token = jwt.encode(
-            to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM
-        )
-        return encoded_access_token
-
-    # define a function to generate a new refresh token
-    async def create_refresh_token(
-        self, data: dict, expires_delta: float | None = None
-    ):
-        to_encode = data.copy()
-        if expires_delta:
-            expire = datetime.utcnow() + timedelta(seconds=expires_delta)
-        else:
-            expire = datetime.utcnow() + timedelta(days=7)
-        to_encode.update(
-            {"iat": datetime.utcnow(), "exp": expire, "scope": "refresh_token"}
-        )
-        encoded_refresh_token = jwt.encode(
-            to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM
-        )
-        return encoded_refresh_token
-
-    def create_email_token(self, data: dict):
-        to_encode = data.copy()
-        expire = datetime.utcnow() + timedelta(days=3)
-        to_encode.update(
-            {"iat": datetime.utcnow(), "exp": expire, "scope": "email_token"}
-        )
-        token = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
-        return token
-
-    async def decode_refresh_token(self, refresh_token: str):
-        try:
-            payload = jwt.decode(
-                refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHM]
-            )
-            if payload["scope"] == "refresh_token":
-                email = payload["sub"]
-                return email
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_SCOPE
-            )
-        except JWTError:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=NOT_VALIDATE_CREDENTIALS,
-            )
-
-    async def get_current_user(
-        self, token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
-    ):
-        credentials_exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail=NOT_VALIDATE_CREDENTIALS
-        )
-
-        try:
-            # Decode JWT
-            payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
-            if payload["scope"] == "access_token":
-                email = payload["sub"]
-                if email is None:
-                    raise credentials_exception
-            else:
-                raise credentials_exception
-            # check token in blacklist
-            
-            is_invalid_token = await repository_users.is_blacklisted_token(token, db)
-            if is_invalid_token:
-                raise credentials_exception
-
-        except JWTError as e:
-            raise credentials_exception
-
-        # get user from redis_cache
-        user = self.redis_cache.get(f"user:{email}")
-        if user is None:
-            print("--- USER POSTGRES ---")
-            user = await repository_users.get_user_by_email(email, db)
-            if user is None:
-                raise credentials_exception
-            self.redis_cache.set(f"user:{email}", pickle.dumps(user))
-            self.redis_cache.expire(f"user:{email}", 900)
-        else:
-            print("--- USER CACHE ---")
-            user = pickle.loads(user)
-        return user
-
-    async def get_email_from_token(self, token: str):
-        try:
-            payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
-            if payload["scope"] == "email_token":
-                email = payload["sub"]
-                return email
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_SCOPE
-            )
-        except JWTError as e:
-            print(e)
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=FAIL_EMAIL_VERIFICATION,
-            )
-            
-    # Decorator for token verification
-    async def is_valid_token(self, token: str = Header("Authorization")):
-        print("THIS IS TOKEN:", token)
-        try:
-            decoded_token = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
-
-            # Get the expiration time from the decoded token
-            expiration_time = decoded_token["exp"]
-
-            # Получаем текущее время            # Get the current time
-
-            current_time = datetime.datetime.utcnow()
-
-            # Comparing the current time with the expiration time
-            if current_time < datetime.datetime.fromtimestamp(expiration_time):
-                return True
-            else:
-                return False
-        except jwt.ExpiredSignatureError:
-            return False
-        except jwt.DecodeError:
-            return False
-        except jwt.InvalidTokenError:
-            return False
-
-
-
-
-
-
-
-
-auth_service = Auth()
+    if blacklist_token:
+        return True
+    return False

@@ -45,6 +45,8 @@ security = HTTPBearer()
     response_model=UserResponseSchema,
     status_code=status.HTTP_201_CREATED,
 )
+
+   
 async def signup(
     body: UserSchema,
     background_tasks: BackgroundTasks,
