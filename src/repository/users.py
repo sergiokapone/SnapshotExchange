@@ -9,7 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from src.conf.config import init_cloudinary
 from src.conf.messages import USER_NOT_ACTIVE
-from src.database.models import User, Role, BlacklistToken
+from src.database.models import User, Role, BlacklistToken, Post
 from src.schemas import UserSchema, UserProfileSchema
 
 
@@ -98,6 +98,7 @@ async def get_users(skip: int, limit: int, db: AsyncSession) -> list[User]:
     return all_users
 
 
+
 async def get_users_with_username(username: str, db: AsyncSession) -> list[User]:
     """
     The get_users_with_username function returns a list of users with the given username.
@@ -111,11 +112,25 @@ async def get_users_with_username(username: str, db: AsyncSession) -> list[User]
     :param db: Session: Pass the database session to the function
     :return: A list of users
     """
-    return (
-        db.query(User)
-        .filter(func.lower(User.username).like(f"%{username.lower()}%"))
-        .all()
-    )
+    query = select(User).where(func.lower(User.username).like(f'%{username.lower()}%'))
+    result = await db.execute(query)
+    matching_users = result.scalars().all()
+    return matching_users
+
+async def get_users_posts(id:int, db: AsyncSession) -> int:
+    """
+    The get_users function returns a list of users from the database.
+    
+    :param skip: int: Skip the first n records in the database
+    :param limit: int: Limit the number of results returned
+    :param db: Session: Pass the database session to the function
+    :return: A list of users
+    """
+    query = select(Post).filter(Post.user_id==id)
+    result = await db.execute(query)
+    all_posts = result.scalars().all()
+
+    return len(all_posts)
 
 
 async def get_user_profile(username: str, db: AsyncSession) -> User:
@@ -152,6 +167,22 @@ async def get_user_by_email(email: str, db: AsyncSession) -> User:
         return user
     except NoResultFound:
         return None
+    
+async def get_user_by_username(username: str, db: AsyncSession) -> User:
+    """
+    The get_user_by_email function takes in an email and a database session, then returns the user with that email.
+
+    :param email: str: Get the email from the user
+    :param db: Session: Pass a database session to the function
+    :return: A user object if the email is found in the database
+    """
+    try:
+        result = await db.execute(select(User).filter(User.username == username))
+        user = result.scalar_one_or_none()
+        return user
+    except NoResultFound:
+        return None
+
 
 
 async def update_token(user: User, token: str | None, db: AsyncSession) -> None:

@@ -21,7 +21,7 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    username: Mapped[str] = mapped_column(String(50))
+    username: Mapped[str] = mapped_column(String(50), unique=True)
     email: Mapped[str] = mapped_column(String(250), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[date] = mapped_column('created_at', DateTime, default=func.now())
@@ -32,6 +32,18 @@ class User(Base):
     confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
     is_active: Mapped[bool] =  mapped_column(Boolean, default=True)
 
+    posts: Mapped['Post'] = relationship('Post', back_populates='user')
+    
+
+class Post(Base):
+    __tablename__ = "posts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    text: Mapped[str] = mapped_column(String(500), nullable=False)
+    photo:Mapped[str] = mapped_column(String(500), nullable=False)
+
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+    user: Mapped['User'] = relationship('User', back_populates='posts')
 
 
 # Create Black list of access token
