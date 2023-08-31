@@ -1,5 +1,6 @@
 from fastapi import (
     APIRouter,
+    Header,
     HTTPException,
     Depends,
     status,
@@ -35,9 +36,9 @@ from src.conf.messages import (
     USER_IS_LOGOUT,
 )
 
+  
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 security = HTTPBearer()
-
 
 @router.post(
     "/signup",
