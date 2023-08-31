@@ -117,8 +117,7 @@ class Auth:
             else:
                 raise credentials_exception
             # check token in blacklist
-            black_list_token = await repository_users.find_blacklisted_token(token, db)
-            if black_list_token:
+            if is_blacklisted_token(token):
                 raise credentials_exception
 
         except JWTError as e:
@@ -127,14 +126,14 @@ class Auth:
         # get user from redis_cache
         user = self.redis_cache.get(f"user:{email}")
         if user is None:
-            print("USER POSTGRES")
+            print("--- USER POSTGRES ---")
             user = await repository_users.get_user_by_email(email, db)
             if user is None:
                 raise credentials_exception
             self.redis_cache.set(f"user:{email}", pickle.dumps(user))
             self.redis_cache.expire(f"user:{email}", 900)
         else:
-            print("USER CACHE")
+            print("--- USER CACHE ---")
             user = pickle.loads(user)
         return user
 

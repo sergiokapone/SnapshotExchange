@@ -11,7 +11,10 @@ from src.routes.auth import router as auth_router
 from src.routes.users import router as users_router
 from src.conf.config import settings
 
-app = FastAPI()
+app = FastAPI(
+    debug = True,
+    title = "Snapshot Exchange",
+)
 
 
 
