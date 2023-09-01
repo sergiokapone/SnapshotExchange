@@ -47,7 +47,6 @@ async def startup():
     
 
 @app.get("/", tags=["Root"],
-
 # dependencies=[Depends(RateLimiter(times=2, seconds=5))]
 )
 
@@ -98,10 +97,7 @@ app.include_router(ratings_router, prefix='/api')
 
 
 if __name__ == '__main__':
-
-    HOST='localhost'
-
+    HOST='0.0.0.0'
     PORT=8000
-
     uvicorn.run(app='main:app', host=HOST, port=PORT, reload=True)
 
