@@ -35,24 +35,9 @@ async def create_user(body: UserSchema, db: AsyncSession) -> User:
     return new_user
 
 
-async def get_me(user: User, db: AsyncSession) -> User:
-    """
-    The get_me function returns the user object of the current logged in user.
-
-
-    :param user: User: Get the user id
-    :param db: Session: Access the database
-    :return: A user object
-    """
-    try:
-        result = await db.execute(select(User).filter(User.email == email))
-        user = result.scalar_one_or_none()
-        return user
-    except NoResultFound:
-        return None
-
-
-async def edit_my_profile(file, new_username, user: User, db: AsyncSession) -> User:
+async def edit_my_profile(
+    file, new_description, new_username, user: User, db: AsyncSession
+) -> User:
     """
     The edit_my_profile function allows a user to edit their profile.
 
@@ -66,7 +51,7 @@ async def edit_my_profile(file, new_username, user: User, db: AsyncSession) -> U
     me = result.scalar_one_or_none()
     if new_username:
         me.username = new_username
-
+        me.description = new_description
     init_cloudinary()
     cloudinary.uploader.upload(
         file.file,
@@ -78,8 +63,8 @@ async def edit_my_profile(file, new_username, user: User, db: AsyncSession) -> U
         width=250, height=250, crop="fill"
     )
     me.avatar = url
-    db.commit()
-    db.refresh(me)
+    await db.commit()
+    await db.refresh(me)
     return me
 
 
@@ -98,7 +83,6 @@ async def get_users(skip: int, limit: int, db: AsyncSession) -> list[User]:
     return all_users
 
 
-
 async def get_users_with_username(username: str, db: AsyncSession) -> list[User]:
     """
     The get_users_with_username function returns a list of users with the given username.
@@ -112,21 +96,22 @@ async def get_users_with_username(username: str, db: AsyncSession) -> list[User]
     :param db: Session: Pass the database session to the function
     :return: A list of users
     """
-    query = select(User).where(func.lower(User.username).like(f'%{username.lower()}%'))
+    query = select(User).where(func.lower(User.username).like(f"%{username.lower()}%"))
     result = await db.execute(query)
     matching_users = result.scalars().all()
     return matching_users
 
-async def get_users_posts(id:int, db: AsyncSession) -> int:
+
+async def get_users_posts(id: int, db: AsyncSession) -> int:
     """
     The get_users function returns a list of users from the database.
-    
+
     :param skip: int: Skip the first n records in the database
     :param limit: int: Limit the number of results returned
     :param db: Session: Pass the database session to the function
     :return: A list of users
     """
-    query = select(Post).filter(Post.user_id==id)
+    query = select(Post).filter(Post.user_id == id)
     result = await db.execute(query)
     all_posts = result.scalars().all()
 
@@ -167,6 +152,29 @@ async def get_user_by_email(email: str, db: AsyncSession) -> User:
         return user
     except NoResultFound:
         return None
+
+async def get_user_by_reset_token(
+    reset_token: str, db: AsyncSession
+) -> User | None:
+    """
+    Отримує об'єкт користувача за токеном скидання пароля.
+
+    Parameters:
+        reset_token (str): Токен скидання пароля.
+        session (AsyncSession): Об'єкт сесії бази даних.
+
+    Returns:
+        User: Об'єкт користувача, якщо знайдено, або None, якщо не знайдено.
+
+    """
+    try:
+        result = await db.execute(
+            select(User).filter(User.reset_token == reset_token)
+        )
+        user = result.scalar_one_or_none()
+        return user
+    except NoResultFound:
+        return None
     
 async def get_user_by_username(username: str, db: AsyncSession) -> User:
     """
@@ -182,7 +190,6 @@ async def get_user_by_username(username: str, db: AsyncSession) -> User:
         return user
     except NoResultFound:
         return None
-
 
 
 async def update_token(user: User, token: str | None, db: AsyncSession) -> None:
@@ -242,7 +249,7 @@ async def make_user_role(email: str, role: Role, db: AsyncSession) -> None:
     user.role = role
     db.commit()
 
-
+   
 #### BLACKLIST #####
 
 

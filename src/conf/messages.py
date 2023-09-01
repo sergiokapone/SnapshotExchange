@@ -39,3 +39,6 @@ ALREADY_LIKE="You have already rated"
 YOUR_PHOTO = "This is your photo, you can't like it"
 FORBIDDEN="Access denied. You don't have permission for this action."
 DELETE_SUCCESSFUL="You deleted SUCCESSFUL"
+
+PASWORD_RESET_SUCCESS = "Password reset successfully"
+

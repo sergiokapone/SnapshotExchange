@@ -1,6 +1,7 @@
 import pickle
+from uvicorn.config import logger
 
-import redis
+
 from jose import JWTError, jwt
 from fastapi import HTTPException, status, Depends, Header
 from fastapi.security import OAuth2PasswordBearer
@@ -19,21 +20,22 @@ from src.conf.messages import (
 )
 
 from src.conf.constants import TOKEN_LIFE_TIME
+from src.conf.config import init_async_redis
 
 class Auth:
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     SECRET_KEY = settings.secret_key
     ALGORITHM = settings.algorithm
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+    
+    def __init__(self):
+        self._redis_cache = None
 
-    redis_cache = redis.Redis(
-        host=settings.redis_host,
-        password=settings.redis_password,
-        username=settings.redis_username,
-        ssl=True,
-        encoding="utf-8",
-        # decode_responses=True
-    )
+    @property
+    async def redis_cache(self):
+        if self._redis_cache is None:
+            self._redis_cache = await init_async_redis()
+        return self._redis_cache
 
     def verify_password(self, plain_password, hashed_password):
         return self.pwd_context.verify(plain_password, hashed_password)
@@ -84,13 +86,13 @@ class Auth:
         token = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
         return token
 
-    async def decode_refresh_token(self, refresh_token: str):
+    async def decode_token(self, token: str):
         try:
             payload = jwt.decode(
-                refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHM]
+                token, self.SECRET_KEY, algorithms=[self.ALGORITHM]
             )
             if payload["scope"] == "refresh_token":
-                email = payload["sub"]
+                email = payload["email"]
                 return email
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_SCOPE
@@ -101,7 +103,8 @@ class Auth:
                 detail=NOT_VALIDATE_CREDENTIALS,
             )
 
-    async def get_current_user(
+            
+    async def get_authenticated_user(
         self, token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
     ):
         credentials_exception = HTTPException(
@@ -112,13 +115,13 @@ class Auth:
             # Decode JWT
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
             if payload["scope"] == "access_token":
-                email = payload["sub"]
+                email = payload["email"]
                 if email is None:
                     raise credentials_exception
             else:
                 raise credentials_exception
+
             # check token in blacklist
-            
             is_invalid_token = await repository_users.is_blacklisted_token(token, db)
             if is_invalid_token:
                 raise credentials_exception
@@ -127,16 +130,16 @@ class Auth:
             raise credentials_exception
 
         # get user from redis_cache
-        user = self.redis_cache.get(f"user:{email}")
+        user = await (await self.redis_cache).get(f"user:{email}")
         if user is None:
-            print("--- USER POSTGRES ---")
+            logger.info("--- Using Database ---")
             user = await repository_users.get_user_by_email(email, db)
             if user is None:
                 raise credentials_exception
-            self.redis_cache.set(f"user:{email}", pickle.dumps(user))
-            self.redis_cache.expire(f"user:{email}", 900)
+            await (await self.redis_cache).set(f"user:{email}", pickle.dumps(user))
+            await (await self.redis_cache).expire(f"user:{email}", 900)
         else:
-            print("--- USER CACHE ---")
+            logger.info("--- Using Redis Cache ---")
             user = pickle.loads(user)
         return user
 
@@ -144,7 +147,7 @@ class Auth:
         try:
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
             if payload["scope"] == "email_token":
-                email = payload["sub"]
+                email = payload["email"]
                 return email
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_SCOPE
@@ -156,36 +159,4 @@ class Auth:
                 detail=FAIL_EMAIL_VERIFICATION,
             )
             
-    # Decorator for token verification
-    async def is_valid_token(self, token: str = Header("Authorization")):
-        print("THIS IS TOKEN:", token)
-        try:
-            decoded_token = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
-
-            # Get the expiration time from the decoded token
-            expiration_time = decoded_token["exp"]
-
-            # Получаем текущее время            # Get the current time
-
-            current_time = datetime.datetime.utcnow()
-
-            # Comparing the current time with the expiration time
-            if current_time < datetime.datetime.fromtimestamp(expiration_time):
-                return True
-            else:
-                return False
-        except jwt.ExpiredSignatureError:
-            return False
-        except jwt.DecodeError:
-            return False
-        except jwt.InvalidTokenError:
-            return False
-
-
-
-
-
-
-
-
 auth_service = Auth()
