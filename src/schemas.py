@@ -13,8 +13,8 @@ class UserSchema(BaseModel):
 
     model_config = ConfigDict(
         json_schema_extra = {
-            "title": "User Model",
-            "description": "Model for user data",
+            "title": "User Schema",
+            "description": "Schema for user data",
             "example": {
                 "username": "sergiokapone",
                 "email": "example@example.com",

@@ -4,6 +4,8 @@ DB_CONNECT_ERROR = "Error connecting to the database"
 
 NOT_FOUND = 'Not Found'
 ALREADY_EXISTS = "Account already exists"
+ALREADY_EXISTS_EMAIL = "Account already exists" 
+ALREADY_EXISTS_USERNAME = "Username already taken"
 DOESNT_EXISTS = "Account doesn't exists"
 SUCCESS_CREATE_USER = "User successfully created. Check your email for confirmation."
 INVALID_PASSWORD = "Invalid credentials"
