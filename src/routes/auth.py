@@ -25,6 +25,8 @@ from src.repository import users as repository_users
 from src.services.auth import auth_service
 from src.conf.messages import (
     ALREADY_EXISTS,
+    ALREADY_EXISTS_EMAIL,
+    ALREADY_EXISTS_USERNAME,
     EMAIL_ALREADY_CONFIRMED,
     EMAIL_CONFIRMED,
     EMAIL_NOT_CONFIRMED,
@@ -58,9 +60,15 @@ async def signup(
     request: Request,
     session: AsyncSession = Depends(get_db),
 ):
-    exist_user = await repository_users.get_user_by_email(body.email, session)
-    if exist_user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=ALREADY_EXISTS)
+    exist_user_email = await repository_users.get_user_by_email(body.email, session)
+    exist_user_username = await repository_users.get_user_by_username(body.username, session)
+    
+    if exist_user_email:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=ALREADY_EXISTS_EMAIL)
+    
+    if exist_user_username:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=ALREADY_EXISTS_USERNAME)
+    
     body.password = auth_service.get_password_hash(body.password)
     new_user = await repository_users.create_user(body, session)
     background_tasks.add_task(

@@ -13,8 +13,8 @@ class UserSchema(BaseModel):
 
     model_config = ConfigDict(
         json_schema_extra = {
-            "title": "User Model",
-            "description": "Model for user data",
+            "title": "User Schema",
+            "description": "Schema for user data",
             "example": {
                 "username": "sergiokapone",
                 "email": "example@example.com",
@@ -28,6 +28,13 @@ class UserSchema(BaseModel):
 class UserUpdateSchema(BaseModel):
     username: str = Field(min_length=5, max_length=25)
 
+class PhotoRat(BaseModel):
+    content:str
+
+class Rating(BaseModel):
+    user_id:int
+    rating:int
+    photo_id:int
 
 class UserResponseSchema(BaseModel):
     id: int
