@@ -3,11 +3,10 @@
 import uvicorn
 
 from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi_limiter import FastAPILimiter
-
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from sqlalchemy import text
 
 from src.conf.messages import DB_CONFIG_ERROR, DB_CONNECT_ERROR, WELCOME_MESSAGE
@@ -23,13 +22,17 @@ from src.conf.config import init_async_redis
 
 
 app = FastAPI(
-
     debug = True,
-
     title = "Snapshot Exchange",
 )
 
-
+# Настройка CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
