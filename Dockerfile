@@ -21,4 +21,4 @@ COPY . /app
 # ENV PYTHONPATH "${PYTHONPATH}:/app/src"
 
 # Запуск приложения
-CMD ["sh", "-c", "cd src && pipenv run python3 main.py"]
+CMD ["sh", "-c", "pipenv run python3 main.py"]
