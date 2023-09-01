@@ -12,6 +12,7 @@ def init_cloudinary():
         secure=True,
     )
 
+
 async def init_async_redis():
     return redis.asyncio.Redis(
         host=settings.redis_host,
@@ -21,7 +22,8 @@ async def init_async_redis():
         encoding="utf-8",
         # decode_responses=True
     )
-    
+
+
 class Settings(BaseSettings):
     sqlalchemy_database_url: str = (
         "postgresql+psycopg2://user:password@localhost:5432/postgres"
