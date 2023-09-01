@@ -33,6 +33,8 @@ class User(Base):
     is_active: Mapped[bool] =  mapped_column(Boolean, default=True)
     description: Mapped[str] = mapped_column(String(500),nullable=True, unique=False)
     posts: Mapped['Post'] = relationship('Post', back_populates='user')
+    ratings: Mapped['Rating'] = relationship('Rating', back_populates='user')
+    photos: Mapped['Photo'] = relationship('Photo', back_populates='user')
     
 
 class Post(Base):
@@ -45,8 +47,29 @@ class Post(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     user: Mapped['User'] = relationship('User', back_populates='posts')
 
+class Photo(Base):
+    __tablename__ = "photos"
 
-# Create Black list of access token
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    ratings: Mapped['Rating'] = relationship('Rating', back_populates='photo')
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+    user: Mapped['User'] = relationship('User', back_populates='photos')
+    content: Mapped[str] = mapped_column(String(200))
+
+class Rating(Base):
+    __tablename__ = "ratings"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+    user: Mapped['User'] = relationship('User', back_populates='ratings')
+
+    rating: Mapped[int] = mapped_column(Integer)
+
+    photo_id: Mapped[int] = mapped_column(Integer, ForeignKey('photos.id'))
+    photo: Mapped[int] = relationship('Photo', back_populates='ratings')
+
+
+
 class BlacklistToken(Base):
     __tablename__ = 'blacklist_tokens'
 
