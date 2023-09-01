@@ -1,5 +1,7 @@
 import cloudinary
 from pydantic_settings import BaseSettings
+import redis
+import redis.asyncio
 
 
 def init_cloudinary():
@@ -10,7 +12,16 @@ def init_cloudinary():
         secure=True,
     )
 
-
+async def init_async_redis():
+    return redis.asyncio.Redis(
+        host=settings.redis_host,
+        password=settings.redis_password,
+        username=settings.redis_username,
+        ssl=True,
+        encoding="utf-8",
+        # decode_responses=True
+    )
+    
 class Settings(BaseSettings):
     sqlalchemy_database_url: str = (
         "postgresql+psycopg2://user:password@localhost:5432/postgres"

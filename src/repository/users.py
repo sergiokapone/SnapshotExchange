@@ -153,7 +153,29 @@ async def get_user_by_email(email: str, db: AsyncSession) -> User:
     except NoResultFound:
         return None
 
+async def get_user_by_reset_token(
+    reset_token: str, db: AsyncSession
+) -> User | None:
+    """
+    Отримує об'єкт користувача за токеном скидання пароля.
 
+    Parameters:
+        reset_token (str): Токен скидання пароля.
+        session (AsyncSession): Об'єкт сесії бази даних.
+
+    Returns:
+        User: Об'єкт користувача, якщо знайдено, або None, якщо не знайдено.
+
+    """
+    try:
+        result = await db.execute(
+            select(User).filter(User.reset_token == reset_token)
+        )
+        user = result.scalar_one_or_none()
+        return user
+    except NoResultFound:
+        return None
+    
 async def get_user_by_username(username: str, db: AsyncSession) -> User:
     """
     The get_user_by_email function takes in an email and a database session, then returns the user with that email.
@@ -227,7 +249,7 @@ async def make_user_role(email: str, role: Role, db: AsyncSession) -> None:
     user.role = role
     db.commit()
 
-
+   
 #### BLACKLIST #####
 
 

@@ -8,6 +8,8 @@ from fastapi import (
     BackgroundTasks,
     Request,
 )
+
+from pydantic import EmailStr
 from fastapi.security import (
     OAuth2PasswordRequestForm,
     HTTPAuthorizationCredentials,
@@ -16,7 +18,7 @@ from fastapi.security import (
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.models import User
-from src.services.email import send_email
+from src.services.email import send_email, reset_password_by_email
 from src.database.connect_db import get_db
 from src.schemas import UserSchema, UserResponseSchema, TokenSchema, RequestEmail
 from src.repository import users as repository_users
@@ -34,43 +36,28 @@ from src.conf.messages import (
     CHECK_YOUR_EMAIL,
     USER_NOT_ACTIVE,
     USER_IS_LOGOUT,
+    EMAIL_HAS_BEEN_SEND,
+    PASWORD_RESET_SUCCESS,
 )
 
 from src.conf.constants import TOKEN_LIFE_TIME
-  
+
+
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 security = HTTPBearer()
+
 
 @router.post(
     "/signup",
     response_model=UserResponseSchema,
     status_code=status.HTTP_201_CREATED,
 )
-
-   
 async def signup(
     body: UserSchema,
     background_tasks: BackgroundTasks,
     request: Request,
     session: AsyncSession = Depends(get_db),
 ):
-    """
-    # Створює нового користувача.
-
-    ## Параметри:
-    - body (UserModel): Модель користувача, що містить дані для створення користувача.
-    - background_tasks (BackgroundTasks): Об'єкт для виконання фонових задач асинхронно.
-    - request (Request): Об'єкт запиту FastAPI.
-    - db (AsyncSession): Об'єкт сесії бази даних.
-
-    ## Повертає:
-    - UserResponse: Об'єкт відповіді, який містить створеного користувача та
-      повідомлення про успішне створення.
-
-    Викликає:
-    - HTTPException: Якщо обліковий запис вже існує.
-    """
-
     exist_user = await repository_users.get_user_by_email(body.email, session)
     if exist_user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=ALREADY_EXISTS)
@@ -114,9 +101,9 @@ async def login(
         )
     # Generate JWT
     access_token = await auth_service.create_access_token(
-        data={"sub": user.email}, expires_delta=TOKEN_LIFE_TIME
+        data={"email": user.email}, expires_delta=TOKEN_LIFE_TIME
     )
-    refresh_token = await auth_service.create_refresh_token(data={"sub": user.email})
+    refresh_token = await auth_service.create_refresh_token(data={"email": user.email})
     await repository_users.update_token(user, refresh_token, db)
     return {
         "access_token": access_token,
@@ -129,7 +116,7 @@ async def login(
 async def logout(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(auth_service.get_current_user),
+    current_user: User = Depends(auth_service.get_authenticated_user),
 ):
     token = credentials.credentials
 
@@ -141,7 +128,7 @@ async def logout(
 async def refresh_token(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(auth_service.get_current_user),
+    current_user: User = Depends(auth_service.get_authenticated_user),
 ):
     """
     The refresh_token function is used to refresh the access token.
@@ -152,7 +139,7 @@ async def refresh_token(
     :return: A dictionary with the access_token, refresh_token and token_type
     """
     token = credentials.credentials
-    email = await auth_service.decode_refresh_token(token)
+    email = await auth_service.decode_token(token)
     user = await repository_users.get_user_by_email(email, db)
     if user.refresh_token != token:
         await repository_users.update_token(user, None, db)
@@ -160,8 +147,8 @@ async def refresh_token(
             status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_TOKEN
         )
 
-    access_token = await auth_service.create_access_token(data={"sub": email})
-    refresh_token = await auth_service.create_refresh_token(data={"sub": email})
+    access_token = await auth_service.create_access_token(data={"email": email})
+    refresh_token = await auth_service.create_refresh_token(data={"email": email})
     await repository_users.update_token(user, refresh_token, db)
     return {
         "access_token": access_token,
@@ -226,3 +213,43 @@ async def request_email(
             send_email, user.email, user.username, request.base_url
         )
     return {"message": CHECK_YOUR_EMAIL}
+
+
+@router.post("/forgot_password")
+async def forgot_password(
+    email: EmailStr,
+    background_tasks: BackgroundTasks,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    user = await repository_users.get_user_by_email(email, db)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_201_CREATED, detail=EMAIL_HAS_BEEN_SEND
+        )
+
+    # Generate a password reset token
+    data = {"email": email}
+    reset_token = auth_service.create_email_token(data)
+
+    background_tasks.add_task(
+        reset_password_by_email, email, user.username, reset_token, request.base_url
+    )
+
+    return {"message": EMAIL_HAS_BEEN_SEND}
+
+
+@router.post("/reset_password")
+async def reset_password(
+    reset_token: str, new_password: str, db: AsyncSession = Depends(get_db)
+):
+    email = await auth_service.get_email_from_token(reset_token)
+
+    # Обновляем пароль пользователя
+    user = await repository_users.get_user_by_email(email, db)
+    user.password = auth_service.get_password_hash(new_password)
+
+    # Сохраняем изменения в базе данных
+    await db.commit()
+
+    return {"message": PASWORD_RESET_SUCCESS}
