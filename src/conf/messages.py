@@ -35,3 +35,7 @@ OWN_POST = "It`s not possible vote for own post."
 VOTE_TWICE = "It`s not possible to vote twice."
 OPERATION_FORBIDDEN = "Operation forbidden"
 
+ALREADY_LIKE="You have already rated"
+YOUR_PHOTO = "This is your photo, you can't like it"
+FORBIDDEN="Access denied. You don't have permission for this action."
+DELETE_SUCCESSFUL="You deleted SUCCESSFUL"

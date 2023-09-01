@@ -34,7 +34,7 @@ class User(Base):
     description: Mapped[str] = mapped_column(String(500),nullable=True, unique=False)
     posts: Mapped['Post'] = relationship('Post', back_populates='user')
     ratings: Mapped['Rating'] = relationship('Rating', back_populates='user')
-    photo: Mapped['Photo'] = relationship('Photo', back_populates='user')
+    photos: Mapped['Photo'] = relationship('Photo', back_populates='user')
     
 
 class Post(Base):

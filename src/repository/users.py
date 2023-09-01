@@ -195,7 +195,7 @@ async def update_token(user: User, token: str | None, db: AsyncSession) -> None:
     :return: None, but the return type is specified as str | none
     """
     user.refresh_token = token
-    db.commit()
+    await db.commit()
 
 
 async def confirm_email(email: str, db: AsyncSession) -> None:
