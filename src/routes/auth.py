@@ -36,6 +36,7 @@ from src.conf.messages import (
     USER_IS_LOGOUT,
 )
 
+from src.conf.constants import TOKEN_LIFE_TIME
   
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 security = HTTPBearer()
@@ -113,7 +114,7 @@ async def login(
         )
     # Generate JWT
     access_token = await auth_service.create_access_token(
-        data={"sub": user.email}, expires_delta=7200
+        data={"sub": user.email}, expires_delta=TOKEN_LIFE_TIME
     )
     refresh_token = await auth_service.create_refresh_token(data={"sub": user.email})
     await repository_users.update_token(user, refresh_token, db)
