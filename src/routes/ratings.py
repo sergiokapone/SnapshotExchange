@@ -46,14 +46,14 @@ allowed_change_user_role = RoleChecker([Role.admin])
 
 
 @router.post("/created_photo/", response_model=PhotoRat)
-async def create_photo_(content:str, current_user: User = Depends(auth_service.get_current_user), db: AsyncSession = Depends(get_db)):
+async def create_photo_(content:str, current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
     new_photo=await repository_ratings.create_photo(content,current_user,db)
 
     return new_photo
 
 
 @router.post("/created_rating/", response_model=Rating)
-async def created_rating(rating,photo_id,current_user: User = Depends(auth_service.get_current_user), db: AsyncSession = Depends(get_db)):
+async def created_rating(rating,photo_id,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
     new_rating=await repository_ratings.create_rating(rating,photo_id,current_user,db)
 
     return new_rating
@@ -66,7 +66,7 @@ async def get_rating(photo_id, db: AsyncSession = Depends(get_db)):
     return new_rating
 
 @router.get("/get_rating_admin/")
-async def get_rating_ADmin_Moder(photo_id,current_user: User = Depends(auth_service.get_current_user), db: AsyncSession = Depends(get_db)):
+async def get_rating_ADmin_Moder(photo_id,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
     if current_user.role == Role.user:
         raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail=FORBIDDEN
@@ -77,7 +77,7 @@ async def get_rating_ADmin_Moder(photo_id,current_user: User = Depends(auth_serv
     
 
 @router.delete("/delete_rating_admin/")
-async def delete_rating_ADmin_Moder(photo_id,user_id,current_user: User = Depends(auth_service.get_current_user), db: AsyncSession = Depends(get_db)):
+async def delete_rating_ADmin_Moder(photo_id,user_id,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
     if current_user.role == Role.user:
         raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail=FORBIDDEN
