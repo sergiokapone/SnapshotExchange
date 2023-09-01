@@ -35,3 +35,4 @@ OWN_POST = "It`s not possible vote for own post."
 VOTE_TWICE = "It`s not possible to vote twice."
 OPERATION_FORBIDDEN = "Operation forbidden"
 
+PASWORD_RESET_SUCCESS = "Password reset successfully"
