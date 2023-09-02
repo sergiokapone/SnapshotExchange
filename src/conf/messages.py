@@ -48,3 +48,6 @@ FORBIDDEN = "Access denied. You don't have permission for this action."
 DELETE_SUCCESSFUL = "You deleted SUCCESSFUL"
 
 PASWORD_RESET_SUCCESS = "Password reset successfully"
+
+PHOTO_UPLOADED = "New photo successfully uploaded"
+NO_PHOTO_FOUND = "This user hasn't uploaded any photos yet"
