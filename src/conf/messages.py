@@ -51,3 +51,4 @@ PASWORD_RESET_SUCCESS = "Password reset successfully"
 ### Auth messages ###
 
 PHOTO_UPLOADED = 'Your photo has been successfully uploaded'
+PHOTO_REMOVED = 'Photo has been removed'

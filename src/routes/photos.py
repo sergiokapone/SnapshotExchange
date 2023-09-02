@@ -36,19 +36,19 @@ from src.conf.messages import (
     USER_ALREADY_NOT_ACTIVE,
     USER_CHANGE_ROLE_TO,
     PHOTO_UPLOADED,
+    PHOTO_REMOVED
 )
 
+from src.services.roles import (
+    allowed_get_user,
+    allowed_create_user,
+    allowed_get_all_users,
+    allowed_remove_user,
+    allowed_ban_user,
+    allowed_change_user_role,
+)
 
 router = APIRouter(prefix="/photos", tags=["Photos"])
-
-# Permissions to use routes by role
-
-allowed_get_user = RoleChecker([Role.admin, Role.moder, Role.user])
-allowed_create_user = RoleChecker([Role.admin, Role.moder, Role.user])
-allowed_get_all_users = RoleChecker([Role.admin])
-allowed_remove_user = RoleChecker([Role.admin])
-allowed_ban_user = RoleChecker([Role.admin])
-allowed_change_user_role = RoleChecker([Role.admin])
 
 
 @router.post("/make_URL_QR/")
@@ -72,6 +72,7 @@ async def test_photo(
 
     return {"message": PHOTO_UPLOADED}
 
+""" ------------------- Crud operations for photos ------------------------ """
 
 @router.post(
     "/upload",
@@ -104,3 +105,15 @@ async def upload_new_photo(
 
     if new_photo:
         return {"message": PHOTO_UPLOADED}
+
+@router.delete("/{photo_id}", response_model=MessageResponseSchema)
+async def remove_photo(
+    photo_id: int, 
+    current_user: User = Depends(auth_service.get_authenticated_user), 
+    db: AsyncSession = Depends(get_db)) -> MessageResponseSchema:
+
+    result = await repository_photos.remove_photo(photo_id, current_user, db)
+    print("------>", result)
+    if not result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NOT_FOUND)
+    return  {"message": PHOTO_REMOVED}

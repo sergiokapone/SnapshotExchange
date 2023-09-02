@@ -12,14 +12,14 @@ from sqlalchemy.orm.exc import NoResultFound
 from fastapi import HTTPException, status
 from src.conf.config import init_cloudinary
 from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE
-from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo,QR_code
+from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo, QR_code
 from src.services.auth import auth_service
 
 from fastapi import File
 
 
 async def created_photo(url: str, curent_user: User, db: AsyncSession):
-    photo= Photo(url=url,description='TEST',user_id=curent_user.id)
+    photo = Photo(url=url, description="TEST", user_id=curent_user.id)
 
     db.add(photo)
     await db.commit()
@@ -27,13 +27,15 @@ async def created_photo(url: str, curent_user: User, db: AsyncSession):
 
     return photo
 
+
 async def upload_photo(
-    current_user: User, photo: File(),  description: str | None, db: AsyncSession) -> bool:
+    current_user: User, photo: File(), description: str | None, db: AsyncSession
+) -> bool:
     unique_photo_id = uuid.uuid4()
     public_photo_id = f"Photos of users/{current_user.username}/{unique_photo_id}"
-    
+
     init_cloudinary()
-    
+
     uploaded_file_info = cloudinary.uploader.upload(
         photo.file, public_id=public_photo_id, overwrite=True
     )
@@ -53,13 +55,26 @@ async def upload_photo(
     return status.HTTP_201_CREATED
 
 
-async def get_URL_Qr(photo_id: int,db: AsyncSession):
-
+async def remove_photo(photo_id: int, 
+                      user: User, 
+                      db: AsyncSession) -> bool:
     query = select(Photo).filter(Photo.id == photo_id)
+    result = await db.execute(query)
+    photo = result.scalar_one_or_none()
+    print("==============>", photo.id)
+    if photo:
+        if user.role == Role.admin or user.role == Role.admin or photo.user_id == user.id:
+            init_cloudinary()
+            cloudinary.uploader.destroy(photo.id)
+            await db.delete(photo)
+            await db.commit()
+            return True
+    return False
 
+async def get_URL_Qr(photo_id: int, db: AsyncSession):
+    query = select(Photo).filter(Photo.id == photo_id)
     result = await db.execute(query)
     photo = result.scalar()
-
     query = select(QR_code).filter(QR_code.photo_id == photo_id)
 
     result = await db.execute(query)
@@ -88,7 +103,7 @@ async def get_URL_Qr(photo_id: int,db: AsyncSession):
         overwrite=True,
         invalidate=True,
     )
-    qr= QR_code(url=upload_result["secure_url"],photo_id=photo_id)
+    qr = QR_code(url=upload_result["secure_url"], photo_id=photo_id)
 
     db.add(qr)
     await db.commit()
@@ -96,4 +111,3 @@ async def get_URL_Qr(photo_id: int,db: AsyncSession):
     os.remove(qr_code_file_path)
 
     return {"source_url": photo.url, "qr_code_url": qr.url}
-
