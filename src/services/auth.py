@@ -33,6 +33,15 @@ class Auth:
 
     @property
     async def redis_cache(self):
+        """
+        Get a Redis cache for storing user data.
+
+        This property returns a Redis cache for storing user data if it's not already initialized.
+
+        :return: The Redis cache.
+        :rtype: aioredis.Redis
+        """
+
         if self._redis_cache is None:
             self._redis_cache = await init_async_redis()
         return self._redis_cache
@@ -43,10 +52,19 @@ class Auth:
     def get_password_hash(self, password: str):
         return self.pwd_context.hash(password)
 
-    # define a function to generate a new access token
     async def create_access_token(
         self, data: dict, expires_delta: int | None = None
     ):
+        """
+        Create an access token.
+
+        This function generates an access token with an optional expiration time.
+
+        :param data: dict: The data to include in the token payload.
+        :param expires_delta: int | None: The token's expiration time (in minutes).
+        :return: The encoded access token.
+        :rtype: str
+        """
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.utcnow() + timedelta(minutes=TOKEN_LIFE_TIME)
@@ -60,10 +78,19 @@ class Auth:
         )
         return encoded_access_token
 
-    # define a function to generate a new refresh token
     async def create_refresh_token(
         self, data: dict, expires_delta: float | None = None
     ):
+        """
+        Create a refresh token.
+
+        This function generates a refresh token with an optional expiration time.
+
+        :param data: dict: The data to include in the token payload.
+        :param expires_delta: float | None: The token's expiration time (in seconds).
+        :return: The encoded refresh token.
+        :rtype: str
+        """
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.utcnow() + timedelta(seconds=expires_delta)
@@ -87,6 +114,16 @@ class Auth:
         return token
 
     async def decode_token(self, token: str):
+        """
+        Decode a JWT token.
+
+        This function decodes a JWT token and validates its scope.
+
+        :param token: str: The JWT token to decode.
+        :return: The payload of the decoded token.
+        :rtype: dict
+        :raises HTTPException: If the token is invalid.
+        """
         try:
             payload = jwt.decode(
                 token, self.SECRET_KEY, algorithms=[self.ALGORITHM]
@@ -107,6 +144,17 @@ class Auth:
     async def get_authenticated_user(
         self, token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
     ):
+        """
+        Get the authenticated user.
+
+        This function retrieves the currently authenticated user using the provided token.
+
+        :param token: str: The JWT token representing the user's authentication.
+        :param db: AsyncSession: The database session.
+        :return: The authenticated user.
+        :rtype: User
+        :raises HTTPException: If the token is invalid or the user is not found.
+        """
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail=NOT_VALIDATE_CREDENTIALS
         )
@@ -144,6 +192,16 @@ class Auth:
         return user
 
     async def get_email_from_token(self, token: str):
+        """
+        Get the email address from an email verification token.
+
+        This function decodes an email verification token and retrieves the email address from it.
+
+        :param token: str: The JWT email verification token.
+        :return: The email address.
+        :rtype: str
+        :raises HTTPException: If the token is invalid.
+        """
         try:
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
             if payload["scope"] == "email_token":
