@@ -64,6 +64,20 @@ async def signup(
     request: Request,
     session: AsyncSession = Depends(get_db),
 ):
+    """
+    Register a new user.
+
+    :param body: User data.
+    :type body: UserSchema
+    :param background_tasks: Background tasks.
+    :type background_tasks: BackgroundTasks
+    :param request: Server request.
+    :type request: Request
+    :param session: Database session.
+    :type session: AsyncSession
+    :return: Created user object.
+    :rtype: UserResponseSchema
+    """
     exist_user_email = await repository_users.get_user_by_email(body.email, session)
     exist_user_username = await repository_users.get_user_by_username(
         body.username, session
@@ -244,13 +258,28 @@ async def forgot_password(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Send a password reset email to the user.
+
+    This function sends a password reset email to the user specified by their email address.
+    It checks if there is an existing user with the provided email and if they have already verified their account.
+    If the user exists and is verified, it generates a password reset token, sends an email with a reset link, and
+    returns a confirmation message.
+
+    :param email: EmailStr: The user's email address.
+    :param background_tasks: BackgroundTasks: Used to queue background tasks.
+    :param request: Request: The incoming HTTP request.
+    :param db: AsyncSession: The database session.
+    :return: A message indicating that the email has been sent.
+    :rtype: MessageResponseSchema
+    """
     user = await repository_users.get_user_by_email(email, db)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_201_CREATED, detail=EMAIL_HAS_BEEN_SEND
         )
 
-    # Generate a password reset token
+
     data = {"email": email}
     reset_token = auth_service.create_email_token(data)
 
@@ -265,13 +294,24 @@ async def forgot_password(
 async def reset_password(
     reset_token: str, new_password: str, db: AsyncSession = Depends(get_db)
 ):
+    """
+    Reset a user's password.
+
+    This function resets a user's password when provided with a valid reset token and a new password.
+    It first retrieves the user's email from the reset token, then fetches the user from the database by their email.
+    Subsequently, it updates the user's password with the new hashed password and saves the changes to the database.
+
+    :param reset_token: str: The password reset token.
+    :param new_password: str: The new password.
+    :param db: AsyncSession: The database session.
+    :return: A message indicating that the password has been reset.
+    :rtype: MessageResponseSchema
+    """
     email = await auth_service.get_email_from_token(reset_token)
 
-    # Обновляем пароль пользователя
     user = await repository_users.get_user_by_email(email, db)
     user.password = auth_service.get_password_hash(new_password)
 
-    # Сохраняем изменения в базе данных
     await db.commit()
 
     return {"message": PASWORD_RESET_SUCCESS}

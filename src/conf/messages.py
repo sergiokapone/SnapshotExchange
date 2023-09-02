@@ -48,7 +48,7 @@ FORBIDDEN = "Access denied. You don't have permission for this action."
 DELETE_SUCCESSFUL = "You deleted SUCCESSFUL"
 PASWORD_RESET_SUCCESS = "Password reset successfully"
 
-### Auth messages ###
+### Photo messages ###
 
 PHOTO_UPLOADED = 'Your photo has been successfully uploaded'
 PHOTO_REMOVED = 'Photo has been removed'

@@ -45,6 +45,15 @@ async def read_my_profile(
     # token: str,
     current_user: User = Depends(auth_service.get_authenticated_user),
 ):
+    """
+    Get the profile of the currently authenticated user.
+
+    This function retrieves the profile of the currently authenticated user.
+
+    :param current_user: User: The currently authenticated user.
+    :return: The user's profile.
+    :rtype: UserDb
+    """
     return current_user
 
 
@@ -56,6 +65,21 @@ async def edit_my_profile(
     current_user: User = Depends(auth_service.get_authenticated_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Edit the profile of the currently authenticated user.
+
+    This function allows the currently authenticated user to edit their profile.
+    It accepts an avatar image, a new username, a new description, the current authenticated user, and a database session.
+    If provided, the avatar, new username, and new description are updated in the user's profile.
+
+    :param avatar: UploadFile: The avatar image file (optional).
+    :param new_username: str: The new username (optional).
+    :param new_description: str: The new description (optional).
+    :param current_user: User: The currently authenticated user.
+    :param db: AsyncSession: The database session.
+    :return: The updated user's profile.
+    :rtype: UserDb
+    """
     updated_user = await repository_users.edit_my_profile(
         avatar, new_description, new_username, current_user, db
     )
@@ -66,6 +90,16 @@ async def edit_my_profile(
 async def user_profile(
     username: str, db: AsyncSession = Depends(get_db)
 ) -> dict | None:
+    """
+    Get a user's profile by username.
+
+    This function retrieves a user's profile by their username from the database.
+
+    :param username: str: The username of the user.
+    :param db: AsyncSession: The database session.
+    :return: The user's profile.
+    :rtype: UserProfile | None
+    """
     user = await repository_users.get_user_by_username(username, db)
     if user:
         count_posts = await repository_users.get_users_posts(user.id, db)
@@ -89,12 +123,35 @@ async def user_profile(
 async def read_all_users(
     skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)
 ):
+    """
+    Get a list of all users (Admin only).
+
+    This function retrieves a list of all users from the database.
+    Only users with the 'admin' role can access this endpoint.
+
+    :param skip: int: The number of users to skip.
+    :param limit: int: The maximum number of users to retrieve.
+    :param db: AsyncSession: The database session.
+    :return: A list of users.
+    :rtype: List[UserDb]
+    """
     users = await repository_users.get_users(skip, limit, db)
     return users
 
 
 @router.patch("/ban/{email}", dependencies=[Depends(allowed_ban_user)])
 async def ban_user_by_email(body: RequestEmail, db: AsyncSession = Depends(get_db)):
+    """
+    Ban a user by email (Admin only).
+
+    This function bans a user by their email address.
+    Only users with the 'admin' role can access this endpoint.
+
+    :param body: RequestEmail: The email address of the user to be banned.
+    :param db: AsyncSession: The database session.
+    :return: A message indicating the user's ban status.
+    :rtype: dict
+    """
     user = await repository_users.get_user_by_email(body.email, db)
 
     if not user:
@@ -114,6 +171,18 @@ async def ban_user_by_email(body: RequestEmail, db: AsyncSession = Depends(get_d
 
 @router.patch("/make_role/{email}", dependencies=[Depends(allowed_change_user_role)])
 async def make_role_by_email(body: RequestRole, db: AsyncSession = Depends(get_db)):
+    """
+    Change a user's role by email (Admin only).
+
+    This function changes a user's role by their email address.
+    Only users with the 'admin' role can access this endpoint.
+
+    :param body: RequestRole: The email address and role to assign to the user.
+    :param db: AsyncSession: The database session.
+    :return: A message indicating the user's role change.
+    :rtype: dict
+    """
+
     user = await repository_users.get_user_by_email(body.email, db)
 
     if not user:
