@@ -39,14 +39,6 @@ allowed_ban_user = RoleChecker([Role.admin])
 allowed_change_user_role = RoleChecker([Role.admin])
 
 
-
-
-
-
-
-
-
-
 @router.post("/make_URL_QR/")
 async def make_URL_QR(photo_id: int, db: AsyncSession = Depends(get_db)):
     
