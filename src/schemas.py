@@ -98,3 +98,13 @@ class RequestRole(BaseModel):
 
 class MessageResponseSchema(BaseModel):
     message: str = "This is a message"
+    
+
+class PhotosDb(BaseModel):
+    id: int
+    url: str
+    description:str | None
+    user_id: int
+    created_at: datetime
+    
+    model_config = ConfigDict(from_attributes = True)

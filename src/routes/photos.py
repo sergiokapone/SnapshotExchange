@@ -7,7 +7,14 @@ from fastapi import (
     UploadFile,
     status,
     Response,
+    Request,
+    Header
 )
+
+
+from fastapi.templating import Jinja2Templates
+from starlette.requests import Request
+templates = Jinja2Templates(directory="templates")  
 
 from fastapi_limiter.depends import RateLimiter
 
@@ -25,6 +32,7 @@ from src.schemas import (
     MessageResponseSchema,
 )
 
+from src.schemas import PhotosDb
 
 from src.services.auth import auth_service
 from src.services.roles import RoleChecker
@@ -106,6 +114,29 @@ async def upload_new_photo(
     if new_photo:
         return {"message": PHOTO_UPLOADED}
 
+@router.get(
+    "/get_all",
+    response_model=list[PhotosDb],
+    dependencies=[Depends(allowed_get_all_users)],
+)
+async def read_all_photos(
+    skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)
+) ->list:
+    photos = await repository_photos.get_photos(skip, limit, db)
+    return photos
+
+@router.get(
+    "/get_all/view",
+    dependencies=[Depends(allowed_get_all_users), Depends(auth_service.get_authenticated_user)]
+)
+async def read_all_photos(request: Request,
+    skip: int = 0, limit: int = 10,  db: AsyncSession = Depends(get_db), 
+    authorization: str = Header(None)
+):
+    photos = await repository_photos.get_photos(skip, limit, db)
+    return templates.TemplateResponse("photo_list.html", {"request": request, "photos": photos})
+
+
 @router.delete("/{photo_id}", response_model=MessageResponseSchema)
 async def remove_photo(
     photo_id: int, 
@@ -113,7 +144,6 @@ async def remove_photo(
     db: AsyncSession = Depends(get_db)) -> MessageResponseSchema:
 
     result = await repository_photos.remove_photo(photo_id, current_user, db)
-    print("------>", result)
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NOT_FOUND)
     return  {"message": PHOTO_REMOVED}

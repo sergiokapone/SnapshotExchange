@@ -27,6 +27,7 @@ async def created_photo(url: str, curent_user: User, db: AsyncSession):
 
     return photo
 
+# ----------------------------- ### CRUD ### ---------------------------------#
 
 async def upload_photo(
     current_user: User, photo: File(), description: str | None, db: AsyncSession
@@ -54,14 +55,18 @@ async def upload_photo(
 
     return status.HTTP_201_CREATED
 
-
+async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[User]:
+    query = select(Photo).offset(skip).limit(limit)
+    result = await db.execute(query)
+    all_photos = result.scalars().all()
+    return all_photos
+    
 async def remove_photo(photo_id: int, 
                       user: User, 
                       db: AsyncSession) -> bool:
     query = select(Photo).filter(Photo.id == photo_id)
     result = await db.execute(query)
     photo = result.scalar_one_or_none()
-    print("==============>", photo.id)
     if photo:
         if user.role == Role.admin or user.role == Role.admin or photo.user_id == user.id:
             init_cloudinary()
@@ -70,6 +75,8 @@ async def remove_photo(photo_id: int,
             await db.commit()
             return True
     return False
+
+# --------------------------- ### END CRUD ### -------------------------------#
 
 async def get_URL_Qr(photo_id: int, db: AsyncSession):
     query = select(Photo).filter(Photo.id == photo_id)
