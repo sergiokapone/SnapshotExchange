@@ -1,8 +1,11 @@
+import redis.asyncio as redis
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.connect_db import get_db
 from src.repository import users as repository_users
 from src.database.models import User, Role
+
 
 from src.schemas import (
     UserProfile,
@@ -23,6 +26,7 @@ from src.services.roles import (
 )
 
 from src.services.auth import auth_service
+from src.conf.config import init_async_redis
 
 from src.services.roles import RoleChecker
 
@@ -39,6 +43,7 @@ from src.conf.messages import (
 router = APIRouter(prefix="/users", tags=["Users"])
 
 # Permissions to use routes by role
+
 
 @router.get("/get_me", response_model=UserDb)
 async def read_my_profile(
@@ -64,31 +69,24 @@ async def edit_my_profile(
     new_description: str = Form(None),
     current_user: User = Depends(auth_service.get_authenticated_user),
     db: AsyncSession = Depends(get_db),
+    redis_client: redis.Redis = Depends(init_async_redis),
 ):
-    """
-    Edit the profile of the currently authenticated user.
-
-    This function allows the currently authenticated user to edit their profile.
-    It accepts an avatar image, a new username, a new description, the current authenticated user, and a database session.
-    If provided, the avatar, new username, and new description are updated in the user's profile.
-
-    :param avatar: UploadFile: The avatar image file (optional).
-    :param new_username: str: The new username (optional).
-    :param new_description: str: The new description (optional).
-    :param current_user: User: The currently authenticated user.
-    :param db: AsyncSession: The database session.
-    :return: The updated user's profile.
-    :rtype: UserDb
-    """
     updated_user = await repository_users.edit_my_profile(
         avatar, new_description, new_username, current_user, db
     )
+
+    # Removing a key from Redis
+    key_to_clear = f"user:{current_user.email}"
+    await redis_client.delete(key_to_clear)
+
     return updated_user
 
 
 @router.get("/{username}", response_model=UserProfile)
 async def user_profile(
-    username: str, db: AsyncSession = Depends(get_db)
+    username: str,
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
 ) -> dict | None:
     """
     Get a user's profile by username.
@@ -140,24 +138,21 @@ async def read_all_users(
 
 
 @router.patch("/ban/{email}", dependencies=[Depends(allowed_ban_user)])
-async def ban_user_by_email(body: RequestEmail, db: AsyncSession = Depends(get_db)):
-    """
-    Ban a user by email (Admin only).
+async def ban_user_by_email(
+    body: RequestEmail,
+    db: AsyncSession = Depends(get_db),
+    redis_client: redis.Redis = Depends(init_async_redis),
+):
+    # Removing a key from Redis
+    key_to_clear = f"user:{body.email}"
+    await redis_client.delete(key_to_clear)
 
-    This function bans a user by their email address.
-    Only users with the 'admin' role can access this endpoint.
-
-    :param body: RequestEmail: The email address of the user to be banned.
-    :param db: AsyncSession: The database session.
-    :return: A message indicating the user's ban status.
-    :rtype: dict
-    """
     user = await repository_users.get_user_by_email(body.email, db)
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_EMAIL
-        )
+        raise HTTPException(status_code=404, detail=INVALID_EMAIL)
+    
+    
 
     if user.is_active:
         await repository_users.ban_user(user.email, db)
@@ -170,18 +165,14 @@ async def ban_user_by_email(body: RequestEmail, db: AsyncSession = Depends(get_d
 
 
 @router.patch("/make_role/{email}", dependencies=[Depends(allowed_change_user_role)])
-async def make_role_by_email(body: RequestRole, db: AsyncSession = Depends(get_db)):
-    """
-    Change a user's role by email (Admin only).
-
-    This function changes a user's role by their email address.
-    Only users with the 'admin' role can access this endpoint.
-
-    :param body: RequestRole: The email address and role to assign to the user.
-    :param db: AsyncSession: The database session.
-    :return: A message indicating the user's role change.
-    :rtype: dict
-    """
+async def make_role_by_email(
+    body: RequestRole,
+    db: AsyncSession = Depends(get_db),
+    redis_client: redis.Redis = Depends(init_async_redis),
+):
+    # Removing a key from Redis
+    key_to_clear = f"user:{body.email}"
+    await redis_client.delete(key_to_clear)
 
     user = await repository_users.get_user_by_email(body.email, db)
 
@@ -196,7 +187,3 @@ async def make_role_by_email(body: RequestRole, db: AsyncSession = Depends(get_d
         await repository_users.make_user_role(body.email, body.role, db)
 
         return {"message": f"{USER_CHANGE_ROLE_TO} {body.role.value}"}
-    
-
-
-

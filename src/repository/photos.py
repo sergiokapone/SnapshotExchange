@@ -18,8 +18,8 @@ from src.services.auth import auth_service
 from fastapi import File
 
 
-
 # ----------------------------- ### CRUD ### ---------------------------------#
+
 
 async def upload_photo(
     current_user: User, photo: File(), description: str | None, db: AsyncSession
@@ -55,22 +55,25 @@ async def upload_photo(
     )
     # add photo url to DB
     new_photo = Photo(url=photo_url, description=description, user_id=current_user.id)
-    db.add(new_photo)
-    await db.commit()
-    await db.refresh(new_photo)
-
+    try:
+        db.add(new_photo)
+        await db.commit()
+        await db.refresh(new_photo)
+    except Exception as e:
+        
+        await db.rollback()
+        raise e 
     return status.HTTP_201_CREATED
+
 
 async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[User]:
     query = select(Photo).offset(skip).limit(limit)
     result = await db.execute(query)
     all_photos = result.scalars().all()
     return all_photos
-    
-async def remove_photo(photo_id: int, 
-                      user: User, 
-                      db: AsyncSession) -> bool:
-    
+
+
+async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
     """
     Remove a photo from cloud storage and the database.
 
@@ -88,7 +91,11 @@ async def remove_photo(photo_id: int,
     result = await db.execute(query)
     photo = result.scalar_one_or_none()
     if photo:
-        if user.role == Role.admin or user.role == Role.admin or photo.user_id == user.id:
+        if (
+            user.role == Role.admin
+            or user.role == Role.admin
+            or photo.user_id == user.id
+        ):
             init_cloudinary()
             cloudinary.uploader.destroy(photo.id)
             await db.delete(photo)
@@ -96,7 +103,9 @@ async def remove_photo(photo_id: int,
             return True
     return False
 
+
 # --------------------------- ### END CRUD ### -------------------------------#
+
 
 async def get_URL_Qr(photo_id: int, db: AsyncSession):
     """
@@ -113,7 +122,7 @@ async def get_URL_Qr(photo_id: int, db: AsyncSession):
     query = select(Photo).filter(Photo.id == photo_id)
     result = await db.execute(query)
     photo = result.scalar()
-    
+
     query = select(QR_code).filter(QR_code.photo_id == photo_id)
 
     result = await db.execute(query)
