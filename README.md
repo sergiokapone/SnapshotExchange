@@ -19,7 +19,7 @@
 SnapShot Exchange application, using a REST API based on [FastAPI](https://fastapi.tiangolo.com/), provides the ability for users to upload, edit and delete their photos, as well as interact with each other through comments and photo ratings.
 
 
-## Project installation 
+## Project Installation 
 
 
 To manage project dependencies, `pipenv` is used. 
@@ -37,7 +37,15 @@ $ pipenv install
 $ python main.py
 ```
 
+Once the application is running *locally*, you can browse to run it on your local host using the following links[^1]:
+- Detailed information on our project [http://localhost:8000/](http://localhost:8000)
+- To test the connection to the database [http://localhost:8000/api/healthchecker](http://localhost:8000/api/healthchecker)
+- To view swagger documentation [http://localhost:8000/docs](http://localhost:8000/docs)
+- To view redoc documentation [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
+For comfortable viewing of `JSON` respone in your browser we recommend to install the extension for Google Chrome
+[JSON Viewer](https://chrome.google.com/webstore/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh/related?hl=ru) or 
+[JSON Formatter](https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=ru) (according to your taste)
 
 ## License
 
