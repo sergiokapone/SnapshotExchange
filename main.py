@@ -20,6 +20,7 @@ from src.database.connect_db import get_db
 from src.routes.auth import router as auth_router
 from src.routes.users import router as users_router
 from src.routes.ratings import router as ratings_router
+from src.routes.photos import router as photos_router
 from src.conf.config import settings
 from src.conf.info_dict import project_info
 
@@ -99,6 +100,7 @@ async def healthchecker(session: AsyncSession = Depends(get_db)):
 app.include_router(auth_router, prefix="/api")
 app.include_router(users_router, prefix="/api")
 app.include_router(ratings_router, prefix="/api")
+app.include_router(photos_router, prefix='/api')
 
 
 if __name__ == "__main__":
