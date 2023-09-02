@@ -45,10 +45,14 @@ OPERATION_FORBIDDEN = "Operation forbidden"
 ALREADY_LIKE = "You have already rated"
 YOUR_PHOTO = "This is your photo, you can't like it"
 FORBIDDEN = "Access denied. You don't have permission for this action."
-DELETE_SUCCESSFUL = "You deleted SUCCESSFUL"
+
+DELETE_SUCCESSFUL = "You deleted successfully"
 PASWORD_RESET_SUCCESS = "Password reset successfully"
 
 ### Photo messages ###
 
 PHOTO_UPLOADED = 'Your photo has been successfully uploaded'
 PHOTO_REMOVED = 'Photo has been removed'
+NO_PHOTO_FOUND = "This user hasn't uploaded any photos yet"
+DELETE_SUCCESSFUL = "You deleted SUCCESSFUL"
+PASWORD_RESET_SUCCESS = "Password reset successfully"

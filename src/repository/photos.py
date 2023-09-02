@@ -9,14 +9,11 @@ import cloudinary.uploader
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import NoResultFound
-from fastapi import HTTPException, status
+from fastapi import File, HTTPException, status
 from src.conf.config import init_cloudinary
 from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE
 from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo, QR_code
 from src.services.auth import auth_service
-
-from fastapi import File
-
 
 # ----------------------------- ### CRUD ### ---------------------------------#
 
@@ -72,6 +69,28 @@ async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[User]:
     all_photos = result.scalars().all()
     return all_photos
 
+  async def get_photo_by_id(current_user: User, photo_id: str, db: AsyncSession) -> dict:
+    query_result = await db.execute(select(Photo).where(Photo.user_id == current_user.id))
+    photos = query_result.scalars()
+
+    for photo in photos:
+        p_id = photo.url.split('/')[-1]
+        if photo_id == p_id:
+            return {photo.url: photo.description}
+
+
+async def patch_update_photo(current_user: User, photo_id: str, description: str, db: AsyncSession) -> dict:
+    query_result = await db.execute(select(Photo).where(Photo.user_id == current_user.id))
+    photos = query_result.scalars()
+
+    for photo in photos:
+        p_id = photo.url.split('/')[-1]
+        if photo_id == p_id:
+            photo.description = description
+            await db.commit()
+            await db.refresh(photo)
+
+            return {photo.url: photo.description}
 
 async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
     """
