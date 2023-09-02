@@ -3,7 +3,7 @@ from fastapi_limiter.depends import RateLimiter
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.conf.messages import PHOTO_UPLOADED, NO_PHOTO_FOUND
+from src.conf.messages import PHOTO_UPLOADED, NO_PHOTO_FOUND, NO_PHOTO_BY_ID
 from src.database.connect_db import get_db
 from src.database.models import User
 from src.repository import photos as repository_photos
@@ -48,7 +48,8 @@ async def get_one_photo(photo_id: str,
     raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_FOUND)
 
 
-@router.post("/{username}", status_code=status.HTTP_201_CREATED,
+@router.post("/{username}",
+             status_code=status.HTTP_201_CREATED,
              description="No more than 10 requests per minute",
              dependencies=[Depends(RateLimiter(times=10, seconds=60))]
              )
@@ -67,3 +68,21 @@ async def upload_new_photo(photo_file: UploadFile = File(),
     if new_photo:
         return HTTPException(status_code=status.HTTP_201_CREATED, detail=PHOTO_UPLOADED)
     raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED)
+
+
+@router.patch("/{username}/{photo_id}",
+              status_code=status.HTTP_201_CREATED,
+              description="No more than 10 requests per minute",
+              dependencies=[Depends(RateLimiter(times=10, seconds=60))]
+              )
+async def patch_update_photo(photo_id: str,
+                             new_photo_description: str,
+                             current_user: User = Depends(auth_service.get_authenticated_user),
+                             db: AsyncSession = Depends(get_db)
+                             ):
+    """Updating a photo by its id"""
+    updated_photo = await repository_photos.patch_update_photo(current_user, photo_id, new_photo_description, db)
+
+    if updated_photo:
+        return jsonable_encoder(updated_photo)
+    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID)

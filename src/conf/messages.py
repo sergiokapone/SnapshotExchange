@@ -51,3 +51,4 @@ PASWORD_RESET_SUCCESS = "Password reset successfully"
 
 PHOTO_UPLOADED = "New photo successfully uploaded"
 NO_PHOTO_FOUND = "This user hasn't uploaded any photos yet"
+NO_PHOTO_BY_ID = "This user hasn't anu photos with this id"
