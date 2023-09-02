@@ -47,8 +47,7 @@ from src.conf.messages import (
     USER_CHANGE_ROLE_TO,
     PHOTO_UPLOADED,
     PHOTO_REMOVED,
-    NO_PHOTO_FOUND, 
-    NO_PHOTO_BY_ID
+    NO_PHOTO_FOUND
 )
 
 from src.services.roles import (
@@ -103,12 +102,12 @@ async def get_all_photos(skip: int = Query(0, description="Number of records to 
         return jsonable_encoder(photos_dict)
     raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_FOUND)
 
-    @router.get("/{username}/{photo_id}",
-            status_code=status.HTTP_200_OK,
-            response_model=dict,
-            description="No more than 10 requests per minute",
-            dependencies=[Depends(RateLimiter(times=10, seconds=60))]
-            )
+@router.get("/{username}/{photo_id}",
+        status_code=status.HTTP_200_OK,
+        response_model=dict,
+        description="No more than 10 requests per minute",
+        dependencies=[Depends(RateLimiter(times=10, seconds=60))]
+        )
 async def get_one_photo(photo_id: str,
                         current_user: User = Depends(auth_service.get_authenticated_user),
                         db: AsyncSession = Depends(get_db)):
@@ -183,22 +182,6 @@ async def patch_update_photo(photo_id: str,
         return jsonable_encoder(updated_photo)
     raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID)
 
-
-@router.delete("/{username}/{photo_id}",
-               status_code=status.HTTP_200_OK,
-               description="No more than 10 requests per minute",
-               dependencies=[Depends(RateLimiter(times=10, seconds=60))]
-               )
-async def delete_photo_by_id(photo_id: str,
-                             current_user: User = Depends(auth_service.get_authenticated_user),
-                             db: AsyncSession = Depends(get_db)
-                             ):
-    """Delete a photo by its id"""
-    deleted_photo = await repository_photos.delete_photo_by_id(photo_id, current_user, db)
-
-    if deleted_photo:
-        return HTTPException(status_code=status.HTTP_200_OK, detail=PHOTO_DELETED)
-    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID)
 
 @router.get(
     "/get_all",

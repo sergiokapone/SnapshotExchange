@@ -69,7 +69,7 @@ async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[User]:
     all_photos = result.scalars().all()
     return all_photos
 
-  async def get_photo_by_id(current_user: User, photo_id: str, db: AsyncSession) -> dict:
+async def get_photo_by_id(current_user: User, photo_id: str, db: AsyncSession) -> dict:
     query_result = await db.execute(select(Photo).where(Photo.user_id == current_user.id))
     photos = query_result.scalars()
 
@@ -117,10 +117,13 @@ async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
         ):
             init_cloudinary()
             cloudinary.uploader.destroy(photo.id)
-            await db.delete(photo)
-            await db.commit()
-            return True
-    return False
+            try:
+                await db.delete(photo)
+                await db.commit()
+                return True
+            except Exception as e:
+                await db.rollback()
+                raise e 
 
 
 # --------------------------- ### END CRUD ### -------------------------------#
@@ -172,9 +175,14 @@ async def get_URL_Qr(photo_id: int, db: AsyncSession):
     )
     qr = QR_code(url=upload_result["secure_url"], photo_id=photo_id)
 
-    db.add(qr)
-    await db.commit()
-    await db.refresh(qr)
+    try:
+        db.add(qr)
+        await db.commit()
+        await db.refresh(qr)
+    except Exception as e:
+        await db.rollback()
+        print(e)
+
     os.remove(qr_code_file_path)
 
     return {"source_url": photo.url, "qr_code_url": qr.url}
