@@ -7,9 +7,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from fastapi import HTTPException, status
 from src.conf.config import init_cloudinary
 from src.conf.messages import YOUR_PHOTO,ALREADY_LIKE
-from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo
+from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo,QR_code
 import qrcode
-import io
+import os
 
 async def created_photo(url,curent_user,db:AsyncSession):
     photo= Photo(url=url,description='TEST',user_id=curent_user.id)
@@ -26,6 +26,13 @@ async def get_URL_Qr(photo_id:int,db:AsyncSession):
 
     result = await db.execute(query)
     photo = result.scalar()
+
+    query = select(QR_code).filter(QR_code.photo_id == photo_id)
+
+    result = await db.execute(query)
+    qr = result.scalar()
+    if qr != None:
+        return {"source_url": photo.url, "qr_code_url": qr.url}
 
     qr = qrcode.QRCode(
         version=1,
@@ -46,13 +53,18 @@ async def get_URL_Qr(photo_id:int,db:AsyncSession):
     init_cloudinary()
     upload_result = cloudinary.uploader.upload(
         qr_code_file_path,
-        public_id=f"Qr_Code/{me.username}",
+        public_id=f"Qr_Code/Photo_{photo_id}",
         overwrite=True,
         invalidate=True,
     )
+    qr= QR_code(url=upload_result["secure_url"],photo_id=photo_id)
 
-    # Після завантаження, видаліть локальний файл
+    db.add(qr)
+    await db.commit()
+    await db.refresh(qr)
+
+
     os.remove(qr_code_file_path)
 
-    return {"source_url": photo.url, "qr_code_url": upload_result["secure_url"]}
+    return {"source_url": photo.url, "qr_code_url": qr.url}
 

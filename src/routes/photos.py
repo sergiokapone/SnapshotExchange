@@ -50,7 +50,7 @@ allowed_change_user_role = RoleChecker([Role.admin])
 @router.post("/make_URL_QR/")
 async def make_URL_QR(photo_id: int, db: AsyncSession = Depends(get_db)):
     
-    data  = await res_photos.get_URL(photo_id, db)
+    data  = await res_photos.get_URL_Qr(photo_id, db)
 
     return data
     
