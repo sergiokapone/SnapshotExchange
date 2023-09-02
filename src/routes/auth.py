@@ -42,6 +42,10 @@ from src.conf.messages import (
     PASWORD_RESET_SUCCESS,
 )
 
+from fastapi.templating import Jinja2Templates
+
+templates = Jinja2Templates(directory="templates")
+
 from src.conf.constants import TOKEN_LIFE_TIME
 
 
@@ -125,6 +129,10 @@ async def login(
         "token_type": "bearer",
     }
 
+
+@router.get("/login/view")
+async def login_view(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
 
 @router.post("/logout", response_model=MessageResponseSchema)
 async def logout(
