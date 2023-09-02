@@ -3,7 +3,7 @@ from fastapi_limiter.depends import RateLimiter
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.conf.messages import PHOTO_UPLOADED, NO_PHOTO_FOUND, NO_PHOTO_BY_ID
+from src.conf.messages import PHOTO_UPLOADED, NO_PHOTO_FOUND, NO_PHOTO_BY_ID, PHOTO_DELETED
 from src.database.connect_db import get_db
 from src.database.models import User
 from src.repository import photos as repository_photos
@@ -71,7 +71,7 @@ async def upload_new_photo(photo_file: UploadFile = File(),
 
 
 @router.patch("/{username}/{photo_id}",
-              status_code=status.HTTP_201_CREATED,
+              status_code=status.HTTP_200_OK,
               description="No more than 10 requests per minute",
               dependencies=[Depends(RateLimiter(times=10, seconds=60))]
               )
@@ -85,4 +85,21 @@ async def patch_update_photo(photo_id: str,
 
     if updated_photo:
         return jsonable_encoder(updated_photo)
+    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID)
+
+
+@router.delete("/{username}/{photo_id}",
+               status_code=status.HTTP_200_OK,
+               description="No more than 10 requests per minute",
+               dependencies=[Depends(RateLimiter(times=10, seconds=60))]
+               )
+async def delete_photo_by_id(photo_id: str,
+                             current_user: User = Depends(auth_service.get_authenticated_user),
+                             db: AsyncSession = Depends(get_db)
+                             ):
+    """Delete a photo by its id"""
+    deleted_photo = await repository_photos.delete_photo_by_id(photo_id, current_user, db)
+
+    if deleted_photo:
+        return HTTPException(status_code=status.HTTP_200_OK, detail=PHOTO_DELETED)
     raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID)

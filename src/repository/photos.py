@@ -67,3 +67,16 @@ async def patch_update_photo(current_user: User, photo_id: str, description: str
             await db.refresh(photo)
 
             return {photo.url: photo.description}
+
+
+async def delete_photo_by_id(photo_id: str, current_user: User, db: AsyncSession) -> bool:
+    query_result = await db.execute(select(Photo).where(Photo.user_id == current_user.id))
+    photos = query_result.scalars()
+
+    for photo in photos:
+        p_id = photo.url.split('/')[-1]
+        if photo_id == p_id:
+            await db.delete(photo)
+            await db.commit()
+
+            return True
