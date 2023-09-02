@@ -38,8 +38,9 @@ $ python main.py
 ```
 
 Once the application is running *locally*, you can browse to run it on your local host using the following links[^1]:
-- Detailed information on our project [http://localhost:8000/](http://localhost:8000)
-- To test the connection to the database [http://localhost:8000/api/healthchecker](http://localhost:8000/api/healthchecker)
+- To view detailed information on our project [http://localhost:8000/info](http://localhost:8000/info)
+- To view detailed information on our project in `JSON` format  [http://localhost:8000/](http://localhost:8000)
+- To test the connection to the database and server time information [http://localhost:8000/api/healthchecker](http://localhost:8000/api/healthchecker)
 - To view swagger documentation [http://localhost:8000/docs](http://localhost:8000/docs)
 - To view redoc documentation [http://localhost:8000/redoc](http://localhost:8000/redoc)
 

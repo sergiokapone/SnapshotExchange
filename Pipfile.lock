@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0d02246794f6e1895b5e70dbace6276cdab3bb587caf7a652f7c219d53050f22"
+            "sha256": "aa1745561e270a6cf27cb1078e5160714c7f44a9ff6602e088f1c7dd39024b82"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -35,12 +35,11 @@
         },
         "alembic": {
             "hashes": [
-                "sha256:3db4ce81a9072e1b5aa44c2d202add24553182672a12daf21608d6f62a8f9cf9",
-                "sha256:d6c96c2482740592777c400550a523bc7a9aada4e210cae2e733354ddae6f6f8"
+                "sha256:03226222f1cf943deee6c85d9464261a6c710cd19b4fe867a3ad1f25afda610f",
+                "sha256:8e7645c32e4f200675e69f0745415335eb59a3663f5feb487abfa0b30c45888b"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.7'",
-            "version": "==1.11.3"
+            "version": "==1.12.0"
         },
         "annotated-types": {
             "hashes": [
@@ -434,7 +433,7 @@
                 "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852",
                 "sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61"
             ],
-            "markers": "python_version >= '3.7'",
+            "index": "pypi",
             "version": "==3.1.2"
         },
         "libgravatar": {
