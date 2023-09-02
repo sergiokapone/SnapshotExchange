@@ -10,6 +10,13 @@ from sqlalchemy import Enum
 Base = declarative_base()
 
 
+photo_m2m_tags = Table(
+    'photo_m2m_tags',
+    Base.metadata,
+    Column('photo_id', Integer, ForeignKey('photos.id')),
+    Column('tag_id', Integer, ForeignKey('tags.id'))
+)
+
 class Role(enum.Enum):
     user: str = 'User'
     moder: str = 'Moderator'
@@ -51,10 +58,14 @@ class Photo(Base):
     __tablename__ = "photos"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    ratings: Mapped['Rating'] = relationship('Rating', back_populates='photo')
+    url: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str] = mapped_column(String(500), nullable=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     user: Mapped['User'] = relationship('User', back_populates='photos')
-    content: Mapped[str] = mapped_column(String(200))
+    ratings: Mapped['Rating'] = relationship('Rating', back_populates='photo')
+    created_at: Mapped[date] = mapped_column('created_at', DateTime, default=func.now())
+    QR: Mapped['QR_code'] = relationship('QR_code', back_populates='photo')
+
 
 class Rating(Base):
     __tablename__ = "ratings"
@@ -69,6 +80,15 @@ class Rating(Base):
     photo: Mapped[int] = relationship('Photo', back_populates='ratings')
 
 
+class QR_code(Base):
+    __tablename__ = "Qr_codes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    url: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    photo_id: Mapped[int] = mapped_column(Integer, ForeignKey('photos.id'))
+    photo: Mapped[int] = relationship('Photo', back_populates='QR')
+
 
 class BlacklistToken(Base):
     __tablename__ = 'blacklist_tokens'
@@ -76,3 +96,9 @@ class BlacklistToken(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     token: Mapped[str] = mapped_column(String(500), unique=True, nullable=False)
     blacklisted_on : Mapped[date] = mapped_column(DateTime, default=func.now())
+
+class Tag(Base):
+    __tablename__ = 'tags'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(25), unique=True, nullable=True)

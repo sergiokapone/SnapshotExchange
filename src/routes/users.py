@@ -127,3 +127,7 @@ async def make_role_by_email(body: RequestRole, db: AsyncSession = Depends(get_d
         await repository_users.make_user_role(body.email, body.role, db)
 
         return {"message": f"{USER_CHANGE_ROLE_TO} {body.role.value}"}
+    
+
+
+
