@@ -20,7 +20,7 @@ async def created_photo(url,curent_user,db:AsyncSession):
 
     return photo
 
-async def get_URL(photo_id:int,db:AsyncSession):
+async def get_URL_Qr(photo_id:int,db:AsyncSession):
 
     query = select(Photo).filter(Photo.id == photo_id)
 
@@ -43,6 +43,16 @@ async def get_URL(photo_id:int,db:AsyncSession):
     qr_code_file_path = "my_qr_code.png"
     img.save(qr_code_file_path)
 
+    init_cloudinary()
+    upload_result = cloudinary.uploader.upload(
+        qr_code_file_path,
+        public_id=f"Qr_Code/{me.username}",
+        overwrite=True,
+        invalidate=True,
+    )
 
-    return {"source_url": photo.url, "qr_code_url": qr_code_file_path}
+    # Після завантаження, видаліть локальний файл
+    os.remove(qr_code_file_path)
+
+    return {"source_url": photo.url, "qr_code_url": upload_result["secure_url"]}
 

@@ -55,7 +55,7 @@ async def edit_my_profile(
     init_cloudinary()
     cloudinary.uploader.upload(
         file.file,
-        public_id=f"Photoshare/{me.username}",
+        public_id=f"Avatars/{me.username}",
         overwrite=True,
         invalidate=True,
     )

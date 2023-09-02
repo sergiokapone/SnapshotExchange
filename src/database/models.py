@@ -60,11 +60,11 @@ class Photo(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     url: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=True)
-    tags: Mapped[list[str]] = relationship('Tags', secondary=photo_m2m_tags, back_populates='photos')
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     user: Mapped['User'] = relationship('User', back_populates='photos')
     ratings: Mapped['Rating'] = relationship('Rating', back_populates='photo')
     created_at: Mapped[date] = mapped_column('created_at', DateTime, default=func.now())
+    QR: Mapped['QR_code'] = relationship('QR_code', back_populates='photo')
 
 
 class Rating(Base):
@@ -80,6 +80,15 @@ class Rating(Base):
     photo: Mapped[int] = relationship('Photo', back_populates='ratings')
 
 
+class QR_code(Base):
+    __tablename__ = "Qr_codes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    url: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    photo_id: Mapped[int] = mapped_column(Integer, ForeignKey('photos.id'))
+    photo: Mapped[int] = relationship('Photo', back_populates='QR')
+
 
 class BlacklistToken(Base):
     __tablename__ = 'blacklist_tokens'
@@ -88,10 +97,8 @@ class BlacklistToken(Base):
     token: Mapped[str] = mapped_column(String(500), unique=True, nullable=False)
     blacklisted_on : Mapped[date] = mapped_column(DateTime, default=func.now())
 
-class Tags(Base):
+class Tag(Base):
     __tablename__ = 'tags'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(25), unique=True, nullable=True)
-
-    photos: Mapped['Photo'] = relationship('Photo', secondary=photo_m2m_tags, back_populates='tags')
