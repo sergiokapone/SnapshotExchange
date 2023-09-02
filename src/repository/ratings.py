@@ -12,18 +12,24 @@ from src.conf.messages import YOUR_PHOTO,ALREADY_LIKE
 from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo
 from src.schemas import UserSchema, UserProfileSchema
 
-async def create_photo(content:str, user:User,db:AsyncSession):
-    new_photo = Photo(content=content,user_id=user.id)
 
-    db.add(new_photo)
-    await db.commit()
-    await db.refresh(new_photo)
-
-    return new_photo
 
 
 async def create_rating(rating: str,photos_id:str, user:User,db:AsyncSession):
+    """
+    Create a new rating for a photo in the database.
 
+    :param rating: The rating value.
+    :type rating: str
+    :param photos_id: The ID of the photo to rate.
+    :type photos_id: str
+    :param user: The user who is creating the rating.
+    :type user: User
+    :param db: The database session.
+    :type db: AsyncSession
+    :return: The created rating object.
+    :rtype: Rating
+    """
     query = select(Rating).filter(Rating.user_id == user.id, 
                                   Rating.photo_id ==Photo.id,)
     result = await db.execute(query)
@@ -49,7 +55,16 @@ async def create_rating(rating: str,photos_id:str, user:User,db:AsyncSession):
     return new_rating
 
 async def get_rating(photos_id:str,db:AsyncSession):
+    """
+    Calculate and retrieve the average rating for a photo.
 
+    :param photos_id: The ID of the photo for which to calculate the rating.
+    :type photos_id: str
+    :param db: The database session.
+    :type db: AsyncSession
+    :return: The average rating for the photo.
+    :rtype: float
+    """
     query = select(Rating).filter(Rating.photo_id == int(photos_id))
 
     result = await db.execute(query)
@@ -66,7 +81,16 @@ async def get_rating(photos_id:str,db:AsyncSession):
 
 
 async def get_all_ratings(photos_id:str,db:AsyncSession):
+    """
+    Retrieve all ratings for a photo.
 
+    :param photos_id: The ID of the photo for which to retrieve ratings.
+    :type photos_id: str
+    :param db: The database session.
+    :type db: AsyncSession
+    :return: A list of rating objects.
+    :rtype: List[Rating]
+    """
     query = select(Rating).filter(Rating.photo_id == int(photos_id))
 
     result = await db.execute(query)
@@ -75,7 +99,18 @@ async def get_all_ratings(photos_id:str,db:AsyncSession):
     return all_ratings
     
 async def delete_all_ratings(photos_id:str,user_id:str,db:AsyncSession):
+    """
+    Delete all ratings by a specific user for a photo.
 
+    :param photos_id: The ID of the photo for which to delete ratings.
+    :type photos_id: str
+    :param user_id: The ID of the user whose ratings should be deleted.
+    :type user_id: str
+    :param db: The database session.
+    :type db: AsyncSession
+    :return: A message indicating whether ratings were deleted.
+    :rtype: dict
+    """
     query = select(Rating).filter(Rating.photo_id == int(photos_id),
                                   Rating.user_id== int(user_id))
     

@@ -14,6 +14,16 @@ from src.schemas import UserSchema, UserProfileSchema
 
 
 async def create_user(body: UserSchema, db: AsyncSession) -> User:
+    """
+    Create a new user in the database.
+
+    :param body: The user data.
+    :type body: UserSchema
+    :param db: The database session.
+    :type db: AsyncSession
+    :return: The created user object.
+    :rtype: User
+    """
     avatar = None
     try:
         g = Gravatar(body.email)
@@ -119,6 +129,17 @@ async def get_users_posts(id: int, db: AsyncSession) -> int:
 
 
 async def get_user_profile(username: str, db: AsyncSession) -> User:
+    """
+    Get the profile of a user by their username.
+
+    :param username: The username of the user.
+    :type username: str
+    :param db: The database session.
+    :type db: AsyncSession
+    :return: The user profile.
+    :rtype: User
+    """
+
     user = db.query(User).filter(User.username == username).first()
     if user:
         post_count = db.query(Post).filter(Post.user_id == user.id).count()
