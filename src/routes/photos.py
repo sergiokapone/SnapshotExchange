@@ -22,6 +22,7 @@ from src.schemas import (
     RequestEmail,
     UserDb,
     RequestRole,
+    MessageResponseSchema,
 )
 
 
@@ -34,7 +35,7 @@ from src.conf.messages import (
     USER_NOT_ACTIVE,
     USER_ALREADY_NOT_ACTIVE,
     USER_CHANGE_ROLE_TO,
-    PHOTO_UPLOADED
+    PHOTO_UPLOADED,
 )
 
 
@@ -57,7 +58,11 @@ async def make_URL_QR(photo_id: int, db: AsyncSession = Depends(get_db)):
     return data
 
 
-@router.post("/photo_test/", dependencies=[Depends(allowed_get_user)])
+@router.post(
+    "/photo_test/",
+    dependencies=[Depends(allowed_get_user)],
+    response_model=MessageResponseSchema,
+)
 async def test_photo(
     url: str,
     current_user: User = Depends(auth_service.get_authenticated_user),
@@ -65,7 +70,7 @@ async def test_photo(
 ):
     url = await res_photos.created_photo(url, current_user, db)
 
-    return {"message": f"Created photo"}
+    return {"message": PHOTO_UPLOADED}
 
 
 @router.post(
@@ -74,15 +79,16 @@ async def test_photo(
     description="No more than 10 requests per minute",
     dependencies=[
         Depends(RateLimiter(times=10, seconds=60)),
-        Depends(allowed_get_user)
-        ]
+        Depends(allowed_get_user),
+    ],
+    response_model=MessageResponseSchema,
 )
 async def upload_new_photo(
     photo_file: UploadFile = File(...),
     description: str = Form(None),
     current_user: User = Depends(auth_service.get_authenticated_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> MessageResponseSchema:
     """Upload new photos"""
     if description is not None:
         if len(description) > 500:

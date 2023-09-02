@@ -94,3 +94,7 @@ class RequestEmail(BaseModel):
 class RequestRole(BaseModel):
     email: EmailStr
     role: Role
+
+
+class MessageResponseSchema(BaseModel):
+    message: str = "This is a message"

@@ -53,7 +53,7 @@ async def upload_photo(
     return status.HTTP_201_CREATED
 
 
-async def get_URL_Qr(photo_id:int,db:AsyncSession):
+async def get_URL_Qr(photo_id: int,db: AsyncSession):
 
     query = select(Photo).filter(Photo.id == photo_id)
 
@@ -75,9 +75,7 @@ async def get_URL_Qr(photo_id:int,db:AsyncSession):
     )
 
     qr.add_data(photo.url)
-
     qr.make(fit=True)
-
     img = qr.make_image(fill_color="black", back_color="white")
 
     qr_code_file_path = "my_qr_code.png"
@@ -95,8 +93,6 @@ async def get_URL_Qr(photo_id:int,db:AsyncSession):
     db.add(qr)
     await db.commit()
     await db.refresh(qr)
-
-
     os.remove(qr_code_file_path)
 
     return {"source_url": photo.url, "qr_code_url": qr.url}

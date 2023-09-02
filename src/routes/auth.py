@@ -20,7 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.models import User
 from src.services.email import send_email, reset_password_by_email
 from src.database.connect_db import get_db
-from src.schemas import UserSchema, UserResponseSchema, TokenSchema, RequestEmail
+from src.schemas import UserSchema, UserResponseSchema, TokenSchema, RequestEmail, MessageResponseSchema
 from src.repository import users as repository_users
 from src.services.auth import auth_service
 from src.conf.messages import (
@@ -61,14 +61,20 @@ async def signup(
     session: AsyncSession = Depends(get_db),
 ):
     exist_user_email = await repository_users.get_user_by_email(body.email, session)
-    exist_user_username = await repository_users.get_user_by_username(body.username, session)
-    
+    exist_user_username = await repository_users.get_user_by_username(
+        body.username, session
+    )
+
     if exist_user_email:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=ALREADY_EXISTS_EMAIL)
-    
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=ALREADY_EXISTS_EMAIL
+        )
+
     if exist_user_username:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=ALREADY_EXISTS_USERNAME)
-    
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=ALREADY_EXISTS_USERNAME
+        )
+
     body.password = auth_service.get_password_hash(body.password)
     new_user = await repository_users.create_user(body, session)
     background_tasks.add_task(
@@ -120,7 +126,7 @@ async def login(
     }
 
 
-@router.post("/logout")
+@router.post("/logout", response_model=MessageResponseSchema)
 async def logout(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: AsyncSession = Depends(get_db),
@@ -165,7 +171,7 @@ async def refresh_token(
     }
 
 
-@router.get("/confirmed_email/{token}")
+@router.get("/confirmed_email/{token}", response_model=MessageResponseSchema)
 async def confirmed_email(token: str, db: AsyncSession = Depends(get_db)):
     """
     The confirmed_email function is used to confirm a user's email address.
@@ -191,7 +197,7 @@ async def confirmed_email(token: str, db: AsyncSession = Depends(get_db)):
     return {"message": EMAIL_CONFIRMED}
 
 
-@router.post("/request_email")
+@router.post("/request_email", response_model=MessageResponseSchema)
 async def request_email(
     body: RequestEmail,
     background_tasks: BackgroundTasks,
@@ -223,7 +229,7 @@ async def request_email(
     return {"message": CHECK_YOUR_EMAIL}
 
 
-@router.post("/forgot_password")
+@router.post("/forgot_password", response_model=MessageResponseSchema)
 async def forgot_password(
     email: EmailStr,
     background_tasks: BackgroundTasks,
@@ -247,7 +253,7 @@ async def forgot_password(
     return {"message": EMAIL_HAS_BEEN_SEND}
 
 
-@router.post("/reset_password")
+@router.post("/reset_password", response_model=MessageResponseSchema)
 async def reset_password(
     reset_token: str, new_password: str, db: AsyncSession = Depends(get_db)
 ):
