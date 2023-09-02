@@ -45,15 +45,23 @@ allowed_ban_user = RoleChecker([Role.admin])
 allowed_change_user_role = RoleChecker([Role.admin])
 
 
-@router.post("/created_photo/", response_model=PhotoRat)
-async def create_photo_(content:str, current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
-    new_photo=await repository_ratings.create_photo(content,current_user,db)
-
-    return new_photo
 
 
 @router.post("/created_rating/", response_model=Rating)
 async def created_rating(rating,photo_id,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
+    """
+    Create a new rating for a photo.
+
+    This function allows users to create a new rating for a photo. Users must be authenticated.
+    The function accepts the rating value, the ID of the photo being rated, the current authenticated user, and a database session.
+
+    :param rating: int: The rating value.
+    :param photo_id: int: The ID of the photo being rated.
+    :param current_user: User: The currently authenticated user.
+    :param db: AsyncSession: The database session.
+    :return: The newly created rating record.
+    :rtype: Rating
+    """
     new_rating=await repository_ratings.create_rating(rating,photo_id,current_user,db)
 
     return new_rating
@@ -61,12 +69,34 @@ async def created_rating(rating,photo_id,current_user: User = Depends(auth_servi
 
 @router.get("/get_rating/")
 async def get_rating(photo_id, db: AsyncSession = Depends(get_db)):
+    """
+    Get the average rating for a photo.
+
+    This function retrieves the average rating for a photo with the specified ID from the database.
+
+    :param photo_id: int: The ID of the photo.
+    :param db: AsyncSession: The database session.
+    :return: The average rating for the photo.
+    :rtype: float
+    """
     new_rating=await repository_ratings.get_rating(photo_id,db)
 
     return new_rating
 
 @router.get("/get_rating_admin/")
 async def get_rating_ADmin_Moder(photo_id,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
+    """
+    Get all ratings for a photo (Admin/Moderator only).
+
+    This function retrieves all ratings for a photo with the specified ID from the database.
+    Only users with the 'admin' or 'moder' role can access this endpoint.
+
+    :param photo_id: int: The ID of the photo.
+    :param current_user: User: The currently authenticated user (admin or moder).
+    :param db: AsyncSession: The database session.
+    :return: All ratings for the photo.
+    :rtype: List[Rating]
+    """
     if current_user.role == Role.user:
         raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail=FORBIDDEN
@@ -78,6 +108,19 @@ async def get_rating_ADmin_Moder(photo_id,current_user: User = Depends(auth_serv
 
 @router.delete("/delete_rating_admin/")
 async def delete_rating_ADmin_Moder(photo_id,user_id,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
+    """
+    Delete all ratings for a photo (Admin/Moderator only).
+
+    This function deletes all ratings for a photo with the specified ID and user ID from the database.
+    Only users with the 'admin' or 'moder' role can access this endpoint.
+
+    :param photo_id: int: The ID of the photo.
+    :param user_id: int: The ID of the user.
+    :param current_user: User: The currently authenticated user (admin or moder).
+    :param db: AsyncSession: The database session.
+    :return: A message indicating successful deletion.
+    :rtype: MessageResponseSchema
+    """
     if current_user.role == Role.user:
         raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail=FORBIDDEN

@@ -61,6 +61,16 @@ async def send_email(email: EmailStr, username: str, host: str):
 async def reset_password_by_email(
     email: EmailStr, username: str, reset_token: str, host: str
 ):
+    """
+    Send an email to reset a user's password.
+
+    This function sends an email to the user with a link to reset their account password.
+
+    :param email: EmailStr: The recipient's email address.
+    :param username: str: The username of the user receiving the email.
+    :param reset_token: str: The password reset token.
+    :param host: str: The hostname of your application for the reset link.
+    """
     try:
         message = MessageSchema(
             subject="Reset account ",
