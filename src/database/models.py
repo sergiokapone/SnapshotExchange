@@ -50,8 +50,8 @@ class Post(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     text: Mapped[str] = mapped_column(String(500), nullable=False)
     photo:Mapped[str] = mapped_column(String(500), nullable=False)
-
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+    
     user: Mapped['User'] = relationship('User', back_populates='posts')
 
 class Photo(Base):
@@ -61,10 +61,12 @@ class Photo(Base):
     url: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-    user: Mapped['User'] = relationship('User', back_populates='photos')
-    ratings: Mapped['Rating'] = relationship('Rating', back_populates='photo')
     created_at: Mapped[date] = mapped_column('created_at', DateTime, default=func.now())
+    
+    ratings: Mapped['Rating'] = relationship('Rating', back_populates='photo')
+    tags: Mapped[list[str]] = relationship('Tag', secondary=photo_m2m_tags, backref='photos')
     QR: Mapped['QR_code'] = relationship('QR_code', back_populates='photo')
+    user: Mapped['User'] = relationship('User', back_populates='photos')
 
 
 class Rating(Base):

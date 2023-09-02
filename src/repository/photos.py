@@ -1,3 +1,8 @@
+import os
+import qrcode
+import random
+import uuid
+
 from libgravatar import Gravatar
 import cloudinary
 import cloudinary.uploader
@@ -6,12 +11,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import NoResultFound
 from fastapi import HTTPException, status
 from src.conf.config import init_cloudinary
-from src.conf.messages import YOUR_PHOTO,ALREADY_LIKE
+from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE
 from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo,QR_code
-import qrcode
-import os
+from src.services.auth import auth_service
 
-async def created_photo(url,curent_user,db:AsyncSession):
+from fastapi import File
+
+
+async def created_photo(url: str, curent_user: User, db: AsyncSession):
     photo= Photo(url=url,description='TEST',user_id=curent_user.id)
 
     db.add(photo)
@@ -19,6 +26,32 @@ async def created_photo(url,curent_user,db:AsyncSession):
     await db.refresh(photo)
 
     return photo
+
+async def upload_photo(
+    current_user: User, photo: File(),  description: str | None, db: AsyncSession) -> bool:
+    unique_photo_id = uuid.uuid4()
+    public_photo_id = f"Photos of users/{current_user.username}/{unique_photo_id}"
+    
+    init_cloudinary()
+    
+    uploaded_file_info = cloudinary.uploader.upload(
+        photo.file, public_id=public_photo_id, overwrite=True
+    )
+
+    photo_url = cloudinary.CloudinaryImage(public_photo_id).build_url(
+        width=250,
+        height=250,
+        crop="fill",
+        version=uploaded_file_info.get("version"),
+    )
+    # add photo url to DB
+    new_photo = Photo(url=photo_url, description=description, user_id=current_user.id)
+    db.add(new_photo)
+    await db.commit()
+    await db.refresh(new_photo)
+
+    return status.HTTP_201_CREATED
+
 
 async def get_URL_Qr(photo_id:int,db:AsyncSession):
 
