@@ -62,7 +62,7 @@ async def root(request: Request):
     return project_info
 
 
-@app.get("/info", response_class=HTMLResponse)
+@app.get("/info", response_class=HTMLResponse, include_in_schema=False)
 async def root(request: Request):
     project_info.update({"request": request})
     return templates.TemplateResponse(
