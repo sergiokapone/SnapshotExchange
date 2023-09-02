@@ -43,4 +43,6 @@ def downgrade() -> None:
     sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], name='photo_tags_tag_id_fkey')
     )
     op.drop_table('photo_m2m_tags')
+
     # ### end Alembic commands ###
+

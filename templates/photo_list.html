@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo List</title>
+    <!-- Подключаем стили Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="display-4">Photo List</h1>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Description</th>
+                    <th>User ID</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for photo in photos %}
+                <tr>
+                    <td>{{ photo.id }}</td>
+                    <td><img src="{{ photo.url }}" alt="Photo"></td>
+                    <td>{{ photo.description }}</td>
+                    <td>{{ photo.user_id }}</td>
+                    <td>{{ photo.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Получить access_token из localStorage
+            var accessToken = localStorage.getItem("access_token");
+
+            // Если access_token существует, добавьте его к заголовкам HTTP-запроса
+            if (accessToken) {
+                // Здесь можно использовать Fetch API или другие методы для отправки запроса
+                // Ниже приведен пример использования Fetch API
+                fetch("/api/photos/get_all/view", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + accessToken
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Обработка ответа от сервера
+                    console.log(data);
+                })
+                .catch(error => {
+                    // Обработка ошибки
+                    console.error(error);
+                });
+            }
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

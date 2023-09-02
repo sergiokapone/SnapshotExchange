@@ -15,7 +15,7 @@ ALREADY_EXISTS_USERNAME = "Username already taken"
 DOESNT_EXISTS = "Account doesn't exists"
 SUCCESS_CREATE_USER = "User successfully created. Check your email for confirmation."
 INVALID_PASSWORD = "Invalid credentials"
-INVALID_EMAIL = "Invalid credentials"
+INVALID_EMAIL = "Invalid email"
 INVALID_TOKEN = "Invalid refresh token"
 VERIFICATION_ERROR = "Verification error"
 EMAIL_NOT_CONFIRMED = "Email is not confirmed"
@@ -45,11 +45,14 @@ OPERATION_FORBIDDEN = "Operation forbidden"
 ALREADY_LIKE = "You have already rated"
 YOUR_PHOTO = "This is your photo, you can't like it"
 FORBIDDEN = "Access denied. You don't have permission for this action."
-DELETE_SUCCESSFUL = "You deleted SUCCESSFULY"
 
+DELETE_SUCCESSFUL = "You deleted successfully"
 PASWORD_RESET_SUCCESS = "Password reset successfully"
 
-PHOTO_UPLOADED = "New photo successfully uploaded"
+### Photo messages ###
+
+PHOTO_UPLOADED = 'Your photo has been successfully uploaded'
+PHOTO_REMOVED = 'Photo has been removed'
 NO_PHOTO_FOUND = "This user hasn't uploaded any photos yet"
-NO_PHOTO_BY_ID = "This user hasn't anu photos with this id"
-PHOTO_DELETED = "Photo was deleted successfuly"
+DELETE_SUCCESSFUL = "You deleted SUCCESSFUL"
+PASWORD_RESET_SUCCESS = "Password reset successfully"

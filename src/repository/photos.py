@@ -1,51 +1,75 @@
-import time
+import os
+import qrcode
 import random
+import uuid
 
+from libgravatar import Gravatar
 import cloudinary
 import cloudinary.uploader
-
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from fastapi import File, status
-
+from sqlalchemy.orm.exc import NoResultFound
+from fastapi import File, HTTPException, status
 from src.conf.config import init_cloudinary
-from src.database.models import User, Photo
+from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE
+from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo, QR_code
+from src.services.auth import auth_service
 
-init_cloudinary()
+# ----------------------------- ### CRUD ### ---------------------------------#
 
 
-async def upload_photo(current_user: User, photo: File(), db: AsyncSession, description=None) -> status:
-    unique_photo_id = f"{int(time.time())}-{random.randint(1, 10_000)}"
+async def upload_photo(
+    current_user: User, photo: File(), description: str | None, db: AsyncSession
+) -> bool:
+    """
+    Upload a photo to the cloud storage and create a database entry.
+
+    :param current_user: The user who is uploading the photo.
+    :type current_user: User
+    :param photo: The photo file to upload.
+    :type photo: File
+    :param description: The description of the photo.
+    :type description: str | None
+    :param db: The database session.
+    :type db: AsyncSession
+    :return: True if the upload was successful, False otherwise.
+    :rtype: bool
+    """
+    unique_photo_id = uuid.uuid4()
     public_photo_id = f"Photos of users/{current_user.username}/{unique_photo_id}"
 
-    uploaded_file_info = cloudinary.uploader.upload(photo.file, public_id=public_photo_id, overwrite=True)
+    init_cloudinary()
 
-    photo_url = cloudinary.CloudinaryImage(public_photo_id).build_url(width=250, height=250,
-                                                                      crop="fill",
-                                                                      version=uploaded_file_info.get('version'))
+    uploaded_file_info = cloudinary.uploader.upload(
+        photo.file, public_id=public_photo_id, overwrite=True
+    )
+
+    photo_url = cloudinary.CloudinaryImage(public_photo_id).build_url(
+        width=250,
+        height=250,
+        crop="fill",
+        version=uploaded_file_info.get("version"),
+    )
     # add photo url to DB
-    new_photo = Photo(url=photo_url,
-                      description=description,
-                      user_id=current_user.id)
-    db.add(new_photo)
-    await db.commit()
-    await db.refresh(new_photo)
-
+    new_photo = Photo(url=photo_url, description=description, user_id=current_user.id)
+    try:
+        db.add(new_photo)
+        await db.commit()
+        await db.refresh(new_photo)
+    except Exception as e:
+        
+        await db.rollback()
+        raise e 
     return status.HTTP_201_CREATED
 
 
-async def get_all_photos(skip: int, limit: int, current_user: User, db: AsyncSession) -> dict:
-    db_query = select(Photo).where(Photo.user_id == current_user.id).offset(skip).limit(limit)
-    result = await db.execute(db_query)
-    photos = result.scalars()
+async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[User]:
+    query = select(Photo).offset(skip).limit(limit)
+    result = await db.execute(query)
+    all_photos = result.scalars().all()
+    return all_photos
 
-    photo_dict = {photo.url: photo.description for photo in photos}
-
-    if photo_dict:
-        return photo_dict
-
-
-async def get_photo_by_id(current_user: User, photo_id: str, db: AsyncSession) -> dict:
+  async def get_photo_by_id(current_user: User, photo_id: str, db: AsyncSession) -> dict:
     query_result = await db.execute(select(Photo).where(Photo.user_id == current_user.id))
     photos = query_result.scalars()
 
@@ -68,15 +92,89 @@ async def patch_update_photo(current_user: User, photo_id: str, description: str
 
             return {photo.url: photo.description}
 
+async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
+    """
+    Remove a photo from cloud storage and the database.
 
-async def delete_photo_by_id(photo_id: str, current_user: User, db: AsyncSession) -> bool:
-    query_result = await db.execute(select(Photo).where(Photo.user_id == current_user.id))
-    photos = query_result.scalars()
+    :param photo_id: The ID of the photo to remove.
+    :type photo_id: int
+    :param user: The user who is removing the photo.
+    :type user: User
+    :param db: The database session.
+    :type db: AsyncSession
+    :return: True if the removal was successful, False otherwise.
+    :rtype: bool
+    """
 
-    for photo in photos:
-        p_id = photo.url.split('/')[-1]
-        if photo_id == p_id:
+    query = select(Photo).filter(Photo.id == photo_id)
+    result = await db.execute(query)
+    photo = result.scalar_one_or_none()
+    if photo:
+        if (
+            user.role == Role.admin
+            or user.role == Role.admin
+            or photo.user_id == user.id
+        ):
+            init_cloudinary()
+            cloudinary.uploader.destroy(photo.id)
             await db.delete(photo)
             await db.commit()
-
             return True
+    return False
+
+
+# --------------------------- ### END CRUD ### -------------------------------#
+
+
+async def get_URL_Qr(photo_id: int, db: AsyncSession):
+    """
+    Generate and retrieve a QR code URL for a photo.
+
+    :param photo_id: The ID of the photo for which to generate a QR code.
+    :type photo_id: int
+    :param db: The database session.
+    :type db: AsyncSession
+    :return: A dictionary containing the source URL and QR code URL.
+    :rtype: dict
+    """
+
+    query = select(Photo).filter(Photo.id == photo_id)
+    result = await db.execute(query)
+    photo = result.scalar()
+
+    query = select(QR_code).filter(QR_code.photo_id == photo_id)
+
+    result = await db.execute(query)
+    qr = result.scalar()
+    if qr != None:
+        return {"source_url": photo.url, "qr_code_url": qr.url}
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+
+    qr.add_data(photo.url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    qr_code_file_path = "my_qr_code.png"
+    img.save(qr_code_file_path)
+
+    init_cloudinary()
+    upload_result = cloudinary.uploader.upload(
+        qr_code_file_path,
+        public_id=f"Qr_Code/Photo_{photo_id}",
+        overwrite=True,
+        invalidate=True,
+    )
+    qr = QR_code(url=upload_result["secure_url"], photo_id=photo_id)
+
+    db.add(qr)
+    await db.commit()
+    await db.refresh(qr)
+    os.remove(qr_code_file_path)
+
+    return {"source_url": photo.url, "qr_code_url": qr.url}

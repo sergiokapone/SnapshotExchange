@@ -14,6 +14,16 @@ from src.schemas import UserSchema, UserProfileSchema
 
 
 async def create_user(body: UserSchema, db: AsyncSession) -> User:
+    """
+    Create a new user in the database.
+
+    :param body: The user data.
+    :type body: UserSchema
+    :param db: The database session.
+    :type db: AsyncSession
+    :return: The created user object.
+    :rtype: User
+    """
     avatar = None
     try:
         g = Gravatar(body.email)
@@ -28,11 +38,15 @@ async def create_user(body: UserSchema, db: AsyncSession) -> User:
 
     if not users_count:  #  First user always admin
         new_user.role = Role.admin
-    db.add(new_user)
-    await db.commit()
-    await db.refresh(new_user)
-    print("Done")
-    return new_user
+    try:
+        db.add(new_user)
+        await db.commit()
+        await db.refresh(new_user)
+        print("Done")
+        return new_user
+    except Exception as e:
+        await db.rollback()
+        raise e 
 
 
 async def edit_my_profile(
@@ -55,7 +69,7 @@ async def edit_my_profile(
     init_cloudinary()
     cloudinary.uploader.upload(
         file.file,
-        public_id=f"Photoshare/{me.username}",
+        public_id=f"Avatars/{me.username}",
         overwrite=True,
         invalidate=True,
     )
@@ -63,9 +77,14 @@ async def edit_my_profile(
         width=250, height=250, crop="fill"
     )
     me.avatar = url
-    await db.commit()
-    await db.refresh(me)
-    return me
+    
+    try:
+        await db.commit()
+        await db.refresh(me)
+        return me
+    except Exception as e:
+        await db.rollback()
+        raise e 
 
 
 async def get_users(skip: int, limit: int, db: AsyncSession) -> list[User]:
@@ -119,6 +138,17 @@ async def get_users_posts(id: int, db: AsyncSession) -> int:
 
 
 async def get_user_profile(username: str, db: AsyncSession) -> User:
+    """
+    Get the profile of a user by their username.
+
+    :param username: The username of the user.
+    :type username: str
+    :param db: The database session.
+    :type db: AsyncSession
+    :return: The user profile.
+    :rtype: User
+    """
+
     user = db.query(User).filter(User.username == username).first()
     if user:
         post_count = db.query(Post).filter(Post.user_id == user.id).count()
@@ -202,7 +232,11 @@ async def update_token(user: User, token: str | None, db: AsyncSession) -> None:
     :return: None, but the return type is specified as str | none
     """
     user.refresh_token = token
-    await db.commit()
+    try:
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise e 
 
 
 async def confirm_email(email: str, db: AsyncSession) -> None:
@@ -215,7 +249,11 @@ async def confirm_email(email: str, db: AsyncSession) -> None:
     """
     user = await get_user_by_email(email, db)
     user.confirmed = True
-    await db.commit()
+    try:
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise e 
 
 
 async def ban_user(email: str, db: AsyncSession) -> None:
@@ -247,7 +285,11 @@ async def make_user_role(email: str, role: Role, db: AsyncSession) -> None:
     """
     user = await get_user_by_email(email, db)
     user.role = role
-    db.commit()
+    try:
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise e 
 
    
 #### BLACKLIST #####
@@ -265,9 +307,17 @@ async def add_to_blacklist(token: str, db: AsyncSession) -> None:
     :return: None
     """
     blacklist_token = BlacklistToken(token=token, blacklisted_on=datetime.now())
-    db.add(blacklist_token)
-    await db.commit()
-    await db.refresh(blacklist_token)
+    
+    try:
+        db.add(blacklist_token)
+        await db.commit()
+        await db.refresh(blacklist_token)
+    except Exception as e:
+        await db.rollback()
+        raise e 
+
+
+
 
 
 async def is_blacklisted_token(token: str, db: AsyncSession) -> bool:

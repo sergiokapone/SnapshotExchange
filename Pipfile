@@ -30,6 +30,8 @@ psycopg2 = "*"
 libgravatar = "*"
 aioredis = "*"
 jinja2 = "*"
+uuid = "*"
+sphinx = "*"
 
 [dev-packages]
 
