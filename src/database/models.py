@@ -13,6 +13,7 @@ Base = declarative_base()
 photo_m2m_tags = Table(
     'photo_m2m_tags',
     Base.metadata,
+    Column("id", Integer, primary_key=True),
     Column('photo_id', Integer, ForeignKey('photos.id')),
     Column('tag_id', Integer, ForeignKey('tags.id'))
 )
@@ -61,10 +62,11 @@ class Photo(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     url: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=True)
-    tags: Mapped[list[str]] = relationship('Tags', secondary=photo_m2m_tags, back_populates='photo')
+    tags: Mapped[list[str]] = relationship('Tag', secondary=photo_m2m_tags, backref='photos')
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     user: Mapped['User'] = relationship('User', back_populates='photos')
     ratings: Mapped['Rating'] = relationship('Rating', back_populates='photo')
+    created_at: Mapped[date] = mapped_column('created_at', DateTime, default=func.now())
 
 
 class Rating(Base):
@@ -88,7 +90,7 @@ class BlacklistToken(Base):
     blacklisted_on: Mapped[date] = mapped_column(DateTime, default=func.now())
 
 
-class Tags(Base):
+class Tag(Base):
     __tablename__ = 'tags'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
