@@ -1,14 +1,18 @@
 # import redis.asyncio as redis
 
 import uvicorn
+from datetime import datetime
 
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi.templating import Jinja2Templates
+
+from fastapi import FastAPI, HTTPException, Depends, Request, status
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-
 from fastapi_limiter import FastAPILimiter
+from fastapi.responses import HTMLResponse
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
-
 from src.conf.messages import DB_CONFIG_ERROR, DB_CONNECT_ERROR, WELCOME_MESSAGE
 
 
@@ -17,9 +21,11 @@ from src.routes.auth import router as auth_router
 from src.routes.users import router as users_router
 from src.routes.ratings import router as ratings_router
 from src.conf.config import settings
+from src.conf.info_dict import project_info
 
 from src.conf.config import init_async_redis
 
+current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 app = FastAPI(
     debug=True,
@@ -34,6 +40,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+templates = Jinja2Templates(directory="templates")
+
 
 @app.on_event("startup")
 async def startup():
@@ -47,37 +57,35 @@ async def startup():
     tags=["Root"],
     # dependencies=[Depends(RateLimiter(times=2, seconds=5))]
 )
-async def root():
-    return {
-        "message": "Welcome to the Snapshot Exchange REST API!",
-        "version": "Version 1.0",
-        "description": "This API provides access to Snapshot Exchange services.",
-        "documentation": "For API documentation, visit our [Documentation Page](https://example.com/documentation).",
-        "authors": [
-            "Sergiy Ponomarenko (aka sergiokapone)",
-            "Sergiy Stepanov",
-            "Ilya Vasylevskyi",
-            "Oleksandr Tarasov",
-        ],
-        "license": "This API is distributed under the MIT License.",
-        "repository": "Find the source code on [GitHub](https://github.com/sergiokapone/SnapshotExchange).",
-    }
+@app.get("/")
+async def root(request: Request):
+    return project_info
+
+
+@app.get("/info", response_class=HTMLResponse)
+async def root(request: Request):
+    project_info.update({"request": request})
+    return templates.TemplateResponse(
+        "index.html", project_info
+    )
 
 
 @app.get("/api/healthchecker", tags=["Root"])
 async def healthchecker(session: AsyncSession = Depends(get_db)):
     try:
         result = await session.execute(text("SELECT 1"))
-
         rows = result.fetchall()
-
         if not rows:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=DB_CONFIG_ERROR,
             )
 
-        return {"message": "You successfully connected to the database!"}
+        return {
+            "status": "healthy",
+            "message": "You successfully connected to the database!",
+            "server_time": current_time,
+        }
 
     except Exception as e:
         print(e)

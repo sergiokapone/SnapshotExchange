@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snapshot Exchange API</title>
+    <!-- Подключаем стили Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="display-4"><b>{{ message }}</b></h1>
+        <p class="lead">Version: {{ version }}</p>
+        <p>{{ description }}</p>
+        <h2>Authors</h2>
+        <ul>
+            {% for author in authors %}
+                <li>
+                    <b><a href="{{ author.github }}" target="_blank">{{ author.name }}</a></b> - {{ author.additional_info }}                   
+                </li>
+            {% endfor %}
+        </ul>
+        <p>{{ license }}</p>
+        <p>Find the source code on <a href="{{ repository }}" target="_blank">GitHub</a></p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

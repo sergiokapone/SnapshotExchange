@@ -29,6 +29,7 @@ faker = "*"
 psycopg2 = "*"
 libgravatar = "*"
 aioredis = "*"
+jinja2 = "*"
 
 [dev-packages]
 
