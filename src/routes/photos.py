@@ -146,5 +146,6 @@ async def remove_photo(
     result = await repository_photos.remove_photo(photo_id, current_user, db)
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NOT_FOUND)
+
     return  {"message": PHOTO_REMOVED}
       

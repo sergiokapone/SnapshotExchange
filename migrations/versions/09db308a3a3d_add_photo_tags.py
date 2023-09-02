@@ -43,4 +43,6 @@ def downgrade() -> None:
     op.drop_column('photos', 'url')
     op.drop_table('photo_tags')
     op.drop_table('tags')
+
     # ### end Alembic commands ###
+

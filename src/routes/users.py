@@ -13,6 +13,14 @@ from src.schemas import (
     RequestRole,
 )
 
+from src.services.roles import (
+    allowed_get_user,
+    allowed_create_user,
+    allowed_get_all_users,
+    allowed_remove_user,
+    allowed_ban_user,
+    allowed_change_user_role,
+)
 
 from src.services.auth import auth_service
 
@@ -31,14 +39,6 @@ from src.conf.messages import (
 router = APIRouter(prefix="/users", tags=["Users"])
 
 # Permissions to use routes by role
-
-allowed_get_user = RoleChecker([Role.admin, Role.moder, Role.user])
-allowed_create_user = RoleChecker([Role.admin, Role.moder, Role.user])
-allowed_get_all_users = RoleChecker([Role.admin])
-allowed_remove_user = RoleChecker([Role.admin])
-allowed_ban_user = RoleChecker([Role.admin])
-allowed_change_user_role = RoleChecker([Role.admin])
-
 
 @router.get("/get_me", response_model=UserDb)
 async def read_my_profile(
@@ -127,3 +127,7 @@ async def make_role_by_email(body: RequestRole, db: AsyncSession = Depends(get_d
         await repository_users.make_user_role(body.email, body.role, db)
 
         return {"message": f"{USER_CHANGE_ROLE_TO} {body.role.value}"}
+    
+
+
+
