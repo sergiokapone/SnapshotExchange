@@ -39,7 +39,7 @@ class User(Base):
     confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
     is_active: Mapped[bool] =  mapped_column(Boolean, default=True)
     description: Mapped[str] = mapped_column(String(500),nullable=True, unique=False)
-    posts: Mapped['Post'] = relationship('Post', back_populates='user')
+    
     ratings: Mapped['Rating'] = relationship('Rating', back_populates='user')
     photos: Mapped['Photo'] = relationship('Photo', back_populates='user')
     
@@ -52,7 +52,6 @@ class Post(Base):
     photo:Mapped[str] = mapped_column(String(500), nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     
-    user: Mapped['User'] = relationship('User', back_populates='posts')
 
 class Photo(Base):
     __tablename__ = "photos"
@@ -63,9 +62,9 @@ class Photo(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     created_at: Mapped[date] = mapped_column('created_at', DateTime, default=func.now())
     
-    ratings: Mapped['Rating'] = relationship('Rating', back_populates='photo')
+    ratings: Mapped['Rating'] = relationship('Rating', back_populates='photo', cascade='all, delete-orphan')
     tags: Mapped[list[str]] = relationship('Tag', secondary=photo_m2m_tags, backref='photos')
-    QR: Mapped['QR_code'] = relationship('QR_code', back_populates='photo')
+    QR: Mapped['QR_code'] = relationship('QR_code', back_populates='photo', cascade='all, delete-orphan')
     user: Mapped['User'] = relationship('User', back_populates='photos')
 
 
@@ -74,11 +73,10 @@ class Rating(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-    user: Mapped['User'] = relationship('User', back_populates='ratings')
-
     rating: Mapped[int] = mapped_column(Integer)
-
     photo_id: Mapped[int] = mapped_column(Integer, ForeignKey('photos.id'))
+
+    user: Mapped['User'] = relationship('User', back_populates='ratings')
     photo: Mapped[int] = relationship('Photo', back_populates='ratings')
 
 

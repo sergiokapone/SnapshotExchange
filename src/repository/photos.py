@@ -109,32 +109,39 @@ async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
 
     :param photo_id: The ID of the photo to remove.
     :type photo_id: int
-    :param user: The user who is removing the photo.
     :type user: User
     :param db: The database session.
     :type db: AsyncSession
     :return: True if the removal was successful, False otherwise.
+    :param user: The user who is removing the photo.
     :rtype: bool
     """
 
     query = select(Photo).filter(Photo.id == photo_id)
     result = await db.execute(query)
     photo = result.scalar_one_or_none()
-    if photo:
-        if (
-            user.role == Role.admin
-            or user.role == Role.admin
-            or photo.user_id == user.id
-        ):
-            init_cloudinary()
-            cloudinary.uploader.destroy(photo.id)
-            try:
-                await db.delete(photo)
-                await db.commit()
-                return True
-            except Exception as e:
-                await db.rollback()
-                raise e
+    
+    if not photo:
+        return False
+    
+    
+    if (
+        user.role == Role.admin
+        or photo.user_id == user.id
+    ):
+        init_cloudinary()
+        cloudinary.uploader.destroy(photo.id)       
+            
+        try:
+            # Deleting linked ratings
+            await db.execute(Rating.__table__.delete().where(Rating.photo_id == photo_id))
+            # Deleting linked photo
+            await db.delete(photo)
+            await db.commit()
+            return True
+        except Exception as e:
+            await db.rollback()
+            raise e
 
 
 # --------------------------- ### END CRUD ### -------------------------------#
