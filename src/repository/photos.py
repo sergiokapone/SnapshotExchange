@@ -77,7 +77,7 @@ async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[Photo]:
     return photos
 
 
-async def get_photo_by_id(photo_id: str, db: AsyncSession) -> dict:
+async def get_photo_by_id(photo_id: int, db: AsyncSession) -> dict:
     query = select(Photo).filter(Photo.id == photo_id)
     result = await db.execute(query)
     photo = result.scalar_one_or_none()
@@ -86,7 +86,7 @@ async def get_photo_by_id(photo_id: str, db: AsyncSession) -> dict:
 
 
 async def patch_update_photo(
-    current_user: User, photo_id: str, description: str, db: AsyncSession
+    current_user: User, photo_id: int, description: str, db: AsyncSession
 ) -> dict:
     query_result = await db.execute(
         select(Photo).where(Photo.user_id == current_user.id)

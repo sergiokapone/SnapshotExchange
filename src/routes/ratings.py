@@ -36,7 +36,7 @@ router = APIRouter(prefix="/ratings", tags=["Ratings"])
 
 
 @router.post("/created_rating/", response_model=Rating)
-async def created_rating(rating,photo_id,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
+async def created_rating(rating:int,photo_id:int,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
     """
     Create a new rating for a photo.
 
@@ -56,7 +56,7 @@ async def created_rating(rating,photo_id,current_user: User = Depends(auth_servi
 
 
 @router.get("/get_rating/")
-async def get_rating(photo_id, db: AsyncSession = Depends(get_db)):
+async def get_rating(photo_id:int, db: AsyncSession = Depends(get_db)):
     """
     Get the average rating for a photo.
 
@@ -72,7 +72,7 @@ async def get_rating(photo_id, db: AsyncSession = Depends(get_db)):
     return new_rating
 
 @router.get("/get_rating_admin/")
-async def get_rating_ADmin_Moder(photo_id,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
+async def get_rating_ADmin_Moder(photo_id:int,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
     """
     Get all ratings for a photo (Admin/Moderator only).
 
@@ -95,7 +95,7 @@ async def get_rating_ADmin_Moder(photo_id,current_user: User = Depends(auth_serv
     
 
 @router.delete("/delete_rating_admin/")
-async def delete_rating_ADmin_Moder(photo_id,user_id,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
+async def delete_rating_ADmin_Moder(photo_id:int,user_id:int,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
     """
     Delete all ratings for a photo (Admin/Moderator only).
 
