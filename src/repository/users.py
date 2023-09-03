@@ -9,7 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from src.conf.config import init_cloudinary
 from src.conf.messages import USER_NOT_ACTIVE
-from src.database.models import User, Role, BlacklistToken, Post
+from src.database.models import User, Role, BlacklistToken, Photo, Comment
 from src.schemas import UserSchema, UserProfileSchema
 
 
@@ -38,11 +38,15 @@ async def create_user(body: UserSchema, db: AsyncSession) -> User:
 
     if not users_count:  #  First user always admin
         new_user.role = Role.admin
-    db.add(new_user)
-    await db.commit()
-    await db.refresh(new_user)
-    print("Done")
-    return new_user
+    try:
+        db.add(new_user)
+        await db.commit()
+        await db.refresh(new_user)
+        print("Done")
+        return new_user
+    except Exception as e:
+        await db.rollback()
+        raise e 
 
 
 async def edit_my_profile(
@@ -54,7 +58,7 @@ async def edit_my_profile(
     :param file: Upload the image to cloudinary
     :param new_username: Change the username of the user
     :param user: User: Get the user object from the database
-    :param db: Session: Access the database
+    :param db: AsyncSession: Access the database
     :return: A user object
     """
     result = await db.execute(select(User).filter(User.id == user.id))
@@ -69,68 +73,38 @@ async def edit_my_profile(
         overwrite=True,
         invalidate=True,
     )
-    url = cloudinary.CloudinaryImage(f"Photoshare/{me.username}").build_url(
+    url = cloudinary.CloudinaryImage(f"Avatars/{me.username}").build_url(
         width=250, height=250, crop="fill"
     )
     me.avatar = url
-    await db.commit()
-    await db.refresh(me)
-    return me
+    
+    try:
+        await db.commit()
+        await db.refresh(me)
+        return me
+    except Exception as e:
+        await db.rollback()
+        raise e 
 
 
 async def get_users(skip: int, limit: int, db: AsyncSession) -> list[User]:
     """
-    The get_users function returns a list of users from the database.
+    The get_users function returns a list of all users from the database.
 
     :param skip: int: Skip the first n records in the database
     :param limit: int: Limit the number of results returned
-    :param db: Session: Pass the database session to the function
-    :return: A list of users
+    :param db: AsyncSession: Pass the database session to the function
+    :return: A list of all users
     """
     query = select(User).offset(skip).limit(limit)
     result = await db.execute(query)
-    all_users = result.scalars().all()
-    return all_users
-
-
-async def get_users_with_username(username: str, db: AsyncSession) -> list[User]:
-    """
-    The get_users_with_username function returns a list of users with the given username.
-        Args:
-            username (str): The username to search for.
-            db (Session): A database session object.
-        Returns:
-            list[User]: A list of User objects that match the given criteria.
-
-    :param username: str: Specify the type of data that is expected to be passed into the function
-    :param db: Session: Pass the database session to the function
-    :return: A list of users
-    """
-    query = select(User).where(func.lower(User.username).like(f"%{username.lower()}%"))
-    result = await db.execute(query)
-    matching_users = result.scalars().all()
-    return matching_users
-
-
-async def get_users_posts(id: int, db: AsyncSession) -> int:
-    """
-    The get_users function returns a list of users from the database.
-
-    :param skip: int: Skip the first n records in the database
-    :param limit: int: Limit the number of results returned
-    :param db: Session: Pass the database session to the function
-    :return: A list of users
-    """
-    query = select(Post).filter(Post.user_id == id)
-    result = await db.execute(query)
-    all_posts = result.scalars().all()
-
-    return len(all_posts)
+    users = result.scalars().all()
+    return users
 
 
 async def get_user_profile(username: str, db: AsyncSession) -> User:
     """
-    Get the profile of a user by their username.
+    Get the profile of a user by username.
 
     :param username: The username of the user.
     :type username: str
@@ -139,21 +113,31 @@ async def get_user_profile(username: str, db: AsyncSession) -> User:
     :return: The user profile.
     :rtype: User
     """
-
-    user = db.query(User).filter(User.username == username).first()
+    
+    query = select(User).filter(User.username == username)
+    result = await db.execute(query)
+    user = result.scalar_one_or_none()
+    
     if user:
-        post_count = db.query(Post).filter(Post.user_id == user.id).count()
-        comment_count = db.query(Comment).filter(Comment.user_id == user.id).count()
-        rates_count = db.query(Rating).filter(Rating.user_id == user.id).count()
-        user_profile = UserProfileModel(
+        
+        # Count number of photos of user with username
+        photos_query = select(func.count()).where(Photo.user_id == user.id)
+        photos_result = await db.execute(photos_query)
+        photos_count = photos_result.scalar()
+    
+        # Count number of comments  of user with username    
+        comments_query = select(func.count()).where(Comment.user_id == user.id)
+        comments_result = await db.execute(comments_query)
+        comments_count = comments_result.scalar()
+        
+        user_profile = UserProfileSchema(
             username=user.username,
             email=user.email,
             avatar=user.avatar,
             created_at=user.created_at,
             is_active=user.is_active,
-            post_count=post_count,
-            comment_count=comment_count,
-            rates_count=rates_count,
+            photos_count=photos_count,
+            comments_count=comments_count,
         )
         return user_profile
     return None
@@ -223,7 +207,11 @@ async def update_token(user: User, token: str | None, db: AsyncSession) -> None:
     :return: None, but the return type is specified as str | none
     """
     user.refresh_token = token
-    await db.commit()
+    try:
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise e 
 
 
 async def confirm_email(email: str, db: AsyncSession) -> None:
@@ -236,7 +224,11 @@ async def confirm_email(email: str, db: AsyncSession) -> None:
     """
     user = await get_user_by_email(email, db)
     user.confirmed = True
-    await db.commit()
+    try:
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise e 
 
 
 async def ban_user(email: str, db: AsyncSession) -> None:
@@ -268,7 +260,11 @@ async def make_user_role(email: str, role: Role, db: AsyncSession) -> None:
     """
     user = await get_user_by_email(email, db)
     user.role = role
-    db.commit()
+    try:
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise e 
 
    
 #### BLACKLIST #####
@@ -286,9 +282,17 @@ async def add_to_blacklist(token: str, db: AsyncSession) -> None:
     :return: None
     """
     blacklist_token = BlacklistToken(token=token, blacklisted_on=datetime.now())
-    db.add(blacklist_token)
-    await db.commit()
-    await db.refresh(blacklist_token)
+    
+    try:
+        db.add(blacklist_token)
+        await db.commit()
+        await db.refresh(blacklist_token)
+    except Exception as e:
+        await db.rollback()
+        raise e 
+
+
+
 
 
 async def is_blacklisted_token(token: str, db: AsyncSession) -> bool:

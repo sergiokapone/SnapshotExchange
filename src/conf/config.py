@@ -1,6 +1,5 @@
 import cloudinary
 from pydantic_settings import BaseSettings
-import redis
 import redis.asyncio
 
 

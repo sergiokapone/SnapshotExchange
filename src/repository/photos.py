@@ -9,17 +9,14 @@ import cloudinary.uploader
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import NoResultFound
-from fastapi import HTTPException, status
+from fastapi import File, HTTPException, status
 from src.conf.config import init_cloudinary
 from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE
 from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo, QR_code
 from src.services.auth import auth_service
 
-from fastapi import File
-
-
-
 # ----------------------------- ### CRUD ### ---------------------------------#
+
 
 async def upload_photo(
     current_user: User, photo: File(), description: str | None, db: AsyncSession
@@ -55,22 +52,58 @@ async def upload_photo(
     )
     # add photo url to DB
     new_photo = Photo(url=photo_url, description=description, user_id=current_user.id)
-    db.add(new_photo)
-    await db.commit()
-    await db.refresh(new_photo)
-
+    try:
+        db.add(new_photo)
+        await db.commit()
+        await db.refresh(new_photo)
+    except Exception as e:
+        await db.rollback()
+        raise e
     return status.HTTP_201_CREATED
 
-async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[User]:
+
+async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[Photo]:
+    """
+    The get_photos function returns a list of all photos from the database.
+
+    :param skip: int: Skip the first n records in the database
+    :param limit: int: Limit the number of results returned
+    :param db: AsyncSession: Pass the database session to the function
+    :return: A list of all photos
+    """
     query = select(Photo).offset(skip).limit(limit)
     result = await db.execute(query)
-    all_photos = result.scalars().all()
-    return all_photos
-    
-async def remove_photo(photo_id: int, 
-                      user: User, 
-                      db: AsyncSession) -> bool:
-    
+    photos = result.scalars().all()
+    return photos
+
+
+async def get_photo_by_id(photo_id: int, db: AsyncSession) -> dict:
+    query = select(Photo).filter(Photo.id == photo_id)
+    result = await db.execute(query)
+    photo = result.scalar_one_or_none()
+
+    return photo
+
+
+async def patch_update_photo(
+    current_user: User, photo_id: int, description: str, db: AsyncSession
+) -> dict:
+    query_result = await db.execute(
+        select(Photo).where(Photo.user_id == current_user.id)
+    )
+    photos = query_result.scalars()
+
+    for photo in photos:
+        p_id = photo.url.split("/")[-1]
+        if photo_id == p_id:
+            photo.description = description
+            await db.commit()
+            await db.refresh(photo)
+
+            return {photo.url: photo.description}
+
+
+async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
     """
     Remove a photo from cloud storage and the database.
 
@@ -88,15 +121,24 @@ async def remove_photo(photo_id: int,
     result = await db.execute(query)
     photo = result.scalar_one_or_none()
     if photo:
-        if user.role == Role.admin or user.role == Role.admin or photo.user_id == user.id:
+        if (
+            user.role == Role.admin
+            or user.role == Role.admin
+            or photo.user_id == user.id
+        ):
             init_cloudinary()
             cloudinary.uploader.destroy(photo.id)
-            await db.delete(photo)
-            await db.commit()
-            return True
-    return False
+            try:
+                await db.delete(photo)
+                await db.commit()
+                return True
+            except Exception as e:
+                await db.rollback()
+                raise e
+
 
 # --------------------------- ### END CRUD ### -------------------------------#
+
 
 async def get_URL_Qr(photo_id: int, db: AsyncSession):
     """
@@ -114,11 +156,14 @@ async def get_URL_Qr(photo_id: int, db: AsyncSession):
     result = await db.execute(query)
     photo = result.scalar()
     
-    query = select(QR_code).filter(QR_code.photo_id == photo_id)
+    if photo is None:
+        raise HTTPException(status_code=404)
 
+    query = select(QR_code).filter(QR_code.photo_id == photo_id)
     result = await db.execute(query)
     qr = result.scalar()
-    if qr != None:
+
+    if qr is not None:
         return {"source_url": photo.url, "qr_code_url": qr.url}
 
     qr = qrcode.QRCode(
@@ -144,9 +189,14 @@ async def get_URL_Qr(photo_id: int, db: AsyncSession):
     )
     qr = QR_code(url=upload_result["secure_url"], photo_id=photo_id)
 
-    db.add(qr)
-    await db.commit()
-    await db.refresh(qr)
+    try:
+        db.add(qr)
+        await db.commit()
+        await db.refresh(qr)
+    except Exception as e:
+        await db.rollback()
+        print(e)
+
     os.remove(qr_code_file_path)
 
     return {"source_url": photo.url, "qr_code_url": qr.url}

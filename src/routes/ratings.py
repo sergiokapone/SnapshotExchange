@@ -6,7 +6,6 @@ from src.repository import ratings as repository_ratings
 from src.database.models import User, Role
 
 from src.schemas import (
-    UserProfile,
     UserProfileSchema,
     UserResponseSchema,
     RequestEmail,
@@ -23,7 +22,7 @@ from src.services.roles import RoleChecker
 
 from src.conf.messages import (
     NOT_FOUND,
-    USER_ROLE_EXISTS,
+    USER_ROLE_IN_USE,
     INVALID_EMAIL,
     USER_NOT_ACTIVE,
     USER_ALREADY_NOT_ACTIVE,
@@ -35,20 +34,9 @@ from src.conf.messages import (
 
 router = APIRouter(prefix="/ratings", tags=["Ratings"])
 
-# Permissions to use routes by role
-
-allowed_get_user = RoleChecker([Role.admin, Role.moder, Role.user])
-allowed_create_user = RoleChecker([Role.admin, Role.moder, Role.user])
-allowed_get_all_users = RoleChecker([Role.admin])
-allowed_remove_user = RoleChecker([Role.admin])
-allowed_ban_user = RoleChecker([Role.admin])
-allowed_change_user_role = RoleChecker([Role.admin])
-
-
-
 
 @router.post("/created_rating/", response_model=Rating)
-async def created_rating(rating,photo_id,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
+async def created_rating(rating:int,photo_id:int,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
     """
     Create a new rating for a photo.
 
@@ -68,7 +56,7 @@ async def created_rating(rating,photo_id,current_user: User = Depends(auth_servi
 
 
 @router.get("/get_rating/")
-async def get_rating(photo_id, db: AsyncSession = Depends(get_db)):
+async def get_rating(photo_id:int, db: AsyncSession = Depends(get_db)):
     """
     Get the average rating for a photo.
 
@@ -84,7 +72,7 @@ async def get_rating(photo_id, db: AsyncSession = Depends(get_db)):
     return new_rating
 
 @router.get("/get_rating_admin/")
-async def get_rating_ADmin_Moder(photo_id,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
+async def get_rating_ADmin_Moder(photo_id:int,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
     """
     Get all ratings for a photo (Admin/Moderator only).
 
@@ -107,7 +95,7 @@ async def get_rating_ADmin_Moder(photo_id,current_user: User = Depends(auth_serv
     
 
 @router.delete("/delete_rating_admin/")
-async def delete_rating_ADmin_Moder(photo_id,user_id,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
+async def delete_rating_ADmin_Moder(photo_id:int,user_id:int,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
     """
     Delete all ratings for a photo (Admin/Moderator only).
 

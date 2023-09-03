@@ -1,5 +1,3 @@
-# import redis.asyncio as redis
-
 import uvicorn
 from datetime import datetime
 
@@ -49,7 +47,6 @@ templates = Jinja2Templates(directory="templates")
 @app.on_event("startup")
 async def startup():
     redis_cache = await init_async_redis()
-
     await FastAPILimiter.init(redis_cache)
 
 

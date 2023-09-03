@@ -8,13 +8,16 @@ from fastapi import (
     status,
     Response,
     Request,
-    Header
+    Header,
+    Query,
 )
 
 
 from fastapi.templating import Jinja2Templates
+from fastapi.encoders import jsonable_encoder
 from starlette.requests import Request
-templates = Jinja2Templates(directory="templates")  
+
+templates = Jinja2Templates(directory="templates")
 
 from fastapi_limiter.depends import RateLimiter
 
@@ -23,7 +26,6 @@ from src.database.connect_db import get_db
 from src.repository import photos as repository_photos
 from src.database.models import User, Role
 from src.schemas import (
-    UserProfile,
     UserProfileSchema,
     UserResponseSchema,
     RequestEmail,
@@ -33,36 +35,34 @@ from src.schemas import (
 )
 
 from src.schemas import PhotosDb
-
 from src.services.auth import auth_service
 from src.services.roles import RoleChecker
 from src.conf.messages import (
     NOT_FOUND,
-    USER_ROLE_EXISTS,
+    USER_ROLE_IN_USE,
     INVALID_EMAIL,
     USER_NOT_ACTIVE,
     USER_ALREADY_NOT_ACTIVE,
     USER_CHANGE_ROLE_TO,
     PHOTO_UPLOADED,
-    PHOTO_REMOVED
+    PHOTO_REMOVED,
+    NO_PHOTO_FOUND,
 )
 
-from src.services.roles import (
-    allowed_get_user,
-    allowed_create_user,
-    allowed_get_all_users,
-    allowed_remove_user,
-    allowed_ban_user,
-    allowed_change_user_role,
-)
+from src.services.roles import Admin_Moder_User, Admin
+
 
 router = APIRouter(prefix="/photos", tags=["Photos"])
 
 
-@router.post("/make_URL_QR/")
-async def make_URL_QR(photo_id: int, db: AsyncSession = Depends(get_db)):
+@router.post("/make_QR/")
+async def make_URL_QR(
+    photo_id: int,
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
+):
     """
-    Generate a QR code URL for a photo.
+    # Generate a QR code URL for a photo.
 
     This function generates a QR code URL for the specified photo by its ID.
 
@@ -71,6 +71,7 @@ async def make_URL_QR(photo_id: int, db: AsyncSession = Depends(get_db)):
     :return: A dictionary containing the QR code URL.
     :rtype: dict
     """
+    
     data = await repository_photos.get_URL_Qr(photo_id, db)
 
     return data
@@ -84,13 +85,13 @@ async def make_URL_QR(photo_id: int, db: AsyncSession = Depends(get_db)):
     description="No more than 10 requests per minute",
     dependencies=[
         Depends(RateLimiter(times=10, seconds=60)),
-        Depends(allowed_get_user),
+        Depends(Admin_Moder_User),
     ],
     response_model=MessageResponseSchema,
 )
-async def upload_new_photo(
+async def upload_photo(
     photo_file: UploadFile = File(...),
-    description: str = Form(None),
+    description: str | None = Form(None),
     current_user: User = Depends(auth_service.get_authenticated_user),
     db: AsyncSession = Depends(get_db),
 ) -> MessageResponseSchema:
@@ -118,39 +119,113 @@ async def upload_new_photo(
             current_user, photo_file, description, db
         )
     else:
-        new_photo = await repository_photos.upload_photo(current_user, photo_file, db)
+        new_photo = await repository_photos.upload_photo(
+            current_user, photo_file, description, db
+        )
 
     if new_photo:
         return {"message": PHOTO_UPLOADED}
 
+
 @router.get(
     "/get_all",
     response_model=list[PhotosDb],
-    dependencies=[Depends(allowed_get_all_users)],
+    dependencies=[Depends(Admin)],
 )
-async def read_all_photos(
+async def get_all_photos(
     skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)
-) ->list:
+) -> list:
     photos = await repository_photos.get_photos(skip, limit, db)
     return photos
 
-@router.get(
-    "/get_all/view",
-    dependencies=[Depends(allowed_get_all_users), Depends(auth_service.get_authenticated_user)]
-)
-async def read_all_photos(request: Request,
-    skip: int = 0, limit: int = 10,  db: AsyncSession = Depends(get_db), 
-    authorization: str = Header(None)
-):
-    photos = await repository_photos.get_photos(skip, limit, db)
-    return templates.TemplateResponse("photo_list.html", {"request": request, "photos": photos})
 
+# @router.get(
+#     "/get_all/view",
+#     dependencies=[
+#         Depends(Admin),
+#         Depends(auth_service.get_authenticated_user),
+#     ],
+# )
+# async def get_all_photos(
+#     request: Request,
+#     skip: int = 0,
+#     limit: int = 10,
+#     db: AsyncSession = Depends(get_db),
+#     authorization: str = Header(None),
+# ):
+#     photos = await repository_photos.get_photos(skip, limit, db)
+#     return templates.TemplateResponse(
+#         "photo_list.html", {"request": request, "photos": photos}
+#     )
+
+
+@router.get(
+    "/{username}",
+    status_code=status.HTTP_200_OK,
+    response_model=dict,
+    description="No more than 10 requests per minute",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
+)
+async def get_all_photos(
+    skip: int = Query(0, description="Number of records to skip"),
+    limit: int = Query(10, description="Number of records to retrieve"),
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Getting all photos from a database for current user"""
+    photos = await repository_photos.get_photos(skip, limit, db)
+
+    if photos:
+        return photos
+    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_FOUND)
+
+
+@router.get(
+    "/{photo_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=dict,
+    description="No more than 10 requests per minute",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
+)
+async def get_one_photo(
+    photo_id: int,
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Getting a photo for current user by unique photo id"""
+
+    photo = await repository_photos.get_photo_by_id(photo_id, db)
+
+    return photo if photo else HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_FOUND)
+
+
+@router.patch(
+    "/{photo_id}",
+    status_code=status.HTTP_200_OK,
+    description="No more than 10 requests per minute",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
+)
+async def patch_update_photo(
+    photo_id: int,
+    new_photo_description: str,
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Updating a photo by its id"""
+    updated_photo = await repository_photos.patch_update_photo(
+        current_user, photo_id, new_photo_description, db
+    )
+
+    if updated_photo:
+        return jsonable_encoder(updated_photo)
+    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID)
 
 @router.delete("/{photo_id}", response_model=MessageResponseSchema)
 async def remove_photo(
-    photo_id: int, 
-    current_user: User = Depends(auth_service.get_authenticated_user), 
-    db: AsyncSession = Depends(get_db)) -> MessageResponseSchema:
+    photo_id: int,
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
+) -> MessageResponseSchema:
     """
     Remove a photo by its ID.
 
@@ -167,6 +242,4 @@ async def remove_photo(
     result = await repository_photos.remove_photo(photo_id, current_user, db)
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NOT_FOUND)
-
-    return  {"message": PHOTO_REMOVED}
-      
+    return {"message": PHOTO_REMOVED}

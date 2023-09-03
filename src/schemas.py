@@ -12,7 +12,7 @@ class UserSchema(BaseModel):
     password: str = Field(min_length=6, max_length=30)
 
     model_config = ConfigDict(
-        json_schema_extra = {
+        json_schema_extra={
             "title": "User Schema",
             "description": "Schema for user data",
             "example": {
@@ -24,17 +24,19 @@ class UserSchema(BaseModel):
     )
 
 
-
 class UserUpdateSchema(BaseModel):
     username: str = Field(min_length=5, max_length=25)
 
+
 class PhotoRat(BaseModel):
-    content:str
+    content: str
+
 
 class Rating(BaseModel):
-    user_id:int
-    rating:int
-    photo_id:int
+    user_id: int
+    rating: int
+    photo_id: int
+
 
 class UserResponseSchema(BaseModel):
     id: int
@@ -43,17 +45,21 @@ class UserResponseSchema(BaseModel):
     is_active: bool | None
     created_at: datetime
 
-    model_config = ConfigDict(from_attributes = True)
+    model_config = ConfigDict(from_attributes=True)
 
+
+    
+    
 class UserProfileSchema(BaseModel):
     username: str
     email: EmailStr
     avatar: str | None
-    post_count: int | None
-    comment_count: int | None
-    rates_count: int | None
+    photos_count: int | None
+    comments_count: int | None
     is_active: bool | None
     created_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserDb(BaseModel):
@@ -63,22 +69,9 @@ class UserDb(BaseModel):
     avatar: str | None
     role: Role
     created_at: datetime
-    description: str| None
+    description: str | None
 
-    model_config = ConfigDict(from_attributes = True)
-
-class UserProfile(BaseModel):
-    username: str
-    email: str
-    avatar: str | None
-    created_at: datetime
-    count_posts : int 
-
-    model_config = ConfigDict(from_attributes = True)
-
-class UserResponseSchema(BaseModel):
-    user: UserDb
-    detail: str = "User successfully created"
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TokenSchema(BaseModel):
