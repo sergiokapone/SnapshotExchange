@@ -187,7 +187,7 @@ async def get_all_photos(
     dependencies=[Depends(RateLimiter(times=10, seconds=60))],
 )
 async def get_one_photo(
-    photo_id: str,
+    photo_id: int,
     current_user: User = Depends(auth_service.get_authenticated_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -205,7 +205,7 @@ async def get_one_photo(
     dependencies=[Depends(RateLimiter(times=10, seconds=60))],
 )
 async def patch_update_photo(
-    photo_id: str,
+    photo_id: int,
     new_photo_description: str,
     current_user: User = Depends(auth_service.get_authenticated_user),
     db: AsyncSession = Depends(get_db),
