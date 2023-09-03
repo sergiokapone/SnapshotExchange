@@ -1,5 +1,4 @@
-import redis.asyncio as redis
-
+from redis.asyncio import Redis  # As type
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.connect_db import get_db
@@ -16,14 +15,7 @@ from src.schemas import (
     RequestRole,
 )
 
-from src.services.roles import (
-    allowed_get_user,
-    allowed_create_user,
-    allowed_get_all_users,
-    allowed_remove_user,
-    allowed_ban_user,
-    allowed_change_user_role,
-)
+from src.services.roles import Admin_Moder_User, Admin 
 
 from src.services.auth import auth_service
 from src.conf.config import init_async_redis
@@ -47,7 +39,6 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.get("/get_me", response_model=UserDb)
 async def read_my_profile(
-    # token: str,
     current_user: User = Depends(auth_service.get_authenticated_user),
 ):
     """
@@ -68,8 +59,8 @@ async def edit_my_profile(
     new_username: str = Form(None),
     new_description: str = Form(None),
     current_user: User = Depends(auth_service.get_authenticated_user),
+    redis_client: Redis = Depends(init_async_redis),
     db: AsyncSession = Depends(get_db),
-    redis_client: redis.Redis = Depends(init_async_redis),
 ):
     updated_user = await repository_users.edit_my_profile(
         avatar, new_description, new_username, current_user, db
@@ -116,7 +107,7 @@ async def user_profile(
 @router.get(
     "/get_all",
     response_model=list[UserDb],
-    dependencies=[Depends(allowed_get_all_users)],
+    dependencies=[Depends(Admin)],
 )
 async def read_all_users(
     skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)
@@ -137,11 +128,11 @@ async def read_all_users(
     return users
 
 
-@router.patch("/ban/{email}", dependencies=[Depends(allowed_ban_user)])
+@router.patch("/ban/{email}", dependencies=[Depends(Admin)])
 async def ban_user_by_email(
     body: RequestEmail,
     db: AsyncSession = Depends(get_db),
-    redis_client: redis.Redis = Depends(init_async_redis),
+    redis_client: Redis = Depends(init_async_redis),
 ):
     # Removing a key from Redis
     key_to_clear = f"user:{body.email}"
@@ -164,11 +155,11 @@ async def ban_user_by_email(
         )
 
 
-@router.patch("/make_role/{email}", dependencies=[Depends(allowed_change_user_role)])
+@router.patch("/make_role/{email}", dependencies=[Depends(Admin)])
 async def make_role_by_email(
     body: RequestRole,
     db: AsyncSession = Depends(get_db),
-    redis_client: redis.Redis = Depends(init_async_redis),
+    redis_client: Redis = Depends(init_async_redis),
 ):
     # Removing a key from Redis
     key_to_clear = f"user:{body.email}"

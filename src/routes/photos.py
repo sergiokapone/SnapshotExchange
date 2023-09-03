@@ -50,14 +50,8 @@ from src.conf.messages import (
     NO_PHOTO_FOUND
 )
 
-from src.services.roles import (
-    allowed_get_user,
-    allowed_create_user,
-    allowed_get_all_users,
-    allowed_remove_user,
-    allowed_ban_user,
-    allowed_change_user_role,
-)
+from src.services.roles import Admin_Moder_User, Admin
+
 
 router = APIRouter(prefix="/photos", tags=["Photos"])
 
@@ -125,7 +119,7 @@ async def get_one_photo(photo_id: str,
     description="No more than 10 requests per minute",
     dependencies=[
         Depends(RateLimiter(times=10, seconds=60)),
-        Depends(allowed_get_user),
+        Depends(Admin_Moder_User),
     ],
     response_model=MessageResponseSchema,
 )
@@ -186,7 +180,7 @@ async def patch_update_photo(photo_id: str,
 @router.get(
     "/get_all",
     response_model=list[PhotosDb],
-    dependencies=[Depends(allowed_get_all_users)],
+    dependencies=[Depends(Admin)],
 )
 async def read_all_photos(
     skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)
@@ -198,7 +192,7 @@ async def read_all_photos(
 @router.get(
     "/get_all/view",
     dependencies=[
-        Depends(allowed_get_all_users),
+        Depends(Admin),
         Depends(auth_service.get_authenticated_user),
     ],
 )

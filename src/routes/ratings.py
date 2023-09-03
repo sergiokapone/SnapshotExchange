@@ -35,17 +35,6 @@ from src.conf.messages import (
 
 router = APIRouter(prefix="/ratings", tags=["Ratings"])
 
-# Permissions to use routes by role
-
-allowed_get_user = RoleChecker([Role.admin, Role.moder, Role.user])
-allowed_create_user = RoleChecker([Role.admin, Role.moder, Role.user])
-allowed_get_all_users = RoleChecker([Role.admin])
-allowed_remove_user = RoleChecker([Role.admin])
-allowed_ban_user = RoleChecker([Role.admin])
-allowed_change_user_role = RoleChecker([Role.admin])
-
-
-
 
 @router.post("/created_rating/", response_model=Rating)
 async def created_rating(rating,photo_id,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):

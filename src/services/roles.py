@@ -13,9 +13,6 @@ class RoleChecker:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=OPERATION_FORBIDDEN)
 
 
-allowed_get_user = RoleChecker([Role.admin, Role.moder, Role.user])
-allowed_create_user = RoleChecker([Role.admin, Role.moder, Role.user])
-allowed_get_all_users = RoleChecker([Role.admin])
-allowed_remove_user = RoleChecker([Role.admin])
-allowed_ban_user = RoleChecker([Role.admin])
-allowed_change_user_role = RoleChecker([Role.admin])
+Admin_Moder_User = RoleChecker([Role.admin, Role.moder, Role.user])
+Admin_Moder = RoleChecker([Role.admin, Role.moder])
+Admin = RoleChecker([Role.admin])
