@@ -48,6 +48,8 @@ class UserResponseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+    
+    
 class UserProfileSchema(BaseModel):
     username: str
     email: EmailStr
@@ -56,6 +58,8 @@ class UserProfileSchema(BaseModel):
     comments_count: int | None
     is_active: bool | None
     created_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserDb(BaseModel):

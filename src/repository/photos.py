@@ -155,12 +155,15 @@ async def get_URL_Qr(photo_id: int, db: AsyncSession):
     query = select(Photo).filter(Photo.id == photo_id)
     result = await db.execute(query)
     photo = result.scalar()
+    
+    if photo is None:
+        raise HTTPException(status_code=404)
 
     query = select(QR_code).filter(QR_code.photo_id == photo_id)
-
     result = await db.execute(query)
     qr = result.scalar()
-    if qr != None:
+
+    if qr is not None:
         return {"source_url": photo.url, "qr_code_url": qr.url}
 
     qr = qrcode.QRCode(

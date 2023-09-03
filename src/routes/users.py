@@ -1,55 +1,90 @@
+### Import from FastAPI ###
+
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    UploadFile,
+    status,
+)
+from fastapi.responses import HTMLResponse, JSONResponse
+
+### Import from Redis ###
+
 from redis.asyncio import Redis  # As type
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+
+### Import from SQLAlchemy ###
+
 from sqlalchemy.ext.asyncio import AsyncSession
+
+### Import from Pydentic ###
+
+from pydantic import EmailStr
+
+### Import from Configurations ###
+
+from src.conf.config import init_async_redis
+from src.conf.messages import (
+    NOT_FOUND,
+    USER_ROLE_IN_USE,
+    INVALID_EMAIL,
+    USER_NOT_ACTIVE,
+    USER_ALREADY_NOT_ACTIVE,
+    USER_CHANGE_ROLE_TO,
+    USER_EXISTS,
+)
+
+### Import from Database ###
+
 from src.database.connect_db import get_db
-from src.repository import users as repository_users
 from src.database.models import User, Role
 
+### Import from Schemas ###
 
 from src.schemas import (
     UserProfileSchema,
     UserResponseSchema,
     RequestEmail,
     UserDb,
-    RequestRole
+    RequestRole,
+    MessageResponseSchema,
 )
 
-from src.services.roles import Admin_Moder_User, Admin 
+### Import from Repository ###
 
+from src.repository import users as repository_users
+
+### Import from Services ###
+
+from src.services.roles import RoleChecker, Admin_Moder_User, Admin
 from src.services.auth import auth_service
-from src.conf.config import init_async_redis
-
-from src.services.roles import RoleChecker
-
-from src.conf.messages import (
-    NOT_FOUND,
-    USER_ROLE_EXISTS,
-    INVALID_EMAIL,
-    USER_NOT_ACTIVE,
-    USER_ALREADY_NOT_ACTIVE,
-    USER_CHANGE_ROLE_TO,
-)
 
 
 router = APIRouter(prefix="/users", tags=["Users"])
+
 
 @router.get("/get_me", response_model=UserDb)
 async def read_my_profile(
     current_user: User = Depends(auth_service.get_authenticated_user),
 ):
     """
-    Get the profile of the currently authenticated user.
+    # Get the profile of the current user.
 
-    This function retrieves the profile of the currently authenticated user.
+    This route retrieves the profile of the current authenticated user.
 
-    :param current_user: User: The currently authenticated user.
-    :return: The user's profile.
+    Level of Access:
+    - Current authorized user
+
+    :param current_user: User: The current authenticated user.
+    :return: Current user profile.
     :rtype: UserDb
     """
     return current_user
 
 
-@router.put("/edit_me", response_model=UserDb)
+@router.patch("/edit_me", status_code=status.HTTP_200_OK, response_model=UserDb)
 async def edit_my_profile(
     avatar: UploadFile = File(),
     new_username: str = Form(None),
@@ -58,40 +93,74 @@ async def edit_my_profile(
     redis_client: Redis = Depends(init_async_redis),
     db: AsyncSession = Depends(get_db),
 ):
-    updated_user = await repository_users.edit_my_profile(
-        avatar, new_description, new_username, current_user, db
-    )
+    """
+    # Edit the current user's profile.
+
+    This route allows the current user to edit own profile, including uploading an avatar, changing the username and description.
+
+    Level of Access:
+    - Current authorized user
+
+    :param avatar: UploadFile: User avatar file (optional).
+    :param new_username: str: New username (optional).
+    :param new_description: str: New user description (optional).
+    :param current_user: User: Current authenticated user.
+    :param redis_client: Redis: Redis client.
+    :param db: AsyncSession: Database session.
+
+    :return: Updated user profile.
+    :rtype: UserDb
+    
+    :raises: HTTPException with code 400 and detail "USER_EXISTS" if the new username already exists.
+    """
 
     # Removing a key from Redis
     key_to_clear = f"user:{current_user.email}"
     await redis_client.delete(key_to_clear)
 
-    return updated_user
+    other_user = await repository_users.get_user_by_username(new_username, db)
+
+    if other_user is None:
+        updated_user = await repository_users.edit_my_profile(
+            avatar, new_description, new_username, current_user, db
+        )
+
+        return updated_user
+
+    raise HTTPException(status_code=400, detail=USER_EXISTS)
+
 
 @router.get(
     "/get_all",
     response_model=list[UserDb],
-    dependencies=[Depends(Admin)],
+    dependencies=[Depends(Admin_Moder_User)],
 )
 async def get_users(
-    skip: int = 0, limit: int = 10, 
+    skip: int = 0,
+    limit: int = 10,
     current_user: User = Depends(auth_service.get_authenticated_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
-    Get a list of all users (Admin only).
+    # Get a list of users.
 
-    This function retrieves a list of all users from the database.
-    Only users with the 'admin' role can access this endpoint.
+    This route allows  to get a list of pagination-aware users.
 
-    :param skip: int: The number of users to skip.
-    :param limit: int: The maximum number of users to retrieve.
-    :param db: AsyncSession: The database session.
-    :return: A list of users.
+    Level of Access:
+    - Current authorized user
+
+    :param skip: int: Number of users to skip.
+    :param limit: int: Maximum number of users to return.
+    :param current_user: User: Current authenticated user.
+    :param db: AsyncSession: Database session.
+
+    :return: List of users.
     :rtype: List[UserDb]
     """
+
     users = await repository_users.get_users(skip, limit, db)
     return users
+
 
 @router.get("/{username}", response_model=UserProfileSchema)
 async def user_profile(
@@ -100,16 +169,25 @@ async def user_profile(
     db: AsyncSession = Depends(get_db),
 ) -> dict | None:
     """
-    Get a user's profile by username.
+    # Get a user's profile by username.
 
-    This function retrieves a user's profile by their username from the database.
+    This route allows to retrieve a user's profile by their username.
 
-    :param username: str: The username of the user.
-    :param db: AsyncSession: The database session.
-    :return: The user's profile.
-    :rtype: UserProfile | None
+    Level of Access:
+    - Current authorized user
+
+    :param username: str: The username of the user whose profile is to be retrieved.
+    :param current_user: User: The current authenticated user (optional).
+    :param db: AsyncSession: Database session.
+
+    :return: User profile or None if no user is found.
+    :rtype: dict | None
+
+    :raises: HTTPException with code 404 and detail "NOT_FOUND" if the user is not found.
     """
+
     user = await repository_users.get_user_by_username(username, db)
+
     if user:
         urer_profile = await repository_users.get_user_profile(user.username, db)
         return urer_profile
@@ -117,23 +195,29 @@ async def user_profile(
         raise HTTPException(status_code=404, detail=NOT_FOUND)
 
 
+@router.patch(
+    "/ban", dependencies=[Depends(Admin)], response_model=MessageResponseSchema
+)
+async def ban_user_by_email(email: EmailStr, db: AsyncSession = Depends(get_db)):
+    """
+    # Block a user by email.
 
-@router.patch("/ban/{email}", dependencies=[Depends(Admin)])
-async def ban_user_by_email(
-    body: RequestEmail,
-    db: AsyncSession = Depends(get_db),
-    redis_client: Redis = Depends(init_async_redis),
-):
-    # Removing a key from Redis
-    key_to_clear = f"user:{body.email}"
-    await redis_client.delete(key_to_clear)
+    This route allows to block a user by their email.
 
-    user = await repository_users.get_user_by_email(body.email, db)
+    Level of Access:
+    - Administartor
+
+    :param email: EmailStr: Email of the user to block.
+    :param db: AsyncSession: Database session.
+
+    :return: Successful user blocking message or error message.
+    :rtype: dict
+    """
+
+    user = await repository_users.get_user_by_email(email, db)
 
     if not user:
         raise HTTPException(status_code=404, detail=INVALID_EMAIL)
-    
-    
 
     if user.is_active:
         await repository_users.ban_user(user.email, db)
@@ -145,26 +229,45 @@ async def ban_user_by_email(
         )
 
 
-@router.patch("/edit_role/{email}", dependencies=[Depends(Admin)])
-async def make_role_by_email(
-    body: RequestRole,
+@router.patch(
+    "/asign_role", dependencies=[Depends(Admin)], response_model=MessageResponseSchema
+)
+async def assign_role(
+    email: EmailStr,
+    selected_role: Role,
     db: AsyncSession = Depends(get_db),
     redis_client: Redis = Depends(init_async_redis),
 ):
+    """
+    # Assign a role to a user by email.
+
+    This route allows to assign the selected role to a user by their email.
+
+    Level of Access:
+    - Administartor
+
+    :param email: EmailStr: Email of the user to whom you want to assign the role.
+    :param selected_role: Role: The selected role for the assignment (Administrator, Moderator or User).
+    :param db: AsyncSession: Database Session.
+    :param redis_client: Redis: Redis client.
+
+    :return: Message about successful role change.
+    :rtype: dict
+    """
+
     # Removing a key from Redis
-    key_to_clear = f"user:{body.email}"
+    key_to_clear = f"user:{email}"
     await redis_client.delete(key_to_clear)
 
-    user = await repository_users.get_user_by_email(body.email, db)
+    user = await repository_users.get_user_by_email(email, db)
 
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_EMAIL
         )
 
-    if body.role == user.role:
-        return {"message": USER_ROLE_EXISTS}
+    if selected_role == user.role:
+        return {"message": USER_ROLE_IN_USE}
     else:
-        await repository_users.make_user_role(body.email, body.role, db)
-
-        return {"message": f"{USER_CHANGE_ROLE_TO} {body.role.value}"}
+        await repository_users.make_user_role(email, selected_role, db)
+        return {"message": f"{USER_CHANGE_ROLE_TO} {selected_role.value}"}

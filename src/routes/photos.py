@@ -39,7 +39,7 @@ from src.services.auth import auth_service
 from src.services.roles import RoleChecker
 from src.conf.messages import (
     NOT_FOUND,
-    USER_ROLE_EXISTS,
+    USER_ROLE_IN_USE,
     INVALID_EMAIL,
     USER_NOT_ACTIVE,
     USER_ALREADY_NOT_ACTIVE,
@@ -62,7 +62,7 @@ async def make_URL_QR(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Generate a QR code URL for a photo.
+    # Generate a QR code URL for a photo.
 
     This function generates a QR code URL for the specified photo by its ID.
 
@@ -71,6 +71,7 @@ async def make_URL_QR(
     :return: A dictionary containing the QR code URL.
     :rtype: dict
     """
+    
     data = await repository_photos.get_URL_Qr(photo_id, db)
 
     return data

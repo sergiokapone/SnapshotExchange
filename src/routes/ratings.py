@@ -22,7 +22,7 @@ from src.services.roles import RoleChecker
 
 from src.conf.messages import (
     NOT_FOUND,
-    USER_ROLE_EXISTS,
+    USER_ROLE_IN_USE,
     INVALID_EMAIL,
     USER_NOT_ACTIVE,
     USER_ALREADY_NOT_ACTIVE,
