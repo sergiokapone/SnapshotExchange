@@ -73,7 +73,7 @@ async def edit_my_profile(
         overwrite=True,
         invalidate=True,
     )
-    url = cloudinary.CloudinaryImage(f"Photoshare/{me.username}").build_url(
+    url = cloudinary.CloudinaryImage(f"Avatars/{me.username}").build_url(
         width=250, height=250, crop="fill"
     )
     me.avatar = url
