@@ -105,3 +105,17 @@ class Tag(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(25), unique=True, nullable=True)
 
+
+class Comment(Base):
+    __tablename__ = 'comments'
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    text: Mapped[int] = mapped_column(Text, nullable=False)
+    created_at: Mapped[date] = mapped_column('created_at', DateTime, default=func.now())
+    updated_at: Mapped[date] = mapped_column('updated_at', DateTime, default=func.now(), onupdate=func.now())
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+    photo_id: Mapped[int] = mapped_column('photo_id', ForeignKey('photos.id', ondelete='CASCADE'), default=None)
+    update_status: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    user = relationship('User', backref="comments")
+    photo = relationship('Photo', backref="comments")

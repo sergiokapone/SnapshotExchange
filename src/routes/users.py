@@ -7,12 +7,11 @@ from src.database.models import User, Role
 
 
 from src.schemas import (
-    UserProfile,
     UserProfileSchema,
     UserResponseSchema,
     RequestEmail,
     UserDb,
-    RequestRole,
+    RequestRole
 )
 
 from src.services.roles import Admin_Moder_User, Admin 
@@ -33,9 +32,6 @@ from src.conf.messages import (
 
 
 router = APIRouter(prefix="/users", tags=["Users"])
-
-# Permissions to use routes by role
-
 
 @router.get("/get_me", response_model=UserDb)
 async def read_my_profile(
@@ -97,7 +93,7 @@ async def get_users(
     users = await repository_users.get_users(skip, limit, db)
     return users
 
-@router.get("/{username}", response_model=UserProfile)
+@router.get("/{username}", response_model=UserProfileSchema)
 async def user_profile(
     username: str,
     current_user: User = Depends(auth_service.get_authenticated_user),
@@ -115,15 +111,8 @@ async def user_profile(
     """
     user = await repository_users.get_user_by_username(username, db)
     if user:
-        count_posts = await repository_users.get_users_posts(user.id, db)
-        result_dict = {
-            "username": user.username,
-            "email": user.email,
-            "created_at": user.created_at,
-            "avatar": user.avatar,
-            "count_posts": count_posts,
-        }
-        return result_dict
+        urer_profile = await repository_users.get_user_profile(user.username, db)
+        return urer_profile
     else:
         raise HTTPException(status_code=404, detail=NOT_FOUND)
 

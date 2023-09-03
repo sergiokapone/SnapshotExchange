@@ -9,7 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from src.conf.config import init_cloudinary
 from src.conf.messages import USER_NOT_ACTIVE
-from src.database.models import User, Role, BlacklistToken, Post
+from src.database.models import User, Role, BlacklistToken, Photo, Comment
 from src.schemas import UserSchema, UserProfileSchema
 
 
@@ -58,7 +58,7 @@ async def edit_my_profile(
     :param file: Upload the image to cloudinary
     :param new_username: Change the username of the user
     :param user: User: Get the user object from the database
-    :param db: Session: Access the database
+    :param db: AsyncSession: Access the database
     :return: A user object
     """
     result = await db.execute(select(User).filter(User.id == user.id))
@@ -102,25 +102,9 @@ async def get_users(skip: int, limit: int, db: AsyncSession) -> list[User]:
     return users
 
 
-async def get_users_posts(id: int, db: AsyncSession) -> int:
-    """
-    The get_users function returns a list of users from the database.
-
-    :param skip: int: Skip the first n records in the database
-    :param limit: int: Limit the number of results returned
-    :param db: Session: Pass the database session to the function
-    :return: A list of users
-    """
-    query = select(Post).filter(Post.user_id == id)
-    result = await db.execute(query)
-    all_posts = result.scalars().all()
-
-    return len(all_posts)
-
-
 async def get_user_profile(username: str, db: AsyncSession) -> User:
     """
-    Get the profile of a user by their username.
+    Get the profile of a user by username.
 
     :param username: The username of the user.
     :type username: str
@@ -129,21 +113,31 @@ async def get_user_profile(username: str, db: AsyncSession) -> User:
     :return: The user profile.
     :rtype: User
     """
-
-    user = db.query(User).filter(User.username == username).first()
+    
+    query = select(User).filter(User.username == username)
+    result = await db.execute(query)
+    user = result.scalar_one_or_none()
+    
     if user:
-        post_count = db.query(Post).filter(Post.user_id == user.id).count()
-        comment_count = db.query(Comment).filter(Comment.user_id == user.id).count()
-        rates_count = db.query(Rating).filter(Rating.user_id == user.id).count()
-        user_profile = UserProfileModel(
+        
+        # Count number of photos of user with username
+        photos_query = select(func.count()).where(Photo.user_id == user.id)
+        photos_result = await db.execute(photos_query)
+        photos_count = photos_result.scalar()
+    
+        # Count number of comments  of user with username    
+        comments_query = select(func.count()).where(Comment.user_id == user.id)
+        comments_result = await db.execute(comments_query)
+        comments_count = comments_result.scalar()
+        
+        user_profile = UserProfileSchema(
             username=user.username,
             email=user.email,
             avatar=user.avatar,
             created_at=user.created_at,
             is_active=user.is_active,
-            post_count=post_count,
-            comment_count=comment_count,
-            rates_count=rates_count,
+            photos_count=photos_count,
+            comments_count=comments_count,
         )
         return user_profile
     return None

@@ -57,9 +57,8 @@ async def upload_photo(
         await db.commit()
         await db.refresh(new_photo)
     except Exception as e:
-        
         await db.rollback()
-        raise e 
+        raise e
     return status.HTTP_201_CREATED
 
 
@@ -77,27 +76,32 @@ async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[Photo]:
     photos = result.scalars().all()
     return photos
 
+
 async def get_photo_by_id(photo_id: str, db: AsyncSession) -> dict:
     query = select(Photo).filter(Photo.id == photo_id)
     result = await db.execute(query)
     photo = result.scalar_one_or_none()
 
     return photo
-        
 
 
-async def patch_update_photo(current_user: User, photo_id: str, description: str, db: AsyncSession) -> dict:
-    query_result = await db.execute(select(Photo).where(Photo.user_id == current_user.id))
+async def patch_update_photo(
+    current_user: User, photo_id: str, description: str, db: AsyncSession
+) -> dict:
+    query_result = await db.execute(
+        select(Photo).where(Photo.user_id == current_user.id)
+    )
     photos = query_result.scalars()
 
     for photo in photos:
-        p_id = photo.url.split('/')[-1]
+        p_id = photo.url.split("/")[-1]
         if photo_id == p_id:
             photo.description = description
             await db.commit()
             await db.refresh(photo)
 
             return {photo.url: photo.description}
+
 
 async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
     """
@@ -130,7 +134,7 @@ async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
                 return True
             except Exception as e:
                 await db.rollback()
-                raise e 
+                raise e
 
 
 # --------------------------- ### END CRUD ### -------------------------------#

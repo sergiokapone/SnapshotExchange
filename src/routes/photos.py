@@ -26,7 +26,6 @@ from src.database.connect_db import get_db
 from src.repository import photos as repository_photos
 from src.database.models import User, Role
 from src.schemas import (
-    UserProfile,
     UserProfileSchema,
     UserResponseSchema,
     RequestEmail,

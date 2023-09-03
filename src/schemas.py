@@ -52,9 +52,8 @@ class UserProfileSchema(BaseModel):
     username: str
     email: EmailStr
     avatar: str | None
-    post_count: int | None
-    comment_count: int | None
-    rates_count: int | None
+    photos_count: int | None
+    comments_count: int | None
     is_active: bool | None
     created_at: datetime
 
@@ -69,22 +68,6 @@ class UserDb(BaseModel):
     description: str | None
 
     model_config = ConfigDict(from_attributes=True)
-
-
-class UserProfile(BaseModel):
-    username: str
-    email: str
-    avatar: str | None
-    created_at: datetime
-    count_posts: int
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-# дублирование - 2 класса UserResponseSchema
-# class UserResponseSchema(BaseModel):
-#     user: UserDb
-#     detail: str = "User successfully created"
 
 
 class TokenSchema(BaseModel):

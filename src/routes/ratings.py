@@ -6,7 +6,6 @@ from src.repository import ratings as repository_ratings
 from src.database.models import User, Role
 
 from src.schemas import (
-    UserProfile,
     UserProfileSchema,
     UserResponseSchema,
     RequestEmail,
