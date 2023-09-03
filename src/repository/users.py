@@ -89,36 +89,17 @@ async def edit_my_profile(
 
 async def get_users(skip: int, limit: int, db: AsyncSession) -> list[User]:
     """
-    The get_users function returns a list of users from the database.
+    The get_users function returns a list of all users from the database.
 
     :param skip: int: Skip the first n records in the database
     :param limit: int: Limit the number of results returned
-    :param db: Session: Pass the database session to the function
-    :return: A list of users
+    :param db: AsyncSession: Pass the database session to the function
+    :return: A list of all users
     """
     query = select(User).offset(skip).limit(limit)
     result = await db.execute(query)
-    all_users = result.scalars().all()
-    return all_users
-
-
-async def get_users_with_username(username: str, db: AsyncSession) -> list[User]:
-    """
-    The get_users_with_username function returns a list of users with the given username.
-        Args:
-            username (str): The username to search for.
-            db (Session): A database session object.
-        Returns:
-            list[User]: A list of User objects that match the given criteria.
-
-    :param username: str: Specify the type of data that is expected to be passed into the function
-    :param db: Session: Pass the database session to the function
-    :return: A list of users
-    """
-    query = select(User).where(func.lower(User.username).like(f"%{username.lower()}%"))
-    result = await db.execute(query)
-    matching_users = result.scalars().all()
-    return matching_users
+    users = result.scalars().all()
+    return users
 
 
 async def get_users_posts(id: int, db: AsyncSession) -> int:

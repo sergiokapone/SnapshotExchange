@@ -9,7 +9,7 @@ from fastapi import (
     Response,
     Request,
     Header,
-    Query
+    Query,
 )
 
 
@@ -47,7 +47,7 @@ from src.conf.messages import (
     USER_CHANGE_ROLE_TO,
     PHOTO_UPLOADED,
     PHOTO_REMOVED,
-    NO_PHOTO_FOUND
+    NO_PHOTO_FOUND,
 )
 
 from src.services.roles import Admin_Moder_User, Admin
@@ -56,7 +56,7 @@ from src.services.roles import Admin_Moder_User, Admin
 router = APIRouter(prefix="/photos", tags=["Photos"])
 
 
-@router.post("/make_URL_QR/")
+@router.post("/make_QR/")
 async def make_URL_QR(
     photo_id: int,
     current_user: User = Depends(auth_service.get_authenticated_user),
@@ -79,40 +79,6 @@ async def make_URL_QR(
 
 """ ------------------- Crud operations for photos ------------------------ """
 
-@router.get("/{username}",
-            status_code=status.HTTP_200_OK,
-            response_model=dict,
-            description="No more than 10 requests per minute",
-            dependencies=[Depends(RateLimiter(times=10, seconds=60))]
-            )
-async def get_all_photos(skip: int = Query(0, description="Number of records to skip"),
-                         limit: int = Query(10, description="Number of records to retrieve"),
-                         current_user: User = Depends(auth_service.get_authenticated_user),
-                         db: AsyncSession = Depends(get_db)):
-    """Getting all photos from a database for current user"""
-    photos_dict = await repository_photos.get_all_photos(skip, limit, current_user, db)
-
-    if photos_dict:
-        return jsonable_encoder(photos_dict)
-    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_FOUND)
-
-@router.get("/{username}/{photo_id}",
-        status_code=status.HTTP_200_OK,
-        response_model=dict,
-        description="No more than 10 requests per minute",
-        dependencies=[Depends(RateLimiter(times=10, seconds=60))]
-        )
-async def get_one_photo(photo_id: str,
-                        current_user: User = Depends(auth_service.get_authenticated_user),
-                        db: AsyncSession = Depends(get_db)):
-    """Getting a photo for current user by unique photo id"""
-
-    photo = await repository_photos.get_photo_by_id(current_user, photo_id, db)
-
-    if photo:
-        return jsonable_encoder(photo)
-    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_FOUND)
-    
 @router.post(
     "/upload",
     status_code=status.HTTP_201_CREATED,
@@ -159,22 +125,6 @@ async def upload_photo(
 
     if new_photo:
         return {"message": PHOTO_UPLOADED}
-@router.patch("/{username}/{photo_id}",
-              status_code=status.HTTP_200_OK,
-              description="No more than 10 requests per minute",
-              dependencies=[Depends(RateLimiter(times=10, seconds=60))]
-              )
-async def patch_update_photo(photo_id: str,
-                             new_photo_description: str,
-                             current_user: User = Depends(auth_service.get_authenticated_user),
-                             db: AsyncSession = Depends(get_db)
-                             ):
-    """Updating a photo by its id"""
-    updated_photo = await repository_photos.patch_update_photo(current_user, photo_id, new_photo_description, db)
-
-    if updated_photo:
-        return jsonable_encoder(updated_photo)
-    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID)
 
 
 @router.get(
@@ -182,32 +132,93 @@ async def patch_update_photo(photo_id: str,
     response_model=list[PhotosDb],
     dependencies=[Depends(Admin)],
 )
-async def read_all_photos(
+async def get_all_photos(
     skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)
 ) -> list:
     photos = await repository_photos.get_photos(skip, limit, db)
     return photos
 
 
+# @router.get(
+#     "/get_all/view",
+#     dependencies=[
+#         Depends(Admin),
+#         Depends(auth_service.get_authenticated_user),
+#     ],
+# )
+# async def get_all_photos(
+#     request: Request,
+#     skip: int = 0,
+#     limit: int = 10,
+#     db: AsyncSession = Depends(get_db),
+#     authorization: str = Header(None),
+# ):
+#     photos = await repository_photos.get_photos(skip, limit, db)
+#     return templates.TemplateResponse(
+#         "photo_list.html", {"request": request, "photos": photos}
+#     )
+
+
 @router.get(
-    "/get_all/view",
-    dependencies=[
-        Depends(Admin),
-        Depends(auth_service.get_authenticated_user),
-    ],
+    "/{username}",
+    status_code=status.HTTP_200_OK,
+    response_model=dict,
+    description="No more than 10 requests per minute",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
 )
-async def read_all_photos(
-    request: Request,
-    skip: int = 0,
-    limit: int = 10,
+async def get_all_photos(
+    skip: int = Query(0, description="Number of records to skip"),
+    limit: int = Query(10, description="Number of records to retrieve"),
+    current_user: User = Depends(auth_service.get_authenticated_user),
     db: AsyncSession = Depends(get_db),
-    authorization: str = Header(None),
 ):
+    """Getting all photos from a database for current user"""
     photos = await repository_photos.get_photos(skip, limit, db)
-    return templates.TemplateResponse(
-        "photo_list.html", {"request": request, "photos": photos}
+
+    if photos:
+        return photos
+    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_FOUND)
+
+
+@router.get(
+    "/{photo_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=dict,
+    description="No more than 10 requests per minute",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
+)
+async def get_one_photo(
+    photo_id: str,
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Getting a photo for current user by unique photo id"""
+
+    photo = await repository_photos.get_photo_by_id(photo_id, db)
+
+    return photo if photo else HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_FOUND)
+
+
+@router.patch(
+    "/{photo_id}",
+    status_code=status.HTTP_200_OK,
+    description="No more than 10 requests per minute",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
+)
+async def patch_update_photo(
+    photo_id: str,
+    new_photo_description: str,
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Updating a photo by its id"""
+    updated_photo = await repository_photos.patch_update_photo(
+        current_user, photo_id, new_photo_description, db
     )
 
+    if updated_photo:
+        return jsonable_encoder(updated_photo)
+    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID)
 
 @router.delete("/{photo_id}", response_model=MessageResponseSchema)
 async def remove_photo(

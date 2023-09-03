@@ -72,6 +72,30 @@ async def edit_my_profile(
 
     return updated_user
 
+@router.get(
+    "/get_all",
+    response_model=list[UserDb],
+    dependencies=[Depends(Admin)],
+)
+async def get_users(
+    skip: int = 0, limit: int = 10, 
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get a list of all users (Admin only).
+
+    This function retrieves a list of all users from the database.
+    Only users with the 'admin' role can access this endpoint.
+
+    :param skip: int: The number of users to skip.
+    :param limit: int: The maximum number of users to retrieve.
+    :param db: AsyncSession: The database session.
+    :return: A list of users.
+    :rtype: List[UserDb]
+    """
+    users = await repository_users.get_users(skip, limit, db)
+    return users
 
 @router.get("/{username}", response_model=UserProfile)
 async def user_profile(
@@ -104,29 +128,6 @@ async def user_profile(
         raise HTTPException(status_code=404, detail=NOT_FOUND)
 
 
-@router.get(
-    "/get_all",
-    response_model=list[UserDb],
-    dependencies=[Depends(Admin)],
-)
-async def read_all_users(
-    skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)
-):
-    """
-    Get a list of all users (Admin only).
-
-    This function retrieves a list of all users from the database.
-    Only users with the 'admin' role can access this endpoint.
-
-    :param skip: int: The number of users to skip.
-    :param limit: int: The maximum number of users to retrieve.
-    :param db: AsyncSession: The database session.
-    :return: A list of users.
-    :rtype: List[UserDb]
-    """
-    users = await repository_users.get_users(skip, limit, db)
-    return users
-
 
 @router.patch("/ban/{email}", dependencies=[Depends(Admin)])
 async def ban_user_by_email(
@@ -155,7 +156,7 @@ async def ban_user_by_email(
         )
 
 
-@router.patch("/make_role/{email}", dependencies=[Depends(Admin)])
+@router.patch("/edit_role/{email}", dependencies=[Depends(Admin)])
 async def make_role_by_email(
     body: RequestRole,
     db: AsyncSession = Depends(get_db),

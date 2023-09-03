@@ -63,20 +63,27 @@ async def upload_photo(
     return status.HTTP_201_CREATED
 
 
-async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[User]:
+async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[Photo]:
+    """
+    The get_photos function returns a list of all photos from the database.
+
+    :param skip: int: Skip the first n records in the database
+    :param limit: int: Limit the number of results returned
+    :param db: AsyncSession: Pass the database session to the function
+    :return: A list of all photos
+    """
     query = select(Photo).offset(skip).limit(limit)
     result = await db.execute(query)
-    all_photos = result.scalars().all()
-    return all_photos
+    photos = result.scalars().all()
+    return photos
 
-async def get_photo_by_id(current_user: User, photo_id: str, db: AsyncSession) -> dict:
-    query_result = await db.execute(select(Photo).where(Photo.user_id == current_user.id))
-    photos = query_result.scalars()
+async def get_photo_by_id(photo_id: str, db: AsyncSession) -> dict:
+    query = select(Photo).filter(Photo.id == photo_id)
+    result = await db.execute(query)
+    photo = result.scalar_one_or_none()
 
-    for photo in photos:
-        p_id = photo.url.split('/')[-1]
-        if photo_id == p_id:
-            return {photo.url: photo.description}
+    return photo
+        
 
 
 async def patch_update_photo(current_user: User, photo_id: str, description: str, db: AsyncSession) -> dict:
