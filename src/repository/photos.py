@@ -6,23 +6,18 @@ import uuid
 
 import cloudinary
 import cloudinary.uploader
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm.exc import NoResultFound
 from fastapi import File, HTTPException, status
 from src.conf.config import init_cloudinary
-from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE, TOO_MANY_TAGS
 from src.database.models import (
     User,
     Role,
-    BlacklistToken,
-    Post,
     Rating,
     Photo,
     QR_code,
     Tag,
 )
-from src.services.auth import auth_service
 
 from src.services.photos import validate_crop_mode, validate_gravity_mode
 
@@ -51,16 +46,16 @@ async def get_or_create_tag(tag_name: str, db: AsyncSession) -> Tag:
 
 # ----------------------------- ### CRUD ### ---------------------------------#
 async def upload_photo(
-    current_user: User,
-    photo: File(),
-    description: str | None,
-    db: AsyncSession,
-    width: int | None,
-    height: int | None,
-    crop_mode: str | None,
-    gravity_mode: str | None,
-    rotation_angle: int | None,
-    tags: List[str] = [],
+        current_user: User,
+        photo: File(),
+        description: str | None,
+        db: AsyncSession,
+        width: int | None,
+        height: int | None,
+        crop_mode: str | None,
+        gravity_mode: str | None,
+        rotation_angle: int | None,
+        tags: List[str] = [],
 ) -> bool:
     """
     Upload a photo to the cloud storage and create a database entry.
@@ -90,13 +85,7 @@ async def upload_photo(
     """
 
     unique_photo_id = uuid.uuid4()
-    public_photo_id = f"Photos of users/{current_user.username}/{unique_photo_id}"
-
-    init_cloudinary()
-
-    uploaded_file_info = cloudinary.uploader.upload(
-        photo.file, public_id=public_photo_id, overwrite=True
-    )
+    public_photo_id = f"Photos_of_users/{current_user.username}/{unique_photo_id}"
 
     if validate_gravity_mode(gravity_mode) and validate_crop_mode(crop_mode):
         transformations = {
@@ -110,9 +99,14 @@ async def upload_photo(
     else:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
-    photo_url = cloudinary.CloudinaryImage(public_photo_id).build_url(
-        **transformations, version=uploaded_file_info.get("version")
+    init_cloudinary()
+
+    uploaded_file_info = cloudinary.uploader.upload(
+        photo.file, public_id=public_photo_id, overwrite=True, **transformations
     )
+
+    photo_url = uploaded_file_info["secure_url"]
+    public_id = uploaded_file_info["public_id"]
 
     # add photo url to DB
     photo_tags = []
@@ -120,9 +114,12 @@ async def upload_photo(
         existing_tag = await get_or_create_tag(tag_name, db)
         photo_tags.append(existing_tag)
 
-    new_photo = Photo(
-        url=photo_url, description=description, user_id=current_user.id, tags=photo_tags
-    )
+    new_photo = Photo(url=photo_url,
+                      cloud_public_id=public_id,
+                      description=description,
+                      user_id=current_user.id,
+                      tags=photo_tags
+                      )
     try:
         db.add(new_photo)
         await db.commit()
@@ -135,7 +132,7 @@ async def upload_photo(
 
 
 async def get_my_photos(
-    skip: int, limit: int, current_user: User, db: AsyncSession
+        skip: int, limit: int, current_user: User, db: AsyncSession
 ) -> list[Photo]:
     """
     The get_photos function returns a list of all photos of current_user from the database.
@@ -155,7 +152,7 @@ async def get_my_photos(
 
 
 async def get_photos(
-    skip: int, limit: int, current_user: User, db: AsyncSession
+        skip: int, limit: int, current_user: User, db: AsyncSession
 ) -> list[Photo]:
     """
     The get_photos function returns a list of all photos of current_user from the database.
@@ -173,6 +170,7 @@ async def get_photos(
     photos = result.scalars().all()
     return photos
 
+
 async def get_photo_by_id(photo_id: int, db: AsyncSession) -> dict:
     """
     Retrieve a photo by its ID from the database.
@@ -189,9 +187,9 @@ async def get_photo_by_id(photo_id: int, db: AsyncSession) -> dict:
 
 
 async def update_photo(
-    current_user: User, photo_id: int, 
-    description: str, 
-    db: AsyncSession
+        current_user: User, photo_id: int,
+        description: str,
+        db: AsyncSession
 ) -> dict:
     """
     Update the description of a photo owned by the current user.
@@ -216,7 +214,7 @@ async def update_photo(
             await db.refresh(photo)
             return photo
         except Exception as e:
-            db.rollback()
+            await db.rollback()
             raise e
 
 
@@ -242,8 +240,9 @@ async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
         return False
 
     if user.role == Role.admin or photo.user_id == user.id:
+        # deleting from cloudinary
         init_cloudinary()
-        cloudinary.uploader.destroy(photo.id)
+        cloudinary.uploader.destroy(photo.cloud_public_id)
 
         try:
             # Deleting linked ratings

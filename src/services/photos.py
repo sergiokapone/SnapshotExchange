@@ -1,3 +1,4 @@
+import re
 from fastapi import HTTPException
 
 ALLOWED_CROP_MODES = ("fill", "thumb", "fit", "limit", "pad", "scale", None)
