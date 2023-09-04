@@ -1,5 +1,4 @@
 from datetime import datetime
-from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field, ConfigDict, validator
 
@@ -99,5 +98,6 @@ class PhotosDb(BaseModel):
     description: str | None
     user_id: int
     created_at: datetime
+    # tags: list[str]
 
     model_config = ConfigDict(from_attributes = True)

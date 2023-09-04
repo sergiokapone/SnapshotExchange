@@ -12,7 +12,16 @@ from sqlalchemy.orm.exc import NoResultFound
 from fastapi import File, HTTPException, status
 from src.conf.config import init_cloudinary
 from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE, TOO_MANY_TAGS
-from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo, QR_code, Tag
+from src.database.models import (
+    User,
+    Role,
+    BlacklistToken,
+    Post,
+    Rating,
+    Photo,
+    QR_code,
+    Tag,
+)
 from src.services.auth import auth_service
 
 from src.services.photos import validate_crop_mode, validate_gravity_mode
@@ -41,17 +50,18 @@ async def get_or_create_tag(tag_name: str, db: AsyncSession) -> Tag:
 
 
 # ----------------------------- ### CRUD ### ---------------------------------#
-async def upload_photo(current_user: User,
-                       photo: File(),
-                       description: str | None,
-                       db: AsyncSession,
-                       width: int | None,
-                       height: int | None,
-                       crop_mode: str | None,
-                       gravity_mode: str | None,
-                       rotation_angle: int | None,
-                       tags: List[str] = []
-                       ) -> bool:
+async def upload_photo(
+    current_user: User,
+    photo: File(),
+    description: str | None,
+    db: AsyncSession,
+    width: int | None,
+    height: int | None,
+    crop_mode: str | None,
+    gravity_mode: str | None,
+    rotation_angle: int | None,
+    tags: List[str] = [],
+) -> bool:
     """
     Upload a photo to the cloud storage and create a database entry.
 
@@ -89,18 +99,20 @@ async def upload_photo(current_user: User,
     )
 
     if validate_gravity_mode(gravity_mode) and validate_crop_mode(crop_mode):
-        transformations = {"width": width,
-                           "height": height,
-                           "crop": crop_mode,
-                           "gravity": gravity_mode,
-                           "angle": rotation_angle,
-                           "background": "transparent"
-                           }
+        transformations = {
+            "width": width,
+            "height": height,
+            "crop": crop_mode,
+            "gravity": gravity_mode,
+            "angle": rotation_angle,
+            "background": "transparent",
+        }
     else:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
-    photo_url = cloudinary.CloudinaryImage(public_photo_id).build_url(**transformations,
-                                                                      version=uploaded_file_info.get("version"))
+    photo_url = cloudinary.CloudinaryImage(public_photo_id).build_url(
+        **transformations, version=uploaded_file_info.get("version")
+    )
 
     # add photo url to DB
     photo_tags = []
@@ -108,10 +120,9 @@ async def upload_photo(current_user: User,
         existing_tag = await get_or_create_tag(tag_name, db)
         photo_tags.append(existing_tag)
 
-    new_photo = Photo(url=photo_url,
-                      description=description,
-                      user_id=current_user.id,
-                      tags=photo_tags)
+    new_photo = Photo(
+        url=photo_url, description=description, user_id=current_user.id, tags=photo_tags
+    )
     try:
         db.add(new_photo)
         await db.commit()
@@ -123,9 +134,11 @@ async def upload_photo(current_user: User,
     return status.HTTP_201_CREATED
 
 
-async def get_photos(skip: int, limit: int, current_user: User, db: AsyncSession) -> list[Photo]:
+async def get_my_photos(
+    skip: int, limit: int, current_user: User, db: AsyncSession
+) -> list[Photo]:
     """
-    The get_photos function returns a list of all photos from the database.
+    The get_photos function returns a list of all photos of current_user from the database.
 
     :param skip: int: Skip the first n records in the database
     :param limit: int: Limit the number of results returned
@@ -134,15 +147,31 @@ async def get_photos(skip: int, limit: int, current_user: User, db: AsyncSession
     :return: A list of all photos
     """
     query = (
-        select(Photo)
-        .where(Photo.user_id == current_user.id)
-        .offset(skip)
-        .limit(limit)
+        select(Photo).where(Photo.user_id == current_user.id).offset(skip).limit(limit)
     )
     result = await db.execute(query)
     photos = result.scalars().all()
     return photos
 
+
+async def get_photos(
+    skip: int, limit: int, current_user: User, db: AsyncSession
+) -> list[Photo]:
+    """
+    The get_photos function returns a list of all photos of current_user from the database.
+
+    :param skip: int: Skip the first n records in the database
+    :param limit: int: Limit the number of results returned
+    :param current_user: User
+    :param db: AsyncSession: Pass the database session to the function
+    :return: A list of all photos
+    """
+    query = (
+        select(Photo).offset(skip).limit(limit)
+    )
+    result = await db.execute(query)
+    photos = result.scalars().all()
+    return photos
 
 async def get_photo_by_id(photo_id: int, db: AsyncSession) -> dict:
     """
@@ -156,16 +185,13 @@ async def get_photo_by_id(photo_id: int, db: AsyncSession) -> dict:
     result = await db.execute(query)
     photo = result.scalar_one_or_none()
     if photo:
-        return {
-            "id": photo.id,
-            "url": photo.url,
-            "description": photo.description,
-            "user_id": photo.user_id,
-        }
+        return photo
 
 
-async def patch_update_photo(
-        current_user: User, photo_id: int, description: str, db: AsyncSession
+async def update_photo(
+    current_user: User, photo_id: int, 
+    description: str, 
+    db: AsyncSession
 ) -> dict:
     """
     Update the description of a photo owned by the current user.
@@ -177,15 +203,21 @@ async def patch_update_photo(
     :return: A dictionary containing the updated photo's URL and description
     """
     query_result = await db.execute(
-        select(Photo).where(Photo.user_id == current_user.id).where(Photo.id == photo_id)
+        select(Photo)
+        .where(Photo.user_id == current_user.id)
+        .where(Photo.id == photo_id)
     )
     photo = query_result.scalar()
 
     if photo:
         photo.description = description
-        await db.commit()
-        await db.refresh(photo)
-        return {photo.url: photo.description}
+        try:
+            await db.commit()
+            await db.refresh(photo)
+            return photo
+        except Exception as e:
+            db.rollback()
+            raise e
 
 
 async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
@@ -209,16 +241,15 @@ async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
     if not photo:
         return False
 
-    if (
-            user.role == Role.admin
-            or photo.user_id == user.id
-    ):
+    if user.role == Role.admin or photo.user_id == user.id:
         init_cloudinary()
         cloudinary.uploader.destroy(photo.id)
 
         try:
             # Deleting linked ratings
-            await db.execute(Rating.__table__.delete().where(Rating.photo_id == photo_id))
+            await db.execute(
+                Rating.__table__.delete().where(Rating.photo_id == photo_id)
+            )
             # Deleting linked photo
             await db.delete(photo)
             await db.commit()

@@ -104,6 +104,7 @@ class Tag(Base):
     name: Mapped[str] = mapped_column(String(25), unique=True, nullable=True)
 
 
+
 class Comment(Base):
     __tablename__ = 'comments'
     
@@ -117,3 +118,4 @@ class Comment(Base):
 
     user = relationship('User', backref="comments")
     photo = relationship('Photo', backref="comments")
+    
