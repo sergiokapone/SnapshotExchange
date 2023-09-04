@@ -57,3 +57,6 @@ PHOTO_REMOVED = 'Photo has been removed'
 NO_PHOTO_FOUND = "This user hasn't uploaded any photos yet"
 DELETE_SUCCESSFUL = "You deleted SUCCESSFUL"
 PASWORD_RESET_SUCCESS = "Password reset successfully"
+NO_PHOTO_BY_ID = "There is no photo with this ID"
+TOO_MANY_TAGS = "You can't add more than 5 tags to a photo."
+LONG_DESCRIPTION = "Description is too long. Maximum length is 500 characters.",
