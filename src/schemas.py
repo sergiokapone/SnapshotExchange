@@ -48,8 +48,8 @@ class UserResponseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-    
-    
+
+
 class UserProfileSchema(BaseModel):
     username: str
     email: EmailStr
@@ -58,7 +58,7 @@ class UserProfileSchema(BaseModel):
     comments_count: int | None
     is_active: bool | None
     created_at: datetime
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -91,13 +91,13 @@ class RequestRole(BaseModel):
 
 class MessageResponseSchema(BaseModel):
     message: str = "This is a message"
-    
+
 
 class PhotosDb(BaseModel):
     id: int
     url: str
-    description:str | None
+    description: str | None
     user_id: int
     created_at: datetime
-    
+
     model_config = ConfigDict(from_attributes = True)
