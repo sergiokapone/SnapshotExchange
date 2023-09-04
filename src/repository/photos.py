@@ -16,6 +16,8 @@ from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE, TOO_MANY_TAGS
 from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo, QR_code, Tag
 from src.services.auth import auth_service
 
+from src.services.photos import validate_crop_mode, validate_gravity_mode
+
 
 async def get_or_create_tag(tag_name: str, db: AsyncSession) -> Tag:
     """
@@ -44,6 +46,11 @@ async def upload_photo(current_user: User,
                        photo: File(),
                        description: str | None,
                        db: AsyncSession,
+                       width: int | None,
+                       height: int | None,
+                       crop_mode: str | None,
+                       gravity_mode: str | None,
+                       rotation_angle: int | None,
                        tags: List[str] = []
                        ) -> bool:
     """
@@ -57,11 +64,22 @@ async def upload_photo(current_user: User,
     :type description: str | None
     :param db: The database session.
     :type db: AsyncSession
-    :param tags: A list of tags
+    :param width: The desired width for the photo transformation.
+    :type width: int | None
+    :param height: The desired height for the photo transformation.
+    :type height: int | None
+    :param crop_mode: The cropping mode for the photo transformation.
+    :type crop_mode: str | None
+    :param gravity_mode: The gravity mode for the photo transformation.
+    :type gravity_mode: str | None
+    :param rotation_angle: The angle for the photo transformation.
+    :type rotation_angle: int | None
+    :param tags: A list of tags for the photo.
     :type tags: List[str]
     :return: True if the upload was successful, False otherwise.
     :rtype: bool
     """
+
     unique_photo_id = uuid.uuid4()
     public_photo_id = f"Photos of users/{current_user.username}/{unique_photo_id}"
 
@@ -71,10 +89,19 @@ async def upload_photo(current_user: User,
         photo.file, public_id=public_photo_id, overwrite=True
     )
 
-    photo_url = cloudinary.CloudinaryImage(public_photo_id).build_url(
-        crop="fill",
-        version=uploaded_file_info.get("version"),
-    )
+    if validate_gravity_mode(gravity_mode) and validate_crop_mode(crop_mode):
+        transformations = {"width": width,
+                           "height": height,
+                           "crop": crop_mode,
+                           "gravity": gravity_mode,
+                           "angle": rotation_angle,
+                           "background": "transparent"
+                           }
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+
+    photo_url = cloudinary.CloudinaryImage(public_photo_id).build_url(**transformations,
+                                                                      version=uploaded_file_info.get("version"))
 
     # add photo url to DB
     photo_tags = []

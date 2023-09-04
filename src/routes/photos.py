@@ -97,6 +97,11 @@ async def upload_photo(
         photo_file: UploadFile = File(...),
         description: str | None = Form(None),
         tags: List[str] = Form(None),
+        width: int = None,
+        height: int = None,
+        crop_mode: str = None,
+        gravity_mode: str = None,
+        rotation_angle: int = None,
         current_user: User = Depends(auth_service.get_authenticated_user),
         db: AsyncSession = Depends(get_db),
 ) -> MessageResponseSchema:
@@ -135,9 +140,10 @@ async def upload_photo(
                                 )
 
     # uploading a new photo
-    new_photo = await repository_photos.upload_photo(
-        current_user, photo_file, description, db, list_tags
-    )
+    new_photo = await repository_photos.upload_photo(current_user, photo_file, description,
+                                                     db, width, height, crop_mode, gravity_mode,
+                                                     rotation_angle, list_tags
+                                                     )
 
     if new_photo:
         return {"message": PHOTO_UPLOADED}
