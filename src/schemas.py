@@ -31,6 +31,32 @@ class PhotoRat(BaseModel):
     content: str
 
 
+class CommentSchema(BaseModel):
+    text: str = "some text"
+    photo_id: int
+
+
+class CommentList(BaseModel):
+    limit: int = 10
+    offset: int = 0
+    photo_id: int
+
+
+class CommentUpdateSchema(BaseModel):
+    id: int
+    text: str
+
+
+class CommentResponse(BaseModel):
+    username: str
+    text: str
+    photo_id: int
+
+
+class CommentRemoveSchema(BaseModel):
+    id: int
+
+
 class Rating(BaseModel):
     user_id: int
     rating: int

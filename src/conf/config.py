@@ -44,6 +44,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+        extra = 'ignore'
         env_file_encoding = "utf-8"
 
 
