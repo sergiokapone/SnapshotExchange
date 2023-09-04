@@ -8,7 +8,6 @@ import cloudinary
 import cloudinary.uploader
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from fastapi import File, HTTPException, status
 from src.conf.config import init_cloudinary
@@ -137,7 +136,6 @@ async def get_photos(skip: int, limit: int, current_user: User, db: AsyncSession
     query = (
         select(Photo)
         .where(Photo.user_id == current_user.id)
-        .options(joinedload(Photo.tags))
         .offset(skip)
         .limit(limit)
     )

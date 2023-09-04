@@ -150,6 +150,19 @@ async def upload_photo(
 
 
 @router.get(
+    "/get_all",
+    response_model=list[PhotosDb],
+    dependencies=[Depends(Admin)],
+)
+async def get_all_photos(
+        skip: int = 0, limit: int = 10, current_user: User = Depends(auth_service.get_authenticated_user),
+        db: AsyncSession = Depends(get_db)
+) -> list:
+    photos = await repository_photos.get_photos(skip, limit, current_user, db)
+    return photos
+
+
+@router.get(
     "/{photo_id}",
     status_code=status.HTTP_200_OK,
     response_model=PhotosDb,
@@ -169,19 +182,6 @@ async def get_one_photo(
         return photo
     else:
         raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID)
-
-
-@router.get(
-    "/get_all",
-    response_model=list[PhotosDb],
-    dependencies=[Depends(Admin)],
-)
-async def get_all_photos(
-        skip: int = 0, limit: int = 10, current_user: User = Depends(auth_service.get_authenticated_user),
-        db: AsyncSession = Depends(get_db)
-) -> list:
-    photos = await repository_photos.get_photos(skip, limit, current_user, db)
-    return photos
 
 
 # @router.get(
