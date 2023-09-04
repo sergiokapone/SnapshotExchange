@@ -15,15 +15,17 @@ from src.conf.messages import DB_CONFIG_ERROR, DB_CONNECT_ERROR, WELCOME_MESSAGE
 
 
 from src.database.connect_db import get_db
+
 from src.routes.auth import router as auth_router
 from src.routes.users import router as users_router
 from src.routes.ratings import router as ratings_router
 from src.routes.photos import router as photos_router
 from src.routes.comments import router as comments_router
+
 from src.conf.config import settings
+from src.conf.config import init_async_redis
 from src.conf.info_dict import project_info
 
-from src.conf.config import init_async_redis
 
 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
