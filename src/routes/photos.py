@@ -144,34 +144,14 @@ async def upload_photo(
 
 
 @router.get(
-    "/{photo_id}",
-    status_code=status.HTTP_200_OK,
-    response_model=PhotosDb,
-    description="No more than 10 requests per minute",
-    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
-)
-async def get_one_photo(
-        photo_id: int,
-        current_user: User = Depends(auth_service.get_authenticated_user),
-        db: AsyncSession = Depends(get_db),
-):
-    """Getting a photo by unique photo id"""
-
-    photo = await repository_photos.get_photo_by_id(photo_id, db)
-
-    if photo:
-        return photo
-    else:
-        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID)
-
-
-@router.get(
     "/get_all",
     response_model=list[PhotosDb],
     dependencies=[Depends(Admin)],
 )
 async def get_all_photos(
-        skip: int = 0, limit: int = 10, current_user: User = Depends(auth_service.get_authenticated_user),
+        skip: int = 0, 
+        limit: int = 10, 
+        current_user: User = Depends(auth_service.get_authenticated_user),
         db: AsyncSession = Depends(get_db)
 ) -> list:
     photos = await repository_photos.get_photos(skip, limit, current_user, db)
@@ -196,6 +176,28 @@ async def get_all_photos(
 #     return templates.TemplateResponse(
 #         "photo_list.html", {"request": request, "photos": photos}
 #     )
+
+
+@router.get(
+    "/{photo_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=PhotosDb,
+    description="No more than 10 requests per minute",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
+)
+async def get_one_photo(
+        photo_id: int,
+        current_user: User = Depends(auth_service.get_authenticated_user),
+        db: AsyncSession = Depends(get_db),
+):
+    """Getting a photo by unique photo id"""
+
+    photo = await repository_photos.get_photo_by_id(photo_id, db)
+
+    if photo:
+        return photo
+    else:
+        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID)
 
 
 @router.get(
