@@ -230,11 +230,11 @@ async def ban_user_by_email(email: EmailStr, db: AsyncSession = Depends(get_db))
 
 
 @router.patch(
-    "/asign_role", dependencies=[Depends(Admin)], response_model=MessageResponseSchema
+    "/asign_role/{role}", dependencies=[Depends(Admin)], response_model=MessageResponseSchema
 )
 async def assign_role(
     email: EmailStr,
-    selected_role: Role,
+    role: Role,
     db: AsyncSession = Depends(get_db),
     redis_client: Redis = Depends(init_async_redis),
 ):
@@ -266,8 +266,8 @@ async def assign_role(
             status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_EMAIL
         )
 
-    if selected_role == user.role:
+    if role == user.role:
         return {"message": USER_ROLE_IN_USE}
     else:
-        await repository_users.make_user_role(email, selected_role, db)
-        return {"message": f"{USER_CHANGE_ROLE_TO} {selected_role.value}"}
+        await repository_users.make_user_role(email, role, db)
+        return {"message": f"{USER_CHANGE_ROLE_TO} {role.value}"}
