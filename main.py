@@ -99,9 +99,9 @@ async def healthchecker(session: AsyncSession = Depends(get_db)):
 
 app.include_router(auth_router, prefix="/api")
 app.include_router(users_router, prefix="/api")
-app.include_router(ratings_router, prefix="/api")
 app.include_router(photos_router, prefix='/api')
 app.include_router(comments_router, prefix='/api')
+app.include_router(ratings_router, prefix="/api")
 
 
 if __name__ == "__main__":

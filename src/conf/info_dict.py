@@ -20,7 +20,7 @@ project_info = {
         },
         {
             "name": "Oleksandr Tarasov",
-            "github": "https://github.com/oleksandrtarasov",
+            "github": "https://github.com/Taras55001",
             "additional_info": "Contributor"
         }
     ],
