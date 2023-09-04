@@ -132,7 +132,6 @@ async def upload_photo(
 @router.get(
     "/get_all",
     response_model=list[PhotosDb],
-    dependencies=[Depends(Admin)],
 )
 async def get_all_photos(
     skip: int = 0,
@@ -146,7 +145,6 @@ async def get_all_photos(
 @router.get(
     "/get_my",
     response_model=list[PhotosDb],
-    dependencies=[Depends(Admin)],
 )
 async def get_all_photos(
     skip: int = 0,
