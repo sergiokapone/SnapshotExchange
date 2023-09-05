@@ -20,6 +20,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Image</th>
+                    <th>QR</th>
                     <th>Description</th>
                     <th>Username</th>
                     <th>Tags</th>
@@ -32,8 +33,9 @@
                 {% for photo in photos %}
                 <tr>
                     <td>{{ photo.id }}</td>
-                    <!-- Добавляем класс "modal-photo" для обработки клика -->
+                    <!-- Add a "modal-photo" class to handle the click -->
                     <td><img src="{{ photo.url }}" alt="Photo" class="modal-photo" data-description="{{ photo.description }}"></td>
+                    <td><img src="{{ photo.QR }}" alt="Photo" class="modal-photo" data-description="{{ photo.description }}"></td>
                     <td>{{ photo.description }}</td>
                     <td>{{ photo.username }}</td>
                     <td>

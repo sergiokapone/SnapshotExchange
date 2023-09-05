@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -298,13 +300,16 @@ async def get_all_photos(
         comments = await repository_photos.get_photo_comments(photo.id, db)
         username = user.username if user else None
         rating = await repository_rating.get_rating(photo.id, db)
+        formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        qr_code = await repository_photos.get_URL_Qr(photo.id, db)
         
         photos_with_username.append(
             {"id": photo.id, 
              "url": photo.url, 
+             "QR": qr_code.get('qr_code_url'),
              "description": photo.description, 
              "username": username, 
-             "created_at": photo.created_at,
+             "created_at": formatted_created_at,
              "comments": comments,
              "tags": tags,
              "rating": rating
