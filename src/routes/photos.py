@@ -167,13 +167,17 @@ async def get_all_photos(
     photos_with_username = []
     for photo in photos:
         user = await repository_users.get_user_by_user_id(photo.user_id, db)
+        tags = await repository_photos.get_photo_tags(photo.id, db)
         username = user.username if user else None
         photos_with_username.append(
             {"id": photo.id, 
              "url": photo.url, 
              "description": photo.description, 
              "username": username, 
-             "created_at": photo.created_at})
+             "created_at": photo.created_at,
+             "tags": tags
+             },
+            )
 
     return templates.TemplateResponse(
         "photo_list.html", {"request": request, "photos": photos_with_username}

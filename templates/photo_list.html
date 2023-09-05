@@ -35,6 +35,7 @@
                     <th>Image</th>
                     <th>Description</th>
                     <th>Username</th>
+                    <th>Tags</th>
                     <th>Created At</th>
                 </tr>
             </thead>
@@ -46,6 +47,12 @@
                     <td><img src="{{ photo.url }}" alt="Photo" class="modal-photo"></td>
                     <td>{{ photo.description }}</td>
                     <td>{{ photo.username }}</td>
+                    <td>
+                        {% for tag in photo.tags %}
+                            {{ tag }}
+                            {% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
                     <td>{{ photo.created_at }}</td>
                 </tr>
                 {% endfor %}
