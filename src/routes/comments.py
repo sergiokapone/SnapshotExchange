@@ -21,7 +21,6 @@ router = APIRouter(prefix="/comments", tags=["Comments"])
 
 @router.post(
     "/publish",
-    # response_model=CommentResponse,
     status_code=status.HTTP_201_CREATED,
     description=TOO_MANY_REQUESTS,
     dependencies=[Depends(RateLimiter(times=10, seconds=60))],

@@ -61,12 +61,15 @@ class Photo(Base):
     description: Mapped[str] = mapped_column(String(500), nullable=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     created_at: Mapped[date] = mapped_column('created_at', DateTime, default=func.now())
+    cloud_public_id: Mapped[str] = mapped_column(String, nullable=False)
     
     ratings: Mapped['Rating'] = relationship('Rating', back_populates='photo', cascade='all, delete-orphan')
     tags: Mapped[list[str]] = relationship('Tag', secondary=photo_m2m_tags, backref='photos')
     QR: Mapped['QR_code'] = relationship('QR_code', back_populates='photo', cascade='all, delete-orphan')
     user: Mapped['User'] = relationship('User', back_populates='photos')
-    cloud_public_id: Mapped[str] = mapped_column(String, nullable=False)
+    
+    comments: Mapped['Comment'] = relationship('Comment', back_populates='photo', cascade='all, delete-orphan')
+
 
 
 class Rating(Base):
@@ -118,5 +121,6 @@ class Comment(Base):
     update_status: Mapped[bool] = mapped_column(Boolean, default=False)
 
     user = relationship('User', backref="comments")
-    photo = relationship('Photo', backref="comments")
+    photo: Mapped['Photo'] = relationship('Photo', back_populates='comments')
+
     
