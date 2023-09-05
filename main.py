@@ -21,6 +21,8 @@ from src.routes.users import router as users_router
 from src.routes.ratings import router as ratings_router
 from src.routes.photos import router as photos_router
 from src.routes.comments import router as comments_router
+from src.routes.chat import router as chat_router
+
 
 from src.conf.config import settings
 from src.conf.config import init_async_redis
@@ -102,6 +104,8 @@ app.include_router(users_router, prefix="/api")
 app.include_router(photos_router, prefix='/api')
 app.include_router(comments_router, prefix='/api')
 app.include_router(ratings_router, prefix="/api")
+app.include_router(chat_router, prefix="/api")
+
 
 
 if __name__ == "__main__":
