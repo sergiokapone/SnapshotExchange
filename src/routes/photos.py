@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.connect_db import get_db
 from src.repository import photos as repository_photos
 from src.repository import users as repository_users
+from src.repository import ratings as repository_rating
 from src.database.models import User, Role
 from src.schemas import (
     UserProfileSchema,
@@ -67,7 +68,7 @@ router = APIRouter(prefix="/photos", tags=["Photos"])
     response_model=MessageResponseSchema,
 )
 async def upload_photo(
-    photo_file: UploadFile = File(...),
+    photo_file: UploadFile = File(..., file_extension=[".jpg", ".jpeg", ".png"]),
     description: str | None = Form(None),
     tags: list[str] = Form(None),
     width: int = None,
@@ -296,6 +297,8 @@ async def get_all_photos(
         tags = await repository_photos.get_photo_tags(photo.id, db)
         comments = await repository_photos.get_photo_comments(photo.id, db)
         username = user.username if user else None
+        rating = await repository_rating.get_rating(photo.id, db)
+        
         photos_with_username.append(
             {"id": photo.id, 
              "url": photo.url, 
@@ -303,7 +306,8 @@ async def get_all_photos(
              "username": username, 
              "created_at": photo.created_at,
              "comments": comments,
-             "tags": tags
+             "tags": tags,
+             "rating": rating
              },
             )
 
@@ -325,7 +329,7 @@ async def make_URL_QR(
 ):
     """
     Make QR Code for Photo URL
-    ------------------
+    --------------------------
 
     This endpoint generates a QR code for a specific photo URL.
 
@@ -453,7 +457,7 @@ async def patch_pdate_photo(
 ):
     """
     Update Photo Description
-    ------------------
+    ------------------------
 
     This endpoint updates the description of a specific photo by its unique ID.
 
