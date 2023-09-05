@@ -224,7 +224,6 @@ async def get_one_photo(
             status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID
         )
 
-
 # @router.get(
 #     "/{username}",
 #     status_code=status.HTTP_200_OK,
