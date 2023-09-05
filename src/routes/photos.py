@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import (
     APIRouter,
     Depends,
@@ -69,7 +67,7 @@ router = APIRouter(prefix="/photos", tags=["Photos"])
 async def upload_photo(
     photo_file: UploadFile = File(...),
     description: str | None = Form(None),
-    tags: List[str] = Form(None),
+    tags: list[str] = Form(None),
     width: int = None,
     height: int = None,
     crop_mode: str = None,
