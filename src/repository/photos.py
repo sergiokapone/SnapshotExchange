@@ -17,10 +17,12 @@ from src.database.models import (
     Photo,
     QR_code,
     Tag,
+    Comment
 )
 
 from src.services.photos import validate_crop_mode, validate_gravity_mode
 
+# ------------------------------- ## TAGS ## ----------------------------------
 
 async def get_or_create_tag(tag_name: str, db: AsyncSession) -> Tag:
     """
@@ -56,6 +58,22 @@ async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
     if tags:
         return tags
     return None
+
+# ---------------------------- ## Comments ## ---------------------------------
+
+
+async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]:
+    query = (
+        select(Comment.text, User.username)
+        .join(User)
+        .filter(Comment.photo_id == photo_id)
+    )
+
+    result = await db.execute(query)
+    comments = result.all()
+    if comments:
+        return [{"text": comment.text, "username": comment.username} for comment in comments]
+    return []
 
 # ----------------------------- ### CRUD ### ---------------------------------#
 async def upload_photo(
