@@ -7,6 +7,7 @@ from fastapi import (
     UploadFile,
     status,
     Query,
+    Request
 )
 
 from fastapi.templating import Jinja2Templates
@@ -19,6 +20,7 @@ from fastapi_limiter.depends import RateLimiter
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.connect_db import get_db
 from src.repository import photos as repository_photos
+from src.repository import users as repository_users
 from src.database.models import User, Role
 from src.schemas import (
     UserProfileSchema,
@@ -137,7 +139,7 @@ async def get_all_photos(
     current_user: User = Depends(auth_service.get_authenticated_user),
     db: AsyncSession = Depends(get_db),
 ) -> list:
-    photos = await repository_photos.get_photos(skip, limit, current_user, db)
+    photos = await repository_photos.get_photos(skip, limit, db)
     return photos
 
 @router.get(
@@ -153,24 +155,29 @@ async def get_all_photos(
     photos = await repository_photos.get_my_photos(skip, limit, current_user, db)
     return photos
 
-# @router.get(
-#     "/get_all/view",
-#     dependencies=[
-#         Depends(Admin),
-#         Depends(auth_service.get_authenticated_user),
-#     ],
-# )
-# async def get_all_photos(
-#     request: Request,
-#     skip: int = 0,
-#     limit: int = 10,
-#     db: AsyncSession = Depends(get_db),
-#     authorization: str = Header(None),
-# ):
-#     photos = await repository_photos.get_photos(skip, limit, db)
-#     return templates.TemplateResponse(
-#         "photo_list.html", {"request": request, "photos": photos}
-#     )
+@router.get("/get_all/view")
+async def get_all_photos(
+    request: Request,
+    skip: int = 0,
+    limit: int = 10,
+    db: AsyncSession = Depends(get_db),
+):
+    photos = await repository_photos.get_photos(skip, limit, db)
+    
+    photos_with_username = []
+    for photo in photos:
+        user = await repository_users.get_user_by_user_id(photo.user_id, db)
+        username = user.username if user else None
+        photos_with_username.append(
+            {"id": photo.id, 
+             "url": photo.url, 
+             "description": photo.description, 
+             "username": username, 
+             "created_at": photo.created_at})
+
+    return templates.TemplateResponse(
+        "photo_list.html", {"request": request, "photos": photos_with_username}
+    )
 
 
 @router.post(

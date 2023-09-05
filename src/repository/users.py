@@ -180,8 +180,17 @@ async def get_user_by_reset_token(
         return user
     except NoResultFound:
         return None
+
+async def get_user_by_user_id(user_id: int, db: AsyncSession) -> User | None:
     
-async def get_user_by_username(username: str, db: AsyncSession) -> User:
+    try:
+        result = await db.execute(select(User).filter(User.id == user_id))
+        user = result.scalar_one_or_none()
+        return user
+    except NoResultFound:
+        return None
+
+async def get_user_by_username(username: str, db: AsyncSession) -> User | None:
     """
     The get_user_by_email function takes in an email and a database session, then returns the user with that email.
 

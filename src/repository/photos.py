@@ -152,7 +152,7 @@ async def get_my_photos(
 
 
 async def get_photos(
-        skip: int, limit: int, current_user: User, db: AsyncSession
+        skip: int, limit: int, db: AsyncSession
 ) -> list[Photo]:
     """
     The get_photos function returns a list of all photos of current_user from the database.
