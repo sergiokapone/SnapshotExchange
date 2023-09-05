@@ -7,19 +7,16 @@ from src.schemas import CommentUpdateSchema, CommentList
 
 async def create_comment(content: str, user: str, photos_id: int, db: AsyncSession):
     """
-    Create a new comment for a photo in the database.
+    Creates a new comment and stores it in the database.
 
-    :param content: The text of the comment
-    :type content: str
-    :param user: The user who is creating the rating.
-    :type user: User
-    :param photos_id: The ID of the photo to rate.
-    :type photos_id: int
-    :param db: The database session.
-    :type db: AsyncSession
-    :return: The created comment object.
-    :rtype: Comment
+    :param content: str: Text of the comment.
+    :param user: str: The user who left the comment.
+    :param photos_id: int: The ID of the photo to which the comment is linked.
+    :param db: AsyncSession: Database session to perform operations.
+    :return: Comment: Comment created.
+    :raises Exception: If an error occurred while creating the comment.
     """
+    
     comment = Comment(text=content, user=user, photo_id=photos_id)
     try:
         db.add(comment)
@@ -67,7 +64,7 @@ async def delete_comment(id: int, db: AsyncSession):
     """
     Delete a comment
 
-    :param comment_id: The ID of the comment to update
+    :param id: The ID of the comment to update
     :type comment_id: int
     :param db: The database session.
     :type db: AsyncSession
@@ -92,19 +89,15 @@ async def get_photo_comments(
     photo_id: int, 
     db: AsyncSession):
     """
-    Review comments by photo
+    Gets comments on a specific photo with pagination.
 
-    :param limit: limit of comments
-    :type: int
-    :param offset: offset of comments
-    :type offset: int
-    :param photos_id: The ID of the photo for which to retrieve ratings.
-    :type photos_id: int
-    :param db: The database session.
-    :type db: AsyncSession
-    :return: A list of comment objects.
-    :rtype: List[Comment]
+    :param offset: int: Offset to sample comments.
+    :param limit: int: Maximum number of comments to sample.
+    :param photo_id: int: Identifier of the photo to which the comments refer.
+    :param db: AsyncSession: The database session for performing operations.
+    :return: list[Comment]: Pagination-aware list of comments on the photo.
     """
+    
     sq = select(Comment).filter(Comment.photo_id == photo_id).offset(offset).limit(limit)
     comments = await db.execute(sq)
     result = comments.scalars().all()
@@ -128,7 +121,7 @@ async def get_user_comments(
     :param db: The database session.
     :type db: AsyncSession
     :return: A list of comment objects.
-    :rtype: List[Comment]
+    :rtype: list[Comment]
     """
     sq = select(Comment).filter(Comment.user_id == user_id).offset(offset).limit(limit)
     comments = await db.execute(sq)

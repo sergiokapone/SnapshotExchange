@@ -31,9 +31,9 @@ libgravatar = "*"
 aioredis = "*"
 jinja2 = "*"
 uuid = "*"
-sphinx = "*"
 
 [dev-packages]
+sphinx = "*"
 
 [requires]
 python_version = "3.10"
