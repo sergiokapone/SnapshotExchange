@@ -79,7 +79,9 @@ async def upload_photo(
     db: AsyncSession = Depends(get_db),
 ) -> MessageResponseSchema:
     """
-    Upload a new photo.
+    
+    Upload a new photo
+    -------------------
 
     This function allows users to upload new photos. It enforces a rate limit of 10 requests per minute. Users must be authenticated
     and have the appropriate role to perform this action. The function accepts an uploaded photo file, an optional description,
@@ -140,8 +142,6 @@ async def get_all_photos(
     db: AsyncSession = Depends(get_db),
 ) -> list:
     """
-    .. http:get:: /get_all
-
    Get All Photos
    ------------------
 
@@ -203,8 +203,6 @@ async def get_all_photos(
     db: AsyncSession = Depends(get_db),
 ) -> list:
     """
-    .. http:get:: /get_my
-
    Get My Photos
    ------------------
 
@@ -261,8 +259,6 @@ async def get_all_photos(
 ):
     """
     
-    .. http:get:: /get_all/view
-
     View All Photos
     ------------------
 
@@ -328,8 +324,6 @@ async def make_URL_QR(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    .. http:post:: /make_QR/
-
     Make QR Code for Photo URL
     ------------------
 
@@ -389,10 +383,8 @@ async def get_one_photo(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    .. http:get:: /{photo_id}
-
     Get One Photo by ID
-    ------------------
+    --------------------
 
     This endpoint retrieves a specific photo by its unique ID.
 
@@ -460,8 +452,6 @@ async def patch_pdate_photo(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    .. http:patch:: /{photo_id}
-
     Update Photo Description
     ------------------
 
@@ -534,8 +524,6 @@ async def remove_photo(
 ) -> MessageResponseSchema:
     """
     
-    .. http:delete:: /{photo_id}
-
     Remove Photo by ID
     ------------------
 
