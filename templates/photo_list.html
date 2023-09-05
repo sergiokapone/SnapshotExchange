@@ -37,6 +37,7 @@
                     <th>Username</th>
                     <th>Tags</th>
                     <th>Comments</th>
+                    <th>Rating</th>
                     <th>Created At</th>
                 </tr>
             </thead>
@@ -61,6 +62,7 @@
                             {% endfor %}
                         </ul>
                     </td>
+                    <td>{{ photo.rating }}</td>
                     <td>{{ photo.created_at }}</td>
                 </tr>
                 {% endfor %}
