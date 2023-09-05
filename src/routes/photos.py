@@ -268,7 +268,7 @@ async def patch_pdate_photo(
     if updated_photo:
         return jsonable_encoder(updated_photo)
 
-    raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=NO_PHOTO_BY_ID)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NO_PHOTO_BY_ID)
 
 
 @router.delete("/{photo_id}", response_model=MessageResponseSchema)
