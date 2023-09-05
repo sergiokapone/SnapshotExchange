@@ -42,7 +42,6 @@ async def create_user(body: UserSchema, db: AsyncSession) -> User:
         db.add(new_user)
         await db.commit()
         await db.refresh(new_user)
-        print("Done")
         return new_user
     except Exception as e:
         await db.rollback()

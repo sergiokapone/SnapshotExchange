@@ -44,6 +44,19 @@ async def get_or_create_tag(tag_name: str, db: AsyncSession) -> Tag:
     return tag
 
 
+async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
+    query = (
+        select(Tag.name)
+        .join(Photo.tags)
+        .filter(Photo.id == photo_id)
+    )
+
+    result = await db.execute(query)
+    tags = result.scalars().all()
+    if tags:
+        return tags
+    return None
+
 # ----------------------------- ### CRUD ### ---------------------------------#
 async def upload_photo(
         current_user: User,
