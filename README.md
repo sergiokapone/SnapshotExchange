@@ -1,6 +1,6 @@
 # [SnapShot Exchange](https://snapshotexchange.onrender.com/) <span><img align="right" width="32px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"/><span> </span><img align="right" width="32px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg"/></span>
 
-The project is available online at [https://sergiokapone.github.io/SnapshotExchange](https://sergiokapone.github.io/SnapshotExchange/)
+The project is available online at [https://snapshotexchange.onrender.com](https://snapshotexchange.onrender.com/)
 
 ![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
@@ -21,10 +21,10 @@ The project is available online at [https://sergiokapone.github.io/SnapshotExcha
 SnapShot Exchange application, using a REST API based on [FastAPI](https://fastapi.tiangolo.com/), provides the ability for users to upload, edit and delete their photos, as well as interact with each other through comments and photo ratings.
 
 
-## Project Installation 
+## Project Installation
 
 
-To manage project dependencies, `pipenv` is used. 
+To manage project dependencies, `pipenv` is used.
 
 - Make sure you have `pipenv` installed
 - Clone the repository `git clone https://github.com/sergiokapone/SnapshotExchange.git`
@@ -50,10 +50,10 @@ Once the application is running *locally*, you can browse to run it on your loca
 - To view redoc documentation [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 For comfortable viewing of `JSON` respone in your browser we recommend to install the extension for Google Chrome
-[JSON Viewer](https://chrome.google.com/webstore/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh/related?hl=ru) or 
+[JSON Viewer](https://chrome.google.com/webstore/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh/related?hl=ru) or
 [JSON Formatter](https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=ru) (according to your taste)
 
-## Chat 
+## Chat
 
 Also our app is equipped with a chat for short messaging via websocket. The chat is available at the link:
 -  [http://localhost:8000/api/chat](http://localhost:8000/api/chat)
@@ -61,7 +61,7 @@ Also our app is equipped with a chat for short messaging via websocket. The chat
 
 ## Sphinx Documentstion for Developers
 
-Our project is equipped with Sphinx documentation, which you can find at [https://sergiokapone.github.io/SnapshotExchange/](https://sergiokapone.github.io/SnapshotExchange/). The documentation may be useful to other developers who 
+Our project is equipped with Sphinx documentation, which you can find at [https://sergiokapone.github.io/SnapshotExchange/](https://sergiokapone.github.io/SnapshotExchange/). The documentation may be useful to other developers who
 can use it to develop our project.
 
 ## License
