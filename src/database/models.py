@@ -66,6 +66,7 @@ class Photo(Base):
     tags: Mapped[list[str]] = relationship('Tag', secondary=photo_m2m_tags, backref='photos')
     QR: Mapped['QR_code'] = relationship('QR_code', back_populates='photo', cascade='all, delete-orphan')
     user: Mapped['User'] = relationship('User', back_populates='photos')
+    cloud_public_id: Mapped[str] = mapped_column(String, nullable=False)
 
 
 class Rating(Base):
