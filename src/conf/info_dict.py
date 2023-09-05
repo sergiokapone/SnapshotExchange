@@ -20,11 +20,11 @@ project_info = {
         },
         {
             "name": "Oleksandr Tarasov",
-            "github": "https://github.com/oleksandrtarasov",
+            "github": "https://github.com/Taras55001",
             "additional_info": "Contributor"
         }
     ],
     "license": "This API is distributed under the MIT License.",
     "site": "https://snapshotexchange.onrender.com/docs",
-    "repository": "https://github.com/sergiokapone/SnapshotExchange."
+    "repository": "https://github.com/sergiokapone/SnapshotExchange"
 }

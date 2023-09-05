@@ -50,6 +50,7 @@ async def created_rating(rating:int,photo_id:int,current_user: User = Depends(au
     :return: The newly created rating record.
     :rtype: Rating
     """
+    
     new_rating=await repository_ratings.create_rating(rating,photo_id,current_user,db)
 
     return new_rating
