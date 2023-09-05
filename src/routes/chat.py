@@ -32,11 +32,18 @@ async def get(request: Request):
 #         raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION)
 #     return session or token
 
+active_connections = []
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    print('asdfadfdf')
     await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
+    active_connections.append(websocket)  
+    try:
+        while True:
+            data = await websocket.receive_text()
+            
+            for connection in active_connections:
+                await connection.send_text(f"Message text was: {data}")
+    except WebSocketDisconnect:
+
+        active_connections.remove(websocket)
