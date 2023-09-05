@@ -26,14 +26,13 @@ pytest-asyncio = "*"
 asyncpg = "*"
 pydantic-settings = "*"
 faker = "*"
-psycopg2 = "*"
 libgravatar = "*"
 aioredis = "*"
 jinja2 = "*"
 uuid = "*"
 
 [dev-packages]
-sphinx = "*"
+sphinx = "==6.1.3"
 
 [requires]
 python_version = "3.10"

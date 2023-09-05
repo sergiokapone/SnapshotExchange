@@ -10,17 +10,8 @@ Welcome to SnapshotExchange's documentation!
   :maxdepth: 4
   :caption: Contents:
 
-
-REST API main
-===================
-.. automodule:: main
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-
 REST API repository Users
-=========================
+==========================
 .. automodule:: src.repository.users
   :members:
   :undoc-members:
@@ -28,7 +19,7 @@ REST API repository Users
 
 
 REST API repository Photos
-=========================
+===========================
 .. automodule:: src.repository.photos
   :members:
   :undoc-members:
@@ -36,35 +27,35 @@ REST API repository Photos
 
 
 REST API repository Comments
-=========================
+=============================
 .. automodule:: src.repository.comments
   :members:
   :undoc-members:
   :show-inheritance:
 
 REST API repository Ratings
-=========================
+============================
 .. automodule:: src.repository.ratings
   :members:
   :undoc-members:
   :show-inheritance:
 
-REST API routes Auh
-=========================
+REST API routes Auth
+====================
 .. automodule:: src.routes.auth
   :members:
   :undoc-members:
   :show-inheritance:
 
 REST API routes Users
-=========================
+======================
 .. automodule:: src.routes.users
   :members:
   :undoc-members:
   :show-inheritance:
 
 REST API routes Photos
-=========================
+======================
 .. automodule:: src.routes.photos
   :members:
   :undoc-members:
