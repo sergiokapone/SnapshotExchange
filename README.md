@@ -1,5 +1,7 @@
 # [SnapShot Exchange](https://snapshotexchange.onrender.com/) <span><img align="right" width="32px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"/><span> </span><img align="right" width="32px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg"/></span>
 
+The project is available online at [https://sergiokapone.github.io/SnapshotExchange](https://sergiokapone.github.io/SnapshotExchange/)
+
 ![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
@@ -47,6 +49,11 @@ Once the application is running *locally*, you can browse to run it on your loca
 For comfortable viewing of `JSON` respone in your browser we recommend to install the extension for Google Chrome
 [JSON Viewer](https://chrome.google.com/webstore/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh/related?hl=ru) or 
 [JSON Formatter](https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=ru) (according to your taste)
+
+## Sphinx Documentstion for Developers
+
+Our project is equipped with Sphinx documentation, which you can find at [https://sergiokapone.github.io/SnapshotExchange/](https://sergiokapone.github.io/SnapshotExchange/). The documentation may be useful to other developers who 
+can use it to develop our project.
 
 ## License
 
