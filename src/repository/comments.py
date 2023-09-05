@@ -21,10 +21,14 @@ async def create_comment(content: str, user: str, photos_id: int, db: AsyncSessi
     :rtype: Comment
     """
     comment = Comment(text=content, user=user, photo_id=photos_id)
-    db.add(comment)
-    await db.commit()
-    await db.refresh(comment)
-    return comment
+    try:
+        db.add(comment)
+        await db.commit()
+        await db.refresh(comment)
+        return comment
+    except Exception as e:
+        await db.rollback()
+        raise e
 
 
 async def update_comment(text: str, id: int, db: AsyncSession):
@@ -40,12 +44,17 @@ async def update_comment(text: str, id: int, db: AsyncSession):
     :return: The updated comment object.
     :rtype: Comment
     """
-    comment = await db.get(Comment, id)
-    comment.text = text
-    comment.update_status = True
-    await db.commit()
-    await db.refresh(comment)
-    return comment
+    
+    try:
+        comment = await db.get(Comment, id)
+        comment.text = text
+        comment.update_status = True
+        await db.commit()
+        await db.refresh(comment)
+        return comment
+    except Exception as e:
+        await db.rollback()
+        raise e
 
 
 async def delete_comment(comment_id: int, db: AsyncSession):
@@ -59,13 +68,21 @@ async def delete_comment(comment_id: int, db: AsyncSession):
     :return: The comment object.
     :rtype: Comment
     """
-    comment = await db.get(Comment, comment_id)
-    await db.delete(comment)
-    await db.commit()
-    return comment
+    
+    try:
+        comment = await db.get(Comment, comment_id)
+        await db.delete(comment)
+        await db.commit()
+        return comment
+    except Exception as e:
+        await db.rollback()
+        raise e
 
-
-async def get_comments(limit: int, offset: int, photos_id: int, db: AsyncSession):
+async def get_comments(
+    offset: int, 
+    limit: int, 
+    photo_id: int, 
+    db: AsyncSession):
     """
     Review comments by photo
 
@@ -80,7 +97,8 @@ async def get_comments(limit: int, offset: int, photos_id: int, db: AsyncSession
     :return: A list of comment objects.
     :rtype: List[Comment]
     """
-    sq = select(Comment).filter_by(photo_id=photos_id).offset(offset).limit(limit)
-    contacts = await db.execute(sq)
-    result = contacts.scalars().all()
+    sq = select(Comment).filter(Comment.photo_id == photo_id).offset(offset).limit(limit)
+    comments = await db.execute(sq)
+    result = comments.scalars().all()
+    print(result)
     return result
