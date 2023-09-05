@@ -30,6 +30,7 @@ libgravatar = "*"
 aioredis = "*"
 jinja2 = "*"
 uuid = "*"
+websockets = "*"
 
 [dev-packages]
 sphinx = "==6.1.3"

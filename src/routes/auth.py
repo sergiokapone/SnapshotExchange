@@ -187,9 +187,9 @@ async def login(
     return tokens
 
 
-@router.get("/login/view")
-async def login_view(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+# @router.get("/login/view")
+# async def login_view(request: Request):
+#     return templates.TemplateResponse("login.html", {"request": request})
 
 
 @router.post("/logout", response_model=MessageResponseSchema)
