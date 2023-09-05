@@ -5,29 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Photo List</title>
     
-    <!-- Подключаем стили Bootstrap -->
+    <!-- Connecting Bootstrap styles -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     
-    <!-- Стили для улучшения внешнего вида -->
-    <style>
-        /* Стили для заголовка */
-        .display-4 {
-            text-align: center;
-        }
+    <!-- Styles to improve appearance -->
+    <link rel="stylesheet" href="/static/styles.css">
 
-        /* Стили для изображений */
-        .table img {
-            max-width: 100px;
-            max-height: 100px;
-            display: block;
-            margin: 0 auto;
-            cursor: pointer; /* Добавляем указатель при наведении для изображений */
-        }
-    </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="display-4">Photo List</h1>
+        <h1 class="display-4"><b>Snapshots</b></h1>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -46,7 +33,7 @@
                 <tr>
                     <td>{{ photo.id }}</td>
                     <!-- Добавляем класс "modal-photo" для обработки клика -->
-                    <td><img src="{{ photo.url }}" alt="Photo" class="modal-photo"></td>
+                    <td><img src="{{ photo.url }}" alt="Photo" class="modal-photo" data-description="{{ photo.description }}"></td>
                     <td>{{ photo.description }}</td>
                     <td>{{ photo.username }}</td>
                     <td>
@@ -69,12 +56,13 @@
             </tbody>
         </table>
         
-        <!-- Модальное окно для отображения фотографии -->
+        <!-- Modal window for displaying a photo -->
         <div class="modal fade" id="photoModal" tabindex="-1" role="dialog" aria-labelledby="photoModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="photoModalLabel">SampleBox</h5>
+                        <h5 class="modal-title" id="photoModalLabel">
+                            Фото</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -92,17 +80,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <!-- JavaScript для отображения выбранной фотографии в модальном окне -->
+    <!-- JavaScript to display the selected photo in a modal window and update the title -->
     <script>
         // Get elements
         var modalPhotos = document.querySelectorAll(".modal-photo");
         var modalPhoto = document.getElementById("modalPhoto");
+        var modalTitle = document.getElementById("photoModalLabel");
 
         // Image click handler
         modalPhotos.forEach(function(photo) {
             photo.addEventListener("click", function () {
+                // Get the description from the data-description attribute
+                const description = this.getAttribute("data-description");
 
-                // Здyou can set the URL of the selected photo
+                // Set the description in the modal title
+                modalTitle.textContent = description;
+
+                // Get the URL of the selected photo
                 const selectedPhotoUrl = this.getAttribute("src");
 
                 // Set the URL of the photo in the modal window

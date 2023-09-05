@@ -299,8 +299,6 @@ async def get_all_photos(
         username = user.username if user else None
         rating = await repository_rating.get_rating(photo.id, db)
         
-        print(rating) 
-        
         photos_with_username.append(
             {"id": photo.id, 
              "url": photo.url, 
