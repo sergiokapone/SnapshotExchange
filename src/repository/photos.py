@@ -61,16 +61,8 @@ async def get_or_create_tag(tag_name: str, db: AsyncSession) -> Tag:
     return tag
 
 
-async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
-    query = (
-        select(Tag.name)
-        .join(Photo.tags)
-        .filter(Photo.id == photo_id)
-    )
-    
+async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:  
     """
-    .. function:: async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None
-
     Get Photo Tags
     
     This function retrieves a list of tags associated with a specific photo by its ID.
@@ -97,6 +89,12 @@ async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
     This function constructs a database query to retrieve tag names associated with a specific photo. If tags are found, it returns a list of tag names. If no tags are associated with the photo, it returns None.
 
     """
+    
+    query = (
+        select(Tag.name)
+        .join(Photo.tags)
+        .filter(Photo.id == photo_id)
+    )
 
     result = await db.execute(query)
     tags = result.scalars().all()
@@ -105,42 +103,42 @@ async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
     return None
 
 async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]:
+    """
+    Get Photo Comments
+
+    This function retrieves a list of comments associated with a specific photo by its ID.
+
+    :param int photo_id: The ID of the photo for which to retrieve comments.
+    :param db: The asynchronous database session.
+    :type db: AsyncSession
+    :return: A list of dictionaries containing comment text and the username of the commenter.
+    :rtype: list[dict]
+    :raises Exception: Raises an exception if there's an issue with database operations.
+
+    **Example Usage:**
+
+    .. code-block:: python
+
+        photo_id = 123
+        async with get_db() as db:
+            comments = await get_photo_comments(photo_id, db)
+            if comments:
+                for comment in comments:
+                    print(f"Username: {comment['username']}")
+                    print(f"Comment: {comment['text']}")
+            else:
+                print("No comments found for the photo.")
+
+    This function constructs a database query to retrieve comments associated with a specific photo. It returns a list of dictionaries, where each dictionary contains the comment text and the username of the commenter.
+
+    """
+    
     query = (
         select(Comment.text, User.username)
         .join(User)
         .filter(Comment.photo_id == photo_id)
     )
-    """
-    .. function:: async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]
-
-   Get Photo Comments
-   
-   This function retrieves a list of comments associated with a specific photo by its ID.
-
-   :param int photo_id: The ID of the photo for which to retrieve comments.
-   :param db: The asynchronous database session.
-   :type db: AsyncSession
-   :return: A list of dictionaries containing comment text and the username of the commenter.
-   :rtype: list[dict]
-   :raises Exception: Raises an exception if there's an issue with database operations.
-
-   **Example Usage:**
-
-   .. code-block:: python
-
-      photo_id = 123
-      async with get_db() as db:
-          comments = await get_photo_comments(photo_id, db)
-          if comments:
-              for comment in comments:
-                  print(f"Username: {comment['username']}")
-                  print(f"Comment: {comment['text']}")
-          else:
-              print("No comments found for the photo.")
-
-   This function constructs a database query to retrieve comments associated with a specific photo. It returns a list of dictionaries, where each dictionary contains the comment text and the username of the commenter.
-
-    """
+        
     result = await db.execute(query)
     comments = result.all()
     if comments:

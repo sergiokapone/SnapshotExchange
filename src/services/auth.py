@@ -23,6 +23,32 @@ from src.conf.constants import TOKEN_LIFE_TIME
 from src.conf.config import init_async_redis
 
 class Auth:
+    """
+    The `Auth` class provides authentication-related functionality for the application.
+
+    It includes methods for password hashing, token creation and decoding, and user verification.
+
+    Attributes:
+        pwd_context (CryptContext): An instance of `CryptContext` for password hashing.
+        SECRET_KEY (str): The secret key used for token generation and decoding.
+        ALGORITHM (str): The algorithm used for token encoding and decoding.
+        oauth2_scheme (OAuth2PasswordBearer): An instance of `OAuth2PasswordBearer` for OAuth2 authentication.
+
+    Methods:
+        verify_password(plain_password, hashed_password): Verify a plain password against a hashed password.
+        get_password_hash(password): Generate a hashed password from a plain text password.
+        create_access_token(data, expires_delta=None): Create an access token with an optional expiration time.
+        create_refresh_token(data, expires_delta=None): Create a refresh token with an optional expiration time.
+        create_email_token(data): Create an email verification token with a fixed expiration time.
+        decode_token(token): Decode a JWT token and validate its scope.
+        get_authenticated_user(token, db): Get the authenticated user based on the provided token.
+        get_email_from_token(token): Get the email address from an email verification token.
+
+    Example Usage:
+        auth = Auth()
+        hashed_password = auth.get_password_hash("my_password")
+    """
+
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     SECRET_KEY = settings.secret_key
     ALGORITHM = settings.algorithm
@@ -47,9 +73,26 @@ class Auth:
         return self._redis_cache
 
     def verify_password(self, plain_password, hashed_password):
+        """
+        Verify a plain password against a hashed password.
+
+        :param str plain_password: The plain text password.
+        :param str hashed_password: The hashed password to compare against.
+        :return: True if the plain password matches the hashed password, False otherwise.
+        :rtype: bool
+        """
+        
         return self.pwd_context.verify(plain_password, hashed_password)
 
     def get_password_hash(self, password: str):
+        """
+        Generate a hashed password from a plain text password.
+
+        :param str password: The plain text password.
+        :return: The hashed password.
+        :rtype: str
+        """
+        
         return self.pwd_context.hash(password)
 
     async def create_access_token(
@@ -105,6 +148,16 @@ class Auth:
         return encoded_refresh_token
 
     def create_email_token(self, data: dict):
+        """
+        Create an email verification token.
+
+        This function generates an email verification token with an expiration time of 3 days.
+
+        :param data: dict: The data to include in the token payload.
+        :return: The encoded email verification token.
+        :rtype: str
+        """
+        
         to_encode = data.copy()
         expire = datetime.utcnow() + timedelta(days=3)
         to_encode.update(
@@ -124,6 +177,7 @@ class Auth:
         :rtype: dict
         :raises HTTPException: If the token is invalid.
         """
+        
         try:
             payload = jwt.decode(
                 token, self.SECRET_KEY, algorithms=[self.ALGORITHM]
@@ -155,6 +209,7 @@ class Auth:
         :rtype: User
         :raises HTTPException: If the token is invalid or the user is not found.
         """
+        
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail=NOT_VALIDATE_CREDENTIALS
         )
