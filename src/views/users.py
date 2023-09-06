@@ -36,7 +36,23 @@ async def view_user_profile(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ):
-    # Получите информацию о пользователе с помощью функции get_user_profile
+    
+    """
+    View User Profile
+
+    This endpoint retrieves and displays a user's profile based on their username.
+
+    :param username: The username of the user whose profile to view.
+    :type username: str
+    :param request: The HTTP request object.
+    :type request: Request
+    :param db: The asynchronous database session (Dependency).
+    :type db: AsyncSession
+    :return: The HTML page displaying the user's profile.
+    :rtype: templates.TemplateResponse
+    :raises HTTPException 404: User not found if the user with the specified username is not found.
+    """
+       
     user = await repository_users.get_user_profile(username, db)
     
     print(user)
@@ -44,7 +60,6 @@ async def view_user_profile(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Верните шаблон с информацией о пользователе
     return templates.TemplateResponse(
         "user_profile_page.html", {"request": request, "user": user}
     )

@@ -23,14 +23,13 @@ conf = ConnectionConfig(
 
 
 async def send_email(email: EmailStr, username: str, host: str):
-    """
-    The send_email function sends an email to the user with a link to confirm their email address.
-        The function takes in three arguments:
-            -email: the user's email address, which is used as a unique identifier for them.
-            -username: the username of the user who is registering. This will be displayed in
-                their confirmation message so they know it was sent to them and not someone else.
-            -host: this is where we are hosting our application, which will be used as part of
-                our confirmation link.
+    """The send_email function sends an email to the user with a link to confirm their email address.
+    
+    The function takes in three arguments:
+
+    - email: the user's email address, which is used as a unique identifier for them.
+    - username: the username of the user who is registering. This will be displayed in their confirmation message so they know it was sent to them and not someone else.
+    - host: this is where we are hosting our application, which will be used as part of our confirmation link.
 
     :param email: EmailStr: Specify the email address of the recipient
     :param username: str: Pass the username of the user to be sent in the email
@@ -61,8 +60,7 @@ async def send_email(email: EmailStr, username: str, host: str):
 async def reset_password_by_email(
     email: EmailStr, username: str, reset_token: str, host: str
 ):
-    """
-    Send an email to reset a user's password.
+    """Send an email to reset a user's password.
 
     This function sends an email to the user with a link to reset their account password.
 
