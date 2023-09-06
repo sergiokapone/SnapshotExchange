@@ -123,7 +123,7 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#module-src.repository.photos">Repository Photos</a><ul>
-<li><a class="reference internal" href="#src.repository.photos.get_URL_Qr"><code class="docutils literal notranslate"><span class="pre">get_URL_Qr()</span></code></a></li>
+<li><a class="reference internal" href="#src.repository.photos.get_URL_QR"><code class="docutils literal notranslate"><span class="pre">get_URL_QR()</span></code></a></li>
 <li><a class="reference internal" href="#src.repository.photos.get_my_photos"><code class="docutils literal notranslate"><span class="pre">get_my_photos()</span></code></a></li>
 <li><a class="reference internal" href="#src.repository.photos.get_or_create_tag"><code class="docutils literal notranslate"><span class="pre">get_or_create_tag()</span></code></a></li>
 <li><a class="reference internal" href="#src.repository.photos.get_photo_by_id"><code class="docutils literal notranslate"><span class="pre">get_photo_by_id()</span></code></a></li>
@@ -1714,8 +1714,8 @@ role (Role): The new Role for the user.</p>
 <section id="module-src.repository.photos">
 <span id="repository-photos"></span><h1>Repository Photos<a class="headerlink" href="#module-src.repository.photos" title="Permalink to this heading"></a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="src.repository.photos.get_URL_Qr">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.repository.photos.</span></span><span class="sig-name descname"><span class="pre">get_URL_Qr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">photo_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.repository.photos.get_URL_Qr" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="src.repository.photos.get_URL_QR">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.repository.photos.</span></span><span class="sig-name descname"><span class="pre">get_URL_QR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">photo_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.repository.photos.get_URL_QR" title="Permalink to this definition"></a></dt>
 <dd><p>Generate and retrieve a QR code URL for a photo.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2212,7 +2212,7 @@ hashed_password = auth.get_password_hash(“my_password”)</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.services.auth.Auth.SECRET_KEY">
-<span class="sig-name descname"><span class="pre">SECRET_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'secret_key'</span></em><a class="headerlink" href="#src.services.auth.Auth.SECRET_KEY" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SECRET_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'secretkey'</span></em><a class="headerlink" href="#src.services.auth.Auth.SECRET_KEY" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
