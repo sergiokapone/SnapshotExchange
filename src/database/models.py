@@ -24,7 +24,27 @@ class Role(enum.Enum):
 
 
 class User(Base):
+    """
+    User Model
 
+    SQLAlchemy model represents a user in the database.
+
+    :param id: The unique identifier for the user (primary key).
+    :param username: The username of the user (unique).
+    :param email: The email address of the user (unique).
+    :param password: The hashed password of the user.
+    :param created_at: The timestamp when the user was created.
+    :param updated_at: The timestamp when the user was last updated.
+    :param avatar: The URL of the user's avatar image.
+    :param refresh_token: The refresh token associated with the user.
+    :param role: The role of the user ('User' or 'Adminisrtator', 'Voderator').
+    :param confirmed: Indicates whether the user's email is confirmed.
+    :param is_active: Indicates whether the user's account is active.
+    :param description: A brief description or bio of the user.
+    :param ratings: Relationship to user ratings.
+    :param photos: Relationship to user's uploaded photos.
+
+    """
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -54,6 +74,26 @@ class Post(Base):
     
 
 class Photo(Base):
+    
+    """
+    Photo Model
+
+    This SQLAlchemy model represents a photo in the database.
+
+    :param id: The unique identifier for the photo (primary key).
+    :param url: The URL of the photo.
+    :param description: A brief description of the photo.
+    :param user_id: The user ID of the owner of the photo.
+    :param created_at: The timestamp when the photo was created.
+    :param cloud_public_id: The public ID of the photo in the cloud storage.
+    :param ratings: Relationship to photo ratings.
+    :param tags: Relationship to tags associated with the photo.
+    :param QR: Relationship to QR codes associated with the photo.
+    :param user: Relationship to the user who uploaded the photo.
+    :param comments: Relationship to comments on the photo.
+
+    """
+    
     __tablename__ = "photos"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -73,6 +113,21 @@ class Photo(Base):
 
 
 class Rating(Base):
+    
+    """
+    Rating Model
+
+    This SQLAlchemy model represents a rating given by a user to a photo in the database.
+
+    :param id: The unique identifier for the rating (primary key).
+    :param user_id: The user ID of the user who gave the rating.
+    :param rating: The numerical rating value.
+    :param photo_id: The photo ID of the photo that received the rating.
+    :param user: Relationship to the user who gave the rating.
+    :param photo: Relationship to the photo that received the rating.
+
+    """
+    
     __tablename__ = "ratings"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

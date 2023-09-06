@@ -13,6 +13,12 @@ Is a comprehensive documentation that provides detailed information about our se
   :maxdepth: 4
   :caption: Contents:
 
+Database
+====================
+.. automodule:: src.database.models
+  :members:
+  :undoc-members:
+  :show-inheritance:
 
 REST API routes Auth
 =====================

@@ -12,7 +12,7 @@ from src.schemas import (
     UserDb,
     RequestRole,
     PhotoRating,
-    Rating,
+    RatingSchema,
 )
 
 
@@ -35,7 +35,7 @@ from src.conf.messages import (
 router = APIRouter(prefix="/ratings", tags=["Ratings"])
 
 
-@router.post("/created_rating/", response_model=Rating)
+@router.post("/created_rating/", response_model=RatingSchema)
 async def created_rating(
     photo_id: int,
     rating: int,
@@ -53,7 +53,7 @@ async def created_rating(
     :param current_user: User: The currently authenticated user.
     :param db: AsyncSession: The database session.
     :return: The newly created rating record.
-    :rtype: Rating
+    :rtype: RatingSchema
     """
 
     new_rating = await repository_ratings.create_rating(

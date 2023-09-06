@@ -78,8 +78,10 @@
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
@@ -95,7 +97,11 @@
 </li>
       <li><a href="index.html#src.repository.users.add_to_blacklist">add_to_blacklist() (in module src.repository.users)</a>
 </li>
+      <li><a href="index.html#src.database.models.Role.admin">admin (src.database.models.Role attribute)</a>
+</li>
       <li><a href="index.html#src.services.auth.Auth.ALGORITHM">ALGORITHM (src.services.auth.Auth attribute)</a>
+</li>
+      <li><a href="index.html#src.services.auth.Auth.allow_rout">allow_rout() (src.services.auth.Auth method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -103,9 +109,11 @@
 </li>
       <li><a href="index.html#src.services.auth.Auth">Auth (class in src.services.auth)</a>
 </li>
-      <li><a href="index.html#src.schemas.UserDb.avatar">avatar (src.schemas.UserDb attribute)</a>
+      <li><a href="index.html#src.database.models.User.avatar">avatar (src.database.models.User attribute)</a>
 
       <ul>
+        <li><a href="index.html#src.schemas.UserDb.avatar">(src.schemas.UserDb attribute)</a>
+</li>
         <li><a href="index.html#src.schemas.UserProfileSchema.avatar">(src.schemas.UserProfileSchema attribute)</a>
 </li>
       </ul></li>
@@ -117,9 +125,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#src.repository.users.ban_user">ban_user() (in module src.repository.users)</a>
 </li>
+      <li><a href="index.html#src.routes.users.ban_user_by_email">ban_user_by_email() (in module src.routes.users)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#src.routes.users.ban_user_by_email">ban_user_by_email() (in module src.routes.users)</a>
+      <li><a href="index.html#src.database.models.BlacklistToken.blacklisted_on">blacklisted_on (src.database.models.BlacklistToken attribute)</a>
+</li>
+      <li><a href="index.html#src.database.models.BlacklistToken">BlacklistToken (class in src.database.models)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -129,11 +141,17 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#src.routes.comments.change_comment">change_comment() (in module src.routes.comments)</a>
 </li>
+      <li><a href="index.html#src.database.models.Photo.cloud_public_id">cloud_public_id (src.database.models.Photo attribute)</a>
+</li>
+      <li><a href="index.html#src.database.models.Comment">Comment (class in src.database.models)</a>
+</li>
       <li><a href="index.html#src.schemas.CommentList">CommentList (class in src.schemas)</a>
 </li>
       <li><a href="index.html#src.schemas.CommentRemoveSchema">CommentRemoveSchema (class in src.schemas)</a>
 </li>
       <li><a href="index.html#src.schemas.CommentResponse">CommentResponse (class in src.schemas)</a>
+</li>
+      <li><a href="index.html#src.database.models.Photo.comments">comments (src.database.models.Photo attribute)</a>
 </li>
       <li><a href="index.html#src.schemas.UserProfileSchema.comments_count">comments_count (src.schemas.UserProfileSchema attribute)</a>
 </li>
@@ -142,6 +160,8 @@
       <li><a href="index.html#src.schemas.CommentUpdateSchema">CommentUpdateSchema (class in src.schemas)</a>
 </li>
       <li><a href="index.html#src.repository.users.confirm_email">confirm_email() (in module src.repository.users)</a>
+</li>
+      <li><a href="index.html#src.database.models.User.confirmed">confirmed (src.database.models.User attribute)</a>
 </li>
       <li><a href="index.html#src.routes.auth.confirmed_email">confirmed_email() (in module src.routes.auth)</a>
 </li>
@@ -161,9 +181,15 @@
 </li>
       <li><a href="index.html#src.repository.users.create_user">create_user() (in module src.repository.users)</a>
 </li>
-      <li><a href="index.html#src.schemas.PhotosDb.created_at">created_at (src.schemas.PhotosDb attribute)</a>
+      <li><a href="index.html#src.database.models.Comment.created_at">created_at (src.database.models.Comment attribute)</a>
 
       <ul>
+        <li><a href="index.html#src.database.models.Photo.created_at">(src.database.models.Photo attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.User.created_at">(src.database.models.User attribute)</a>
+</li>
+        <li><a href="index.html#src.schemas.PhotosDb.created_at">(src.schemas.PhotosDb attribute)</a>
+</li>
         <li><a href="index.html#src.schemas.UserDb.created_at">(src.schemas.UserDb attribute)</a>
 </li>
         <li><a href="index.html#src.schemas.UserProfileSchema.created_at">(src.schemas.UserProfileSchema attribute)</a>
@@ -185,13 +211,17 @@
 </li>
       <li><a href="index.html#src.repository.comments.delete_comment">delete_comment() (in module src.repository.comments)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#src.routes.ratings.delete_rating_ADmin_Moder">delete_rating_ADmin_Moder() (in module src.routes.ratings)</a>
 </li>
-      <li><a href="index.html#src.schemas.PhotosDb.description">description (src.schemas.PhotosDb attribute)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="index.html#src.database.models.Photo.description">description (src.database.models.Photo attribute)</a>
 
       <ul>
+        <li><a href="index.html#src.database.models.User.description">(src.database.models.User attribute)</a>
+</li>
+        <li><a href="index.html#src.schemas.PhotosDb.description">(src.schemas.PhotosDb attribute)</a>
+</li>
         <li><a href="index.html#src.schemas.UserDb.description">(src.schemas.UserDb attribute)</a>
 </li>
       </ul></li>
@@ -207,9 +237,11 @@
         <li><a href="index.html#src.routes.users.edit_my_profile">(in module src.routes.users)</a>
 </li>
       </ul></li>
-      <li><a href="index.html#src.schemas.RequestEmail.email">email (src.schemas.RequestEmail attribute)</a>
+      <li><a href="index.html#src.database.models.User.email">email (src.database.models.User attribute)</a>
 
       <ul>
+        <li><a href="index.html#src.schemas.RequestEmail.email">(src.schemas.RequestEmail attribute)</a>
+</li>
         <li><a href="index.html#src.schemas.RequestRole.email">(src.schemas.RequestRole attribute)</a>
 </li>
         <li><a href="index.html#src.schemas.UserDb.email">(src.schemas.UserDb attribute)</a>
@@ -307,9 +339,25 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#src.schemas.CommentRemoveSchema.id">id (src.schemas.CommentRemoveSchema attribute)</a>
+      <li><a href="index.html#src.database.models.BlacklistToken.id">id (src.database.models.BlacklistToken attribute)</a>
 
       <ul>
+        <li><a href="index.html#src.database.models.Comment.id">(src.database.models.Comment attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.Photo.id">(src.database.models.Photo attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.Post.id">(src.database.models.Post attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.QR_code.id">(src.database.models.QR_code attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.Rating.id">(src.database.models.Rating attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.Tag.id">(src.database.models.Tag attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.User.id">(src.database.models.User attribute)</a>
+</li>
+        <li><a href="index.html#src.schemas.CommentRemoveSchema.id">(src.schemas.CommentRemoveSchema attribute)</a>
+</li>
         <li><a href="index.html#src.schemas.CommentUpdateSchema.id">(src.schemas.CommentUpdateSchema attribute)</a>
 </li>
         <li><a href="index.html#src.schemas.PhotosDb.id">(src.schemas.PhotosDb attribute)</a>
@@ -321,9 +369,11 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#src.schemas.UserProfileSchema.is_active">is_active (src.schemas.UserProfileSchema attribute)</a>
+      <li><a href="index.html#src.database.models.User.is_active">is_active (src.database.models.User attribute)</a>
 
       <ul>
+        <li><a href="index.html#src.schemas.UserProfileSchema.is_active">(src.schemas.UserProfileSchema attribute)</a>
+</li>
         <li><a href="index.html#src.schemas.UserResponseSchema.is_active">(src.schemas.UserResponseSchema attribute)</a>
 </li>
       </ul></li>
@@ -374,7 +424,7 @@
 </li>
         <li><a href="index.html#src.schemas.PhotosDb.model_config">(src.schemas.PhotosDb attribute)</a>
 </li>
-        <li><a href="index.html#src.schemas.Rating.model_config">(src.schemas.Rating attribute)</a>
+        <li><a href="index.html#src.schemas.RatingSchema.model_config">(src.schemas.RatingSchema attribute)</a>
 </li>
         <li><a href="index.html#src.schemas.RequestEmail.model_config">(src.schemas.RequestEmail attribute)</a>
 </li>
@@ -410,7 +460,7 @@
 </li>
         <li><a href="index.html#src.schemas.PhotosDb.model_fields">(src.schemas.PhotosDb attribute)</a>
 </li>
-        <li><a href="index.html#src.schemas.Rating.model_fields">(src.schemas.Rating attribute)</a>
+        <li><a href="index.html#src.schemas.RatingSchema.model_fields">(src.schemas.RatingSchema attribute)</a>
 </li>
         <li><a href="index.html#src.schemas.RequestEmail.model_fields">(src.schemas.RequestEmail attribute)</a>
 </li>
@@ -431,10 +481,14 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="index.html#src.database.models.Role.moder">moder (src.database.models.Role attribute)</a>
+</li>
       <li>
     module
 
       <ul>
+        <li><a href="index.html#module-src.database.models">src.database.models</a>
+</li>
         <li><a href="index.html#module-src.repository.comments">src.repository.comments</a>
 </li>
         <li><a href="index.html#module-src.repository.photos">src.repository.photos</a>
@@ -475,6 +529,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="index.html#src.database.models.Tag.name">name (src.database.models.Tag attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -490,27 +552,53 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#src.schemas.UserSchema.password">password (src.schemas.UserSchema attribute)</a>
-</li>
-      <li><a href="index.html#src.routes.photos.patch_pdate_photo">patch_pdate_photo() (in module src.routes.photos)</a>
-</li>
-      <li><a href="index.html#src.schemas.CommentList.photo_id">photo_id (src.schemas.CommentList attribute)</a>
+      <li><a href="index.html#src.database.models.User.password">password (src.database.models.User attribute)</a>
 
       <ul>
+        <li><a href="index.html#src.schemas.UserSchema.password">(src.schemas.UserSchema attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="index.html#src.routes.photos.patch_pdate_photo">patch_pdate_photo() (in module src.routes.photos)</a>
+</li>
+      <li><a href="index.html#src.database.models.Photo">Photo (class in src.database.models)</a>
+</li>
+      <li><a href="index.html#src.database.models.Comment.photo">photo (src.database.models.Comment attribute)</a>
+
+      <ul>
+        <li><a href="index.html#src.database.models.Post.photo">(src.database.models.Post attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.QR_code.photo">(src.database.models.QR_code attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.Rating.photo">(src.database.models.Rating attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="index.html#src.database.models.Comment.photo_id">photo_id (src.database.models.Comment attribute)</a>
+
+      <ul>
+        <li><a href="index.html#src.database.models.QR_code.photo_id">(src.database.models.QR_code attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.Rating.photo_id">(src.database.models.Rating attribute)</a>
+</li>
+        <li><a href="index.html#src.schemas.CommentList.photo_id">(src.schemas.CommentList attribute)</a>
+</li>
         <li><a href="index.html#src.schemas.CommentResponse.photo_id">(src.schemas.CommentResponse attribute)</a>
 </li>
         <li><a href="index.html#src.schemas.CommentSchema.photo_id">(src.schemas.CommentSchema attribute)</a>
 </li>
-        <li><a href="index.html#src.schemas.Rating.photo_id">(src.schemas.Rating attribute)</a>
+        <li><a href="index.html#src.schemas.RatingSchema.photo_id">(src.schemas.RatingSchema attribute)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#src.schemas.PhotoRating">PhotoRating (class in src.schemas)</a>
 </li>
+      <li><a href="index.html#src.database.models.User.photos">photos (src.database.models.User attribute)</a>
+</li>
       <li><a href="index.html#src.schemas.UserProfileSchema.photos_count">photos_count (src.schemas.UserProfileSchema attribute)</a>
 </li>
       <li><a href="index.html#src.schemas.PhotosDb">PhotosDb (class in src.schemas)</a>
+</li>
+      <li><a href="index.html#src.database.models.Post">Post (class in src.database.models)</a>
 </li>
       <li><a href="index.html#src.routes.comments.post_comment">post_comment() (in module src.routes.comments)</a>
 </li>
@@ -519,31 +607,59 @@
   </ul></td>
 </tr></table>
 
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="index.html#src.database.models.Photo.QR">QR (src.database.models.Photo attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="index.html#src.database.models.QR_code">QR_code (class in src.database.models)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#src.schemas.Rating">Rating (class in src.schemas)</a>
+      <li><a href="index.html#src.database.models.Rating">Rating (class in src.database.models)</a>
 </li>
-      <li><a href="index.html#src.schemas.Rating.rating">rating (src.schemas.Rating attribute)</a>
+      <li><a href="index.html#src.database.models.Rating.rating">rating (src.database.models.Rating attribute)</a>
+
+      <ul>
+        <li><a href="index.html#src.schemas.RatingSchema.rating">(src.schemas.RatingSchema attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="index.html#src.database.models.Photo.ratings">ratings (src.database.models.Photo attribute)</a>
+
+      <ul>
+        <li><a href="index.html#src.database.models.User.ratings">(src.database.models.User attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="index.html#src.schemas.RatingSchema">RatingSchema (class in src.schemas)</a>
 </li>
       <li><a href="index.html#src.routes.users.read_my_profile">read_my_profile() (in module src.routes.users)</a>
 </li>
       <li><a href="index.html#src.services.auth.Auth.redis_cache">redis_cache (src.services.auth.Auth property)</a>
 </li>
-      <li><a href="index.html#src.schemas.TokenSchema.refresh_token">refresh_token (src.schemas.TokenSchema attribute)</a>
+      <li><a href="index.html#src.database.models.User.refresh_token">refresh_token (src.database.models.User attribute)</a>
+
+      <ul>
+        <li><a href="index.html#src.schemas.TokenSchema.refresh_token">(src.schemas.TokenSchema attribute)</a>
 </li>
+      </ul></li>
       <li><a href="index.html#src.routes.auth.refresh_token">refresh_token() (in module src.routes.auth)</a>
 </li>
       <li><a href="index.html#src.routes.comments.remove_comment">remove_comment() (in module src.routes.comments)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#src.repository.photos.remove_photo">remove_photo() (in module src.repository.photos)</a>
 
       <ul>
         <li><a href="index.html#src.routes.photos.remove_photo">(in module src.routes.photos)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#src.routes.auth.request_email">request_email() (in module src.routes.auth)</a>
 </li>
       <li><a href="index.html#src.schemas.RequestEmail">RequestEmail (class in src.schemas)</a>
@@ -554,9 +670,13 @@
 </li>
       <li><a href="index.html#src.services.email.reset_password_by_email">reset_password_by_email() (in module src.services.email)</a>
 </li>
-      <li><a href="index.html#src.schemas.RequestRole.role">role (src.schemas.RequestRole attribute)</a>
+      <li><a href="index.html#src.database.models.Role">Role (class in src.database.models)</a>
+</li>
+      <li><a href="index.html#src.database.models.User.role">role (src.database.models.User attribute)</a>
 
       <ul>
+        <li><a href="index.html#src.schemas.RequestRole.role">(src.schemas.RequestRole attribute)</a>
+</li>
         <li><a href="index.html#src.schemas.UserDb.role">(src.schemas.UserDb attribute)</a>
 </li>
       </ul></li>
@@ -580,6 +700,13 @@
 </li>
       <li><a href="index.html#src.routes.auth.signup">signup() (in module src.routes.auth)</a>
 </li>
+      <li>
+    src.database.models
+
+      <ul>
+        <li><a href="index.html#module-src.database.models">module</a>
+</li>
+      </ul></li>
       <li>
     src.repository.comments
 
@@ -629,6 +756,8 @@
         <li><a href="index.html#module-src.routes.photos">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     src.routes.ratings
 
@@ -636,8 +765,6 @@
         <li><a href="index.html#module-src.routes.ratings">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     src.routes.users
 
@@ -714,9 +841,17 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#src.schemas.CommentResponse.text">text (src.schemas.CommentResponse attribute)</a>
+      <li><a href="index.html#src.database.models.Tag">Tag (class in src.database.models)</a>
+</li>
+      <li><a href="index.html#src.database.models.Photo.tags">tags (src.database.models.Photo attribute)</a>
+</li>
+      <li><a href="index.html#src.database.models.Comment.text">text (src.database.models.Comment attribute)</a>
 
       <ul>
+        <li><a href="index.html#src.database.models.Post.text">(src.database.models.Post attribute)</a>
+</li>
+        <li><a href="index.html#src.schemas.CommentResponse.text">(src.schemas.CommentResponse attribute)</a>
+</li>
         <li><a href="index.html#src.schemas.CommentSchema.text">(src.schemas.CommentSchema attribute)</a>
 </li>
         <li><a href="index.html#src.schemas.CommentUpdateSchema.text">(src.schemas.CommentUpdateSchema attribute)</a>
@@ -724,6 +859,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="index.html#src.database.models.BlacklistToken.token">token (src.database.models.BlacklistToken attribute)</a>
+</li>
       <li><a href="index.html#src.schemas.TokenSchema.token_type">token_type (src.schemas.TokenSchema attribute)</a>
 </li>
       <li><a href="index.html#src.schemas.TokenSchema">TokenSchema (class in src.schemas)</a>
@@ -738,31 +875,67 @@
 </li>
       <li><a href="index.html#src.repository.photos.update_photo">update_photo() (in module src.repository.photos)</a>
 </li>
+      <li><a href="index.html#src.database.models.Comment.update_status">update_status (src.database.models.Comment attribute)</a>
+</li>
       <li><a href="index.html#src.repository.users.update_token">update_token() (in module src.repository.users)</a>
 </li>
+      <li><a href="index.html#src.database.models.Comment.updated_at">updated_at (src.database.models.Comment attribute)</a>
+
+      <ul>
+        <li><a href="index.html#src.database.models.User.updated_at">(src.database.models.User attribute)</a>
+</li>
+      </ul></li>
       <li><a href="index.html#src.repository.photos.upload_photo">upload_photo() (in module src.repository.photos)</a>
 
       <ul>
         <li><a href="index.html#src.routes.photos.upload_photo">(in module src.routes.photos)</a>
 </li>
       </ul></li>
-      <li><a href="index.html#src.schemas.PhotosDb.url">url (src.schemas.PhotosDb attribute)</a>
-</li>
-      <li><a href="index.html#src.schemas.PhotosDb.user_id">user_id (src.schemas.PhotosDb attribute)</a>
+      <li><a href="index.html#src.database.models.Photo.url">url (src.database.models.Photo attribute)</a>
 
       <ul>
-        <li><a href="index.html#src.schemas.Rating.user_id">(src.schemas.Rating attribute)</a>
+        <li><a href="index.html#src.database.models.QR_code.url">(src.database.models.QR_code attribute)</a>
+</li>
+        <li><a href="index.html#src.schemas.PhotosDb.url">(src.schemas.PhotosDb attribute)</a>
 </li>
       </ul></li>
+      <li><a href="index.html#src.database.models.User">User (class in src.database.models)</a>
+</li>
+      <li><a href="index.html#src.database.models.Comment.user">user (src.database.models.Comment attribute)</a>
+
+      <ul>
+        <li><a href="index.html#src.database.models.Photo.user">(src.database.models.Photo attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.Rating.user">(src.database.models.Rating attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.Role.user">(src.database.models.Role attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="index.html#src.database.models.Comment.user_id">user_id (src.database.models.Comment attribute)</a>
+
+      <ul>
+        <li><a href="index.html#src.database.models.Photo.user_id">(src.database.models.Photo attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.Post.user_id">(src.database.models.Post attribute)</a>
+</li>
+        <li><a href="index.html#src.database.models.Rating.user_id">(src.database.models.Rating attribute)</a>
+</li>
+        <li><a href="index.html#src.schemas.PhotosDb.user_id">(src.schemas.PhotosDb attribute)</a>
+</li>
+        <li><a href="index.html#src.schemas.RatingSchema.user_id">(src.schemas.RatingSchema attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#src.routes.users.user_profile">user_profile() (in module src.routes.users)</a>
 </li>
       <li><a href="index.html#src.schemas.UserDb">UserDb (class in src.schemas)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#src.schemas.CommentResponse.username">username (src.schemas.CommentResponse attribute)</a>
+      <li><a href="index.html#src.database.models.User.username">username (src.database.models.User attribute)</a>
 
       <ul>
+        <li><a href="index.html#src.schemas.CommentResponse.username">(src.schemas.CommentResponse attribute)</a>
+</li>
         <li><a href="index.html#src.schemas.UserDb.username">(src.schemas.UserDb attribute)</a>
 </li>
         <li><a href="index.html#src.schemas.UserProfileSchema.username">(src.schemas.UserProfileSchema attribute)</a>
