@@ -1,14 +1,14 @@
 import enum
+from enum import Enum
 from datetime import date
 
-from sqlalchemy import Boolean, Column, DateTime,ForeignKey, Integer, Numeric, String, Table, Text, func
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String, Table, Text, func
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import aggregated
 from sqlalchemy import Enum
 
 Base = declarative_base()
-
 
 photo_m2m_tags = Table(
     'photo_m2m_tags',
@@ -17,14 +17,36 @@ photo_m2m_tags = Table(
     Column('tag_id', Integer, ForeignKey('tags.id'))
 )
 
+
 class Role(enum.Enum):
     user: str = 'User'
     moder: str = 'Moderator'
     admin: str = 'Administrator'
 
 
-class User(Base):
+class CropMode(str, enum.Enum):
+    fill = "fill"
+    thumb = "thumb"
+    fit = "fit"
+    limit = "limit"
+    pad = "pad"
+    scale = "scale"
 
+
+class GravityMode(str, enum.Enum):
+    center = "center"
+    north = "north"
+    north_east = "north_east"
+    east = "east"
+    south_east = "south_east"
+    south = "south"
+    south_west = "south_west"
+    west = "west"
+    north_west = "north_west"
+    auto = "auto"
+
+
+class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -37,21 +59,21 @@ class User(Base):
     refresh_token: Mapped[str] = mapped_column(String(255), nullable=True)
     role: Mapped[Enum] = mapped_column('role', Enum(Role), default=Role.user)
     confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
-    is_active: Mapped[bool] =  mapped_column(Boolean, default=True)
-    description: Mapped[str] = mapped_column(String(500),nullable=True, unique=False)
-    
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    description: Mapped[str] = mapped_column(String(500), nullable=True, unique=False)
+
     ratings: Mapped['Rating'] = relationship('Rating', back_populates='user')
     photos: Mapped['Photo'] = relationship('Photo', back_populates='user')
-    
+
 
 class Post(Base):
     __tablename__ = "posts"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     text: Mapped[str] = mapped_column(String(500), nullable=False)
-    photo:Mapped[str] = mapped_column(String(500), nullable=False)
+    photo: Mapped[str] = mapped_column(String(500), nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-    
+
 
 class Photo(Base):
     __tablename__ = "photos"
@@ -62,14 +84,13 @@ class Photo(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     created_at: Mapped[date] = mapped_column('created_at', DateTime, default=func.now())
     cloud_public_id: Mapped[str] = mapped_column(String, nullable=False)
-    
+
     ratings: Mapped['Rating'] = relationship('Rating', back_populates='photo', cascade='all, delete-orphan')
     tags: Mapped[list[str]] = relationship('Tag', secondary=photo_m2m_tags, backref='photos')
     QR: Mapped['QR_code'] = relationship('QR_code', back_populates='photo', cascade='all, delete-orphan')
     user: Mapped['User'] = relationship('User', back_populates='photos')
-    
-    comments: Mapped['Comment'] = relationship('Comment', back_populates='photo', cascade='all, delete-orphan')
 
+    comments: Mapped['Comment'] = relationship('Comment', back_populates='photo', cascade='all, delete-orphan')
 
 
 class Rating(Base):
@@ -99,7 +120,8 @@ class BlacklistToken(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     token: Mapped[str] = mapped_column(String(500), unique=True, nullable=False)
-    blacklisted_on : Mapped[date] = mapped_column(DateTime, default=func.now())
+    blacklisted_on: Mapped[date] = mapped_column(DateTime, default=func.now())
+
 
 class Tag(Base):
     __tablename__ = 'tags'
@@ -108,10 +130,9 @@ class Tag(Base):
     name: Mapped[str] = mapped_column(String(25), unique=True, nullable=True)
 
 
-
 class Comment(Base):
     __tablename__ = 'comments'
-    
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     text: Mapped[int] = mapped_column(Text, nullable=False)
     created_at: Mapped[date] = mapped_column('created_at', DateTime, default=func.now())
@@ -122,5 +143,3 @@ class Comment(Base):
 
     user = relationship('User', backref="comments")
     photo: Mapped['Photo'] = relationship('Photo', back_populates='comments')
-
-    

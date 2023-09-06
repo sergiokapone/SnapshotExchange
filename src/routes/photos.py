@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from fastapi import (
     APIRouter,
     Depends,
@@ -8,7 +6,6 @@ from fastapi import (
     HTTPException,
     UploadFile,
     status,
-    Query,
     Request
 )
 
@@ -24,26 +21,14 @@ from src.database.connect_db import get_db
 from src.repository import photos as repository_photos
 from src.repository import users as repository_users
 from src.repository import ratings as repository_rating
-from src.database.models import User, Role
-from src.schemas import (
-    UserProfileSchema,
-    UserResponseSchema,
-    RequestEmail,
-    UserDb,
-    RequestRole,
-    MessageResponseSchema,
-)
+from src.database.models import User, CropMode, GravityMode
+from src.schemas import MessageResponseSchema
 
 from src.schemas import PhotosDb
 from src.services.auth import auth_service
 from src.services.roles import RoleChecker
 from src.conf.messages import (
     NOT_FOUND,
-    USER_ROLE_IN_USE,
-    INVALID_EMAIL,
-    USER_NOT_ACTIVE,
-    USER_ALREADY_NOT_ACTIVE,
-    USER_CHANGE_ROLE_TO,
     PHOTO_UPLOADED,
     PHOTO_REMOVED,
     NO_PHOTO_FOUND,
@@ -54,7 +39,6 @@ from src.conf.messages import (
 from src.services.roles import Admin_Moder_User, Admin
 
 router = APIRouter(prefix="/photos", tags=["Photos"])
-
 
 """ ------------------- Crud operations for photos ------------------------ """
 
@@ -70,34 +54,38 @@ router = APIRouter(prefix="/photos", tags=["Photos"])
     response_model=MessageResponseSchema,
 )
 async def upload_photo(
-    photo_file: UploadFile = File(..., file_extension=[".jpg", ".jpeg", ".png"]),
-    description: str | None = Form(None),
-    tags: list[str] = Form(None),
-    width: int = None,
-    height: int = None,
-    crop_mode: str = None,
-    gravity_mode: str = None,
-    rotation_angle: int = None,
-    current_user: User = Depends(auth_service.get_authenticated_user),
-    db: AsyncSession = Depends(get_db),
+        photo_file: UploadFile = File(..., description="Select a photo to upload (file in .jpg, .jpeg, .png format)"),
+        description: str | None = Form(None, description="Add a description to your photo (string)"),
+        tags: list[str] = Form(None, description="Tags to associate with the photo (list of strings)"),
+        width: int | None = Form(None, description="The desired width for the photo transformation (integer)"),
+        height: int | None = Form(None, description="The desired height for the photo transformation (integer)"),
+        crop_mode: CropMode = Form(None, description="The cropping mode for the photo transformation (string)"),
+        gravity_mode: GravityMode = Form(None, description="The gravity mode for the photo transformation (string)"),
+        rotation_angle: int | None = Form(None, description="The angle for the photo transformation (integer)"),
+        current_user: User = Depends(auth_service.get_authenticated_user),
+        db: AsyncSession = Depends(get_db),
 ) -> MessageResponseSchema:
-    """
-    
-    Upload a new photo
-    -------------------
 
-    This function allows users to upload new photos. It enforces a rate limit of 10 requests per minute. Users must be authenticated
-    and have the appropriate role to perform this action. The function accepts an uploaded photo file, an optional description,
-    the current authenticated user, and a database session.
+    """
+    Upload a new photo.
+
+    This function allows users to upload new photos. It enforces a rate limit of 10 requests per minute.
+    Users must be authenticated and have the appropriate role to perform this action.
 
     :param photo_file: UploadFile: The photo file to be uploaded.
     :param description: str: An optional description for the photo.
-    :param tags: An optional list of tags. Max number of tags - 5
+    :param tags: list: An optional list of tags to associate with the photo. Maximum of 5 tags allowed.
+    :param width: int: The desired width for the photo transformation.
+    :param height: int: The desired height for the photo transformation.
+    :param crop_mode: CropMode: The cropping mode for the photo transformation.
+    :param gravity_mode: GravityMode: The gravity mode for the photo transformation.
+    :param rotation_angle: int: The angle for the photo transformation.
     :param current_user: User: The currently authenticated user.
     :param db: AsyncSession: The database session.
     :return: A message indicating that the photo has been uploaded.
     :rtype: MessageResponseSchema
     """
+
     if description is not None and len(description) > 500:
         raise HTTPException(status_code=400, detail=LONG_DESCRIPTION)
 
@@ -131,7 +119,7 @@ async def upload_photo(
     )
 
     if new_photo:
-        return {"message": PHOTO_UPLOADED}
+        return MessageResponseSchema(message="Photo uploaded successfully")
 
 
 @router.get(
@@ -139,10 +127,10 @@ async def upload_photo(
     response_model=list[PhotosDb],
 )
 async def get_all_photos(
-    skip: int = 0,
-    limit: int = 10,
-    current_user: User = Depends(auth_service.get_authenticated_user),
-    db: AsyncSession = Depends(get_db),
+        skip: int = 0,
+        limit: int = 10,
+        current_user: User = Depends(auth_service.get_authenticated_user),
+        db: AsyncSession = Depends(get_db),
 ) -> list:
     """
    Get All Photos
@@ -191,19 +179,20 @@ async def get_all_photos(
 
     This documentation provides information about the /get_all endpoint, its parameters, the expected response, and potential error responses. You can include this in your Sphinx documentation for your API. If you need further details or have any specific requirements, please let me know.
     """
-    
+
     photos = await repository_photos.get_photos(skip, limit, db)
     return photos
+
 
 @router.get(
     "/get_my",
     response_model=list[PhotosDb]
 )
 async def get_all_photos(
-    skip: int = 0,
-    limit: int = 10,
-    current_user: User = Depends(auth_service.get_authenticated_user),
-    db: AsyncSession = Depends(get_db),
+        skip: int = 0,
+        limit: int = 10,
+        current_user: User = Depends(auth_service.get_authenticated_user),
+        db: AsyncSession = Depends(get_db),
 ) -> list:
     """
    Get My Photos
@@ -253,13 +242,14 @@ async def get_all_photos(
     photos = await repository_photos.get_my_photos(skip, limit, current_user, db)
     return photos
 
+
 @router.get("/get_all/view",
-    name="get_all_pages")
+            name="get_all_pages")
 async def get_all_photos(
-    request: Request,
-    skip: int = 0,
-    limit: int = 10,
-    db: AsyncSession = Depends(get_db),
+        request: Request,
+        skip: int = 0,
+        limit: int = 10,
+        db: AsyncSession = Depends(get_db),
 ):
     """
     
@@ -293,7 +283,7 @@ async def get_all_photos(
     
     """
     photos = await repository_photos.get_photos(skip, limit, db)
-    
+
     photos_with_username = []
     for photo in photos:
         user = await repository_users.get_user_by_user_id(photo.user_id, db)
@@ -303,19 +293,19 @@ async def get_all_photos(
         rating = await repository_rating.get_rating(photo.id, db)
         formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
         qr_code = await repository_photos.get_URL_Qr(photo.id, db)
-        
+
         photos_with_username.append(
-            {"id": photo.id, 
-             "url": photo.url, 
+            {"id": photo.id,
+             "url": photo.url,
              "QR": qr_code.get('qr_code_url'),
-             "description": photo.description, 
-             "username": username, 
+             "description": photo.description,
+             "username": username,
              "created_at": formatted_created_at,
              "comments": comments,
              "tags": tags,
              "rating": rating
              },
-            )
+        )
 
     return templates.TemplateResponse(
         "photo_list.html", {"request": request, "photos": photos_with_username}
@@ -329,9 +319,9 @@ async def get_all_photos(
     dependencies=[Depends(RateLimiter(times=10, seconds=60))],
 )
 async def make_URL_QR(
-    photo_id: int,
-    current_user: User = Depends(auth_service.get_authenticated_user),
-    db: AsyncSession = Depends(get_db),
+        photo_id: int,
+        current_user: User = Depends(auth_service.get_authenticated_user),
+        db: AsyncSession = Depends(get_db),
 ):
     """
     Make QR Code for Photo URL
@@ -388,9 +378,9 @@ async def make_URL_QR(
     dependencies=[Depends(RateLimiter(times=10, seconds=60))],
 )
 async def get_one_photo(
-    photo_id: int,
-    current_user: User = Depends(auth_service.get_authenticated_user),
-    db: AsyncSession = Depends(get_db),
+        photo_id: int,
+        current_user: User = Depends(auth_service.get_authenticated_user),
+        db: AsyncSession = Depends(get_db),
 ):
     """
     Get One Photo by ID
@@ -448,6 +438,7 @@ async def get_one_photo(
             status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID
         )
 
+
 @router.patch(
     "/{photo_id}",
     status_code=status.HTTP_200_OK,
@@ -456,10 +447,10 @@ async def get_one_photo(
     response_model=PhotosDb,
 )
 async def patch_pdate_photo(
-    photo_id: int,
-    new_photo_description: str,
-    current_user: User = Depends(auth_service.get_authenticated_user),
-    db: AsyncSession = Depends(get_db),
+        photo_id: int,
+        new_photo_description: str,
+        current_user: User = Depends(auth_service.get_authenticated_user),
+        db: AsyncSession = Depends(get_db),
 ):
     """
     Update Photo Description
@@ -528,9 +519,9 @@ async def patch_pdate_photo(
 
 @router.delete("/{photo_id}", response_model=MessageResponseSchema)
 async def remove_photo(
-    photo_id: int,
-    current_user: User = Depends(auth_service.get_authenticated_user),
-    db: AsyncSession = Depends(get_db),
+        photo_id: int,
+        current_user: User = Depends(auth_service.get_authenticated_user),
+        db: AsyncSession = Depends(get_db),
 ) -> MessageResponseSchema:
     """
     
