@@ -55,6 +55,14 @@ class Auth:
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
     
     def __init__(self):
+        """
+        Initialize a new instance of the `Auth` class.
+
+        This constructor initializes the `Auth` class and sets the `_redis_cache` attribute to `None`.
+
+        :return: None
+        """
+        
         self._redis_cache = None
 
     @property
