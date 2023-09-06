@@ -31,9 +31,10 @@ aioredis = "*"
 jinja2 = "*"
 uuid = "*"
 websockets = "*"
-sphinx-rtd-theme = "*"
+sphinx = "==6.1.3"
 
 [dev-packages]
+sphinx-rtd-theme = "*"
 sphinx = "==6.1.3"
 
 [requires]

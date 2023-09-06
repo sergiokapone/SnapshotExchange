@@ -11,7 +11,7 @@ from src.schemas import (
     RequestEmail,
     UserDb,
     RequestRole,
-    PhotoRat,
+    PhotoRating,
     Rating,
 )
 

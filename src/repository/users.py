@@ -161,16 +161,16 @@ async def get_user_by_reset_token(
     reset_token: str, db: AsyncSession
 ) -> User | None:
     """
-    Отримує об'єкт користувача за токеном скидання пароля.
+    Retrieve a user by their reset token.
 
-    Parameters:
-        reset_token (str): Токен скидання пароля.
-        session (AsyncSession): Об'єкт сесії бази даних.
+    This function queries the database to retrieve a user based on their reset token.
 
-    Returns:
-        User: Об'єкт користувача, якщо знайдено, або None, якщо не знайдено.
-
+    :param reset_token: str: The reset token associated with the user.
+    :param db: AsyncSession: The asynchronous database session.
+    :return: The user if found, or None if not found.
+    :rtype: User | None
     """
+    
     try:
         result = await db.execute(
             select(User).filter(User.reset_token == reset_token)
