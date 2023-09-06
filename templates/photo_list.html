@@ -77,37 +77,11 @@
         </div>
     </div>
 
-    <!-- Ваши скрипты -->
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <!-- JavaScript to display the selected photo in a modal window and update the title -->
-    <script>
-        // Get elements
-        var modalPhotos = document.querySelectorAll(".modal-photo");
-        var modalPhoto = document.getElementById("modalPhoto");
-        var modalTitle = document.getElementById("photoModalLabel");
-
-        // Image click handler
-        modalPhotos.forEach(function(photo) {
-            photo.addEventListener("click", function () {
-                // Get the description from the data-description attribute
-                const description = this.getAttribute("data-description");
-
-                // Set the description in the modal title
-                modalTitle.textContent = description;
-
-                // Get the URL of the selected photo
-                const selectedPhotoUrl = this.getAttribute("src");
-
-                // Set the URL of the photo in the modal window
-                modalPhoto.src = selectedPhotoUrl;
-                
-                // Opening a modal window
-                $("#photoModal").modal("show");
-            });
-        });
-    </script>
+    <script src="/static/modal.js"></script>
 </body>
 </html>

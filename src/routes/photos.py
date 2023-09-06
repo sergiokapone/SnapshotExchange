@@ -197,7 +197,7 @@ async def get_all_photos(
 
 @router.get(
     "/get_my",
-    response_model=list[PhotosDb],
+    response_model=list[PhotosDb]
 )
 async def get_all_photos(
     skip: int = 0,
@@ -253,7 +253,8 @@ async def get_all_photos(
     photos = await repository_photos.get_my_photos(skip, limit, current_user, db)
     return photos
 
-@router.get("/get_all/view")
+@router.get("/get_all/view",
+    name="get_all_pages")
 async def get_all_photos(
     request: Request,
     skip: int = 0,
