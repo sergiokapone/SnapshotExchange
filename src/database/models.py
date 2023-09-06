@@ -18,6 +18,25 @@ photo_m2m_tags = Table(
 )
 
 class Role(enum.Enum):
+    """
+    User Roles Enumeration
+
+    This enumeration defines the possible roles for users in the system.
+
+    - `user`: Represents a regular user.
+    - `moder`: Represents a moderator with additional privileges.
+    - `admin`: Represents an administrator with full system control.
+
+    Each role has a corresponding string value for easy identification.
+
+    **Example Usage:**
+
+    .. code-block:: python
+
+        user_role = Role.user
+        admin_role = Role.admin
+
+    """
     user: str = 'User'
     moder: str = 'Moderator'
     admin: str = 'Administrator'
@@ -65,6 +84,28 @@ class User(Base):
     
 
 class Post(Base):
+    """
+    Post Model
+
+    This model represents a user post in the system.
+
+    :param int id: The unique identifier for the post (primary key).
+    :param str text: The text content of the post.
+    :param str photo: The URL or identifier of the associated photo.
+    :param int user_id: The user's ID who created the post (foreign key).
+
+    **Example Usage:**
+
+    .. code-block:: python
+
+        new_post = Post(
+            text="This is a sample post.",
+            photo="https://example.com/sample.jpg",
+            user_id=1
+        )
+
+    """
+    
     __tablename__ = "posts"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -140,6 +181,26 @@ class Rating(Base):
 
 
 class QR_code(Base):
+    """
+    QR_code Model
+
+    This model represents a QR code associated with a photo in the system.
+
+    :param int id: The unique identifier for the QR code (primary key).
+    :param str url: The URL or identifier of the QR code.
+    :param int photo_id: The ID of the associated photo (foreign key).
+
+    **Example Usage:**
+
+    .. code-block:: python
+
+        new_qr_code = QR_code(
+            url="https://example.com/qrcode123",
+            photo_id=1
+        )
+
+    """
+    
     __tablename__ = "Qr_codes"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -150,6 +211,25 @@ class QR_code(Base):
 
 
 class BlacklistToken(Base):
+    """
+    BlacklistToken Model
+
+    This model represents a blacklisted token in the system, which is used to prevent token reuse.
+
+    :param int id: The unique identifier for the blacklisted token (primary key).
+    :param str token: The token string that has been blacklisted (unique and not nullable).
+    :param datetime blacklisted_on: The date and time when the token was blacklisted (default is the current time).
+
+    **Example Usage:**
+
+    .. code-block:: python
+
+        blacklisted_token = BlacklistToken(
+            token="your_token_string_here"
+        )
+
+    """
+    
     __tablename__ = 'blacklist_tokens'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -157,6 +237,24 @@ class BlacklistToken(Base):
     blacklisted_on : Mapped[date] = mapped_column(DateTime, default=func.now())
 
 class Tag(Base):
+    """
+    Tag Model
+
+    This model represents a tag that can be associated with photos in the system.
+
+    :param int id: The unique identifier for the tag (primary key).
+    :param str name: The name of the tag (unique and nullable).
+
+    **Example Usage:**
+
+    .. code-block:: python
+
+        tag = Tag(
+            name="your_tag_name_here"
+        )
+
+    """
+    
     __tablename__ = 'tags'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -165,6 +263,34 @@ class Tag(Base):
 
 
 class Comment(Base):
+    """
+    Comment Model
+
+    This model represents a comment left by a user on a photo in the system.
+
+    :param int id: The unique identifier for the comment (primary key).
+    :param str text: The text content of the comment (required).
+    :param datetime created_at: The timestamp when the comment was created (automatically generated).
+    :param datetime updated_at: The timestamp when the comment was last updated (automatically generated).
+    :param int user_id: The user identifier associated with the comment (foreign key to 'users.id').
+    :param int photo_id: The photo identifier associated with the comment (foreign key to 'photos.id', can be None).
+    :param bool update_status: A boolean flag indicating if the comment has been updated (default is False).
+
+    :type user: User
+    :type photo: Photo
+
+    **Example Usage:**
+
+    .. code-block:: python
+
+        comment = Comment(
+            text="Your comment text here",
+            user_id=1,
+            photo_id=2  # Optional, can be None
+        )
+
+    """
+    
     __tablename__ = 'comments'
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
