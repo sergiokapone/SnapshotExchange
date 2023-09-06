@@ -92,5 +92,5 @@ async def view_all_photos(
         )
 
     return templates.TemplateResponse(
-        "photo_list.html", {"request": request, "photos": photos_with_username}
+        "photo_list.html", {"request": request, "photos": photos_with_username, "skip": skip, "limit": limit}
     )
