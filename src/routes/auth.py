@@ -96,6 +96,7 @@ async def signup(
     This route allows you to register a new user.
 
     Level of Access:
+    
     - All comers
 
 
@@ -141,6 +142,7 @@ async def login(
     This route allows the user to log in by providing the correct email and password and receive access tokens.
 
     Level of Access:
+    
     - Verified users
 
     :param body: OAuth2PasswordRequestForm: A form with the user's email and password.
@@ -192,11 +194,12 @@ async def logout(
     current_user: User = Depends(auth_service.get_authenticated_user),
 ):
     """
-    # Log out user and add the token to the blacklist.
+    **Log out user and add the token to the blacklist.**
 
     This route allows the user to log out and their access token will be added to the blacklist.
 
     Level of Access:
+    
     - Current authorized user
 
     :param credentials: HTTPAuthorizationCredentials: User authentication data (token).
@@ -219,11 +222,12 @@ async def refresh_token(
     current_user: User = Depends(auth_service.get_authenticated_user),
 ):
     """
-    # Updates the user's access token.
+    Updates the user's access token.
 
     This route allows the user's access token to be refreshed if a valid refresh token is present.
 
     Level of Access:
+    
     - Current authorized user
 
     :param credentials: HTTPAuthorizationCredentials: User authentication data (access token).
@@ -258,11 +262,12 @@ async def refresh_token(
 @router.get("/confirmed_email/{token}", response_model=MessageResponseSchema)
 async def confirmed_email(token: str, db: AsyncSession = Depends(get_db)):
     """
-    # Confirmation of the user's email.
+    Confirmation of the user's email.
 
     This route allows the user to confirm their email by providing the correct confirmation token.
 
     Level of Access:
+    
     - Users who have registered
 
     :param token: str: Email confirmation token.
@@ -295,11 +300,12 @@ async def request_email(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    # Request to confirm the user's email.
+    Request to confirm the user's email.
 
     This route allows the user to request that an email be sent to confirm the user's email.
 
     Level of Access:
+    
     - Any user
     - Email is only sent to registered users.
 
@@ -333,13 +339,14 @@ async def forgot_password(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    # User password recovery request.
+    User password recovery request.
 
     This route allows the user to request password recovery via email.
 
     Level of Access:
-        - Any user
-        - Email is only sent to registered users.
+    
+    - Any user
+    - Email is only sent to registered users.
 
     :param email: EmailStr: Email of the user for whom password recovery is requested.
     :param background_tasks: BackgroundTasks: Tasks that are executed in the background (sending an email with instructions).
@@ -373,10 +380,11 @@ async def reset_password(
     reset_token: str, new_password: str, db: AsyncSession = Depends(get_db)
 ):
     """
-    # Reset user password.
+    Reset user password.
 
     Level of Access:
-        - Any user
+    
+    - Any user
 
     This route allows the user to reset their password by providing the correct reset token and a new password.
 

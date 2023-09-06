@@ -38,7 +38,6 @@ async def view_all_photos(
     """
 
     View All Photos
-    ------------------
 
     This endpoint retrieves and displays a view of all photos from the database.
 
@@ -76,7 +75,7 @@ async def view_all_photos(
         username = user.username if user else None
         rating = await repository_rating.get_rating(photo.id, db)
         formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
-        qr_code = await repository_photos.get_URL_Qr(photo.id, db)
+        qr_code = await repository_photos.get_URL_QR(photo.id, db)
 
         photos_with_username.append(
             {

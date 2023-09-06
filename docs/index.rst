@@ -6,6 +6,9 @@
 Welcome to SnapshotExchange's documentation!
 ============================================
 
+Is a comprehensive documentation that provides detailed information about our services and APIs. Whether you're a developer looking to integrate with our services or an end user seeking information, you'll find valuable resources here.
+
+
 .. toctree::
   :maxdepth: 4
   :caption: Contents:
@@ -16,7 +19,6 @@ REST API repository Users
   :members:
   :undoc-members:
   :show-inheritance:
-
 
 REST API repository Photos
 ===========================
@@ -61,7 +63,6 @@ REST API routes Photos
   :undoc-members:
   :show-inheritance:
 
-
 REST API routes Comments
 =========================
 .. automodule:: src.routes.comments
@@ -83,7 +84,6 @@ REST API service Auth
   :undoc-members:
   :show-inheritance:
 
-
 REST API service Email
 =========================
 .. automodule:: src.services.email
@@ -91,23 +91,23 @@ REST API service Email
   :undoc-members:
   :show-inheritance:
 
-  REST API service Photos
-=========================
+
+REST API service Photos
+==========================
 .. automodule:: src.services.photos
   :members:
   :undoc-members:
   :show-inheritance:
 
-  REST API service Roles
-=========================
-.. automodule:: src.services.Roles
+REST API service Roles
+==========================
+.. automodule:: src.services.roles
   :members:
   :undoc-members:
   :show-inheritance:
 
 Indices and tables
-==================
-
+=====================
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`

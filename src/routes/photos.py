@@ -49,10 +49,6 @@ from src.services.roles import Admin_Moder_User, Admin
 
 router = APIRouter(prefix="/photos", tags=["Photos"])
 
-
-""" ------------------- Crud operations for photos ------------------------ """
-
-
 @router.post(
     "/upload",
     status_code=status.HTTP_201_CREATED,
@@ -78,7 +74,7 @@ async def upload_photo(
     """
     
     Upload a new photo
-    -------------------
+    
 
     This function allows users to upload new photos. It enforces a rate limit of 10 requests per minute. Users must be authenticated
     and have the appropriate role to perform this action. The function accepts an uploaded photo file, an optional description,
@@ -92,6 +88,7 @@ async def upload_photo(
     :return: A message indicating that the photo has been uploaded.
     :rtype: MessageResponseSchema
     """
+    
     if description is not None and len(description) > 500:
         raise HTTPException(status_code=400, detail=LONG_DESCRIPTION)
 
@@ -139,51 +136,54 @@ async def get_all_photos(
     db: AsyncSession = Depends(get_db),
 ) -> list:
     """
-   Get All Photos
-   ------------------
+    Get All Photos
+    
+    This endpoint retrieves a list of photos from the database.
 
-   This endpoint retrieves a list of photos from the database.
+    :param int skip: The number of photos to skip (default is 0).
+    :param int limit: The maximum number of photos to retrieve (default is 10).
+    :param current_user: The authenticated user (Dependency).
+    :type current_user: User
+    :param db: The asynchronous database session (Dependency).
+    :type db: AsyncSession
+    :return: A list of Photo objects.
+    :rtype: list[PhotosDb]
+    :raises HTTPException 401: Unauthorized if the user is not authenticated.
+    :raises HTTPException 500: Internal Server Error if there's a database issue.
 
-   :param int skip: The number of photos to skip (default is 0).
-   :param int limit: The maximum number of photos to retrieve (default is 10).
-   :param current_user: The authenticated user (Dependency).
-   :type current_user: User
-   :param db: The asynchronous database session (Dependency).
-   :type db: AsyncSession
-   :return: A list of Photo objects.
-   :rtype: list[PhotosDb]
-   :raises HTTPException 401: Unauthorized if the user is not authenticated.
-   :raises HTTPException 500: Internal Server Error if there's a database issue.
+    **Example Request:**
 
-   **Example Request:**
+    .. code-block:: http
 
-   .. code-block:: http
+        GET /get_all?skip=0&limit=10 HTTP/1.1
+        Host: yourapi.com
+        Authorization: Bearer your_access_token
 
-      GET /get_all?skip=0&limit=10 HTTP/1.1
-      Host: yourapi.com
-      Authorization: Bearer your_access_token
+    **Example Response:**
+    
+    .. code-block:: http
+    
+        HTTP/1.1 200 OK
+        Content-Type: application/json
 
-   **Example Response:**
+    .. code-block:: json
 
-   .. code-block:: json
 
-      HTTP/1.1 200 OK
-      Content-Type: application/json
-
-      [
+        [
         {
-          "id": 1,
-          "title": "Photo 1",
-          "url": "https://example.com/photo1.jpg"
+            "id": 1,
+            "title": "Photo 1",
+            "url": "https://example.com/photo1.jpg"
         },
         {
-          "id": 2,
-          "title": "Photo 2",
-          "url": "https://example.com/photo2.jpg"
+            "id": 2,
+            "title": "Photo 2",
+            "url": "https://example.com/photo2.jpg"
         }
-      ]
+        ]
 
     This documentation provides information about the /get_all endpoint, its parameters, the expected response, and potential error responses. You can include this in your Sphinx documentation for your API. If you need further details or have any specific requirements, please let me know.
+    
     """
     
     photos = await repository_photos.get_photos(skip, limit, db)
@@ -193,57 +193,61 @@ async def get_all_photos(
     "/get_my",
     response_model=list[PhotosDb]
 )
-async def get_all_photos(
+async def get_my_photos(
     skip: int = 0,
     limit: int = 10,
     current_user: User = Depends(auth_service.get_authenticated_user),
     db: AsyncSession = Depends(get_db),
 ) -> list:
     """
-   Get My Photos
-   ------------------
+    Get My Photos
+    
 
-   This endpoint retrieves a list of photos that belong to the authenticated user from the database.
+    This endpoint retrieves a list of photos that belong to the authenticated user from the database.
 
-   :param int skip: The number of photos to skip (default is 0).
-   :param int limit: The maximum number of photos to retrieve (default is 10).
-   :param current_user: The authenticated user (Dependency).
-   :type current_user: User
-   :param db: The asynchronous database session (Dependency).
-   :type db: AsyncSession
-   :return: A list of Photo objects.
-   :rtype: list[PhotosDb]
-   :raises HTTPException 401: Unauthorized if the user is not authenticated.
-   :raises HTTPException 500: Internal Server Error if there's a database issue.
+    :param int skip: The number of photos to skip (default is 0).
+    :param int limit: The maximum number of photos to retrieve (default is 10).
+    :param current_user: The authenticated user (Dependency).
+    :type current_user: User
+    :param db: The asynchronous database session (Dependency).
+    :type db: AsyncSession
+    :return: A list of Photo objects.
+    :rtype: list[PhotosDb]
+    :raises HTTPException 401: Unauthorized if the user is not authenticated.
+    :raises HTTPException 500: Internal Server Error if there's a database issue.
+    
+    **Example Request:**
 
-   **Example Request:**
+    .. code-block:: http
 
-   .. code-block:: http
+        GET /get_my?skip=0&limit=10 HTTP/1.1
+        Host: yourapi.com
+        Authorization: Bearer your_access_token
 
-      GET /get_my?skip=0&limit=10 HTTP/1.1
-      Host: yourapi.com
-      Authorization: Bearer your_access_token
+    **Example Response:**
 
-   **Example Response:**
+    .. code-block:: http
+    
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+    
+    .. code-block:: json
 
-   .. code-block:: json
-
-      HTTP/1.1 200 OK
-      Content-Type: application/json
-
-      [
+        [
         {
-          "id": 1,
-          "title": "My Photo 1",
-          "url": "https://example.com/my_photo1.jpg"
+            "id": 1,
+            "title": "My Photo 1",
+            "url": "https://example.com/my_photo1.jpg"
         },
         {
-          "id": 2,
-          "title": "My Photo 2",
-          "url": "https://example.com/my_photo2.jpg"
+            "id": 2,
+            "title": "My Photo 2",
+            "url": "https://example.com/my_photo2.jpg"
         }
-      ]
+        ]
+
     """
+
     photos = await repository_photos.get_my_photos(skip, limit, current_user, db)
     return photos
 
@@ -261,7 +265,7 @@ async def make_URL_QR(
 ):
     """
     Make QR Code for Photo URL
-    --------------------------
+    
 
     This endpoint generates a QR code for a specific photo URL.
 
@@ -287,8 +291,8 @@ async def make_URL_QR(
     **Example Response:**
 
     The response contains the generated QR code data, which can be used to display or download the QR code image.
-
-    .. code-block:: binary
+   
+    .. code-block:: http
 
         HTTP/1.1 200 OK
         Content-Type: application/octet-stream
@@ -301,7 +305,7 @@ async def make_URL_QR(
 
     """
 
-    data = await repository_photos.get_URL_Qr(photo_id, db)
+    data = await repository_photos.get_URL_QR(photo_id, db)
 
     return data
 
@@ -320,7 +324,6 @@ async def get_one_photo(
 ):
     """
     Get One Photo by ID
-    --------------------
 
     This endpoint retrieves a specific photo by its unique ID.
 
@@ -347,11 +350,14 @@ async def get_one_photo(
     **Example Response:**
 
     The response contains the Photo object with the specified ID.
-
-    .. code-block:: json
+    
+    .. code-block:: http
 
         HTTP/1.1 200 OK
         Content-Type: application/json
+
+    .. code-block:: json
+
 
         {
             "id": 123,
@@ -389,7 +395,6 @@ async def patch_pdate_photo(
 ):
     """
     Update Photo Description
-    ------------------------
 
     This endpoint updates the description of a specific photo by its unique ID.
 
@@ -422,12 +427,14 @@ async def patch_pdate_photo(
     **Example Response:**
 
     The response contains the updated Photo object with the specified ID.
-
-    .. code-block:: json
+    
+    .. code-block:: http
 
         HTTP/1.1 200 OK
         Content-Type: application/json
 
+    .. code-block:: json
+    
         {
             "id": 123,
             "title": "Photo 123",
@@ -441,6 +448,7 @@ async def patch_pdate_photo(
 
 
     """
+    
     # Updating a photo by its id
     updated_photo = await repository_photos.update_photo(
         current_user, photo_id, new_photo_description, db
@@ -461,7 +469,6 @@ async def remove_photo(
     """
     
     Remove Photo by ID
-    ------------------
 
     This endpoint removes a specific photo by its unique ID.
 
@@ -480,22 +487,24 @@ async def remove_photo(
 
     .. code-block:: http
 
-    DELETE /123 HTTP/1.1
-    Host: yourapi.com
-    Authorization: Bearer your_access_token
+        DELETE /123 HTTP/1.1
+        Host: yourapi.com
+        Authorization: Bearer your_access_token
 
     **Example Response:**
 
     The response contains a message indicating that the photo has been successfully removed.
+   
+    .. code-block:: http
 
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        
     .. code-block:: json
 
-    HTTP/1.1 200 OK
-    Content-Type: application/json
-
-    {
-        "message": "Photo removed successfully"
-    }
+        {
+            "message": "Photo removed successfully"
+        }
 
     """
 

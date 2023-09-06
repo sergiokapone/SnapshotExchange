@@ -22,15 +22,10 @@ from src.database.models import (
 
 from src.services.photos import validate_crop_mode, validate_gravity_mode
 
-# ------------------------------- ## TAGS ## ----------------------------------
-
 async def get_or_create_tag(tag_name: str, db: AsyncSession) -> Tag:
     """
-    .. function:: async def get_or_create_tag(tag_name: str, db: AsyncSession) -> Tag
-
     Get or Create Tag
-    ------------------
-
+    
     This function retrieves an existing tag with the specified name from the database or creates a new one if it doesn't exist.
 
     :param str tag_name: The name of the tag to retrieve or create.
@@ -77,8 +72,7 @@ async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
     .. function:: async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None
 
     Get Photo Tags
-    ------------------
-
+    
     This function retrieves a list of tags associated with a specific photo by its ID.
 
     :param int photo_id: The ID of the photo for which to retrieve tags.
@@ -110,9 +104,6 @@ async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
         return tags
     return None
 
-# ---------------------------- ## Comments ## ---------------------------------
-
-
 async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]:
     query = (
         select(Comment.text, User.username)
@@ -123,8 +114,7 @@ async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]:
     .. function:: async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]
 
    Get Photo Comments
-   ------------------
-
+   
    This function retrieves a list of comments associated with a specific photo by its ID.
 
    :param int photo_id: The ID of the photo for which to retrieve comments.
@@ -157,7 +147,6 @@ async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]:
         return [{"text": comment.text, "username": comment.username} for comment in comments]
     return []
 
-# ----------------------------- ### CRUD ### ---------------------------------#
 async def upload_photo(
         current_user: User,
         photo: File(),
@@ -369,10 +358,6 @@ async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
         except Exception as e:
             await db.rollback()
             raise e
-
-
-# --------------------------- ### END CRUD ### -------------------------------#
-
 
 async def get_URL_Qr(photo_id: int, db: AsyncSession):
     """

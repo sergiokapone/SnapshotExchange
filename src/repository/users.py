@@ -280,10 +280,7 @@ async def make_user_role(email: str, role: Role, db: AsyncSession) -> None:
 
 async def add_to_blacklist(token: str, db: AsyncSession) -> None:
     """
-    The add_to_blacklist function adds a token to the blacklist.
-        Args:
-            token (str): The JWT that is being blacklisted.
-            db (AsyncSession): The database session object used for querying and updating the database.
+    **Adds a token to the blacklist.**
 
     :param token: str: Pass the token to be blacklisted
     :param db: AsyncSession: Create a new session with the database
