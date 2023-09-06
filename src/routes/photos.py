@@ -12,7 +12,6 @@ from fastapi import (
 )
 
 from fastapi.templating import Jinja2Templates
-from fastapi.encoders import jsonable_encoder
 
 templates = Jinja2Templates(directory="templates")
 
@@ -500,7 +499,7 @@ async def get_one_photo(
     dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     response_model=PhotosDb,
 )
-async def patch_pdate_photo(
+async def patch_update_photo(
         photo_id: int,
         new_photo_description: str,
         current_user: User = Depends(auth_service.get_authenticated_user),
@@ -566,7 +565,15 @@ async def patch_pdate_photo(
     )
 
     if updated_photo:
-        return jsonable_encoder(updated_photo)
+        response = PhotosDb(
+            id=updated_photo.id,
+            url=updated_photo.url,
+            description=updated_photo.description,
+            user_id=updated_photo.user_id,
+            created_at=updated_photo.created_at,
+            tags=[tag.name for tag in updated_photo.tags]
+        )
+        return response
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NO_PHOTO_BY_ID)
 
@@ -621,4 +628,4 @@ async def remove_photo(
     result = await repository_photos.remove_photo(photo_id, current_user, db)
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NOT_FOUND)
-    return {"message": PHOTO_REMOVED}
+    return MessageResponseSchema(message=PHOTO_REMOVED)

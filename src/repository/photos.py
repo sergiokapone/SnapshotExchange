@@ -318,7 +318,7 @@ async def update_photo(
         current_user: User, photo_id: int,
         description: str,
         db: AsyncSession
-) -> dict:
+) -> Photo:
     """
     Update the description of a photo owned by the current user.
 
@@ -330,10 +330,12 @@ async def update_photo(
     """
     query_result = await db.execute(
         select(Photo)
+        .join(Photo.tags)
+        .options(selectinload(Photo.tags))
         .where(Photo.user_id == current_user.id)
         .where(Photo.id == photo_id)
     )
-    photo = query_result.scalar()
+    photo = query_result.scalar_one_or_none()
 
     if photo:
         photo.description = description
