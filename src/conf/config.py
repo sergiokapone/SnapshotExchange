@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     cloudinary_api_secret: str = "secret"
 
     class Config:
+        extra = "ignore"
         env_file = ".env"
         env_file_encoding = "utf-8"
 
