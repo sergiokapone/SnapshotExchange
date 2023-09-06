@@ -181,6 +181,16 @@ async def get_user_by_reset_token(
         return None
 
 async def get_user_by_user_id(user_id: int, db: AsyncSession) -> User | None:
+    """
+    Get User by User ID
+
+    This function retrieves a user by their user ID from the database.
+
+    :param int user_id: The ID of the user to retrieve.
+    :param AsyncSession db: An asynchronous database session.
+    :return: The user with the specified ID, or None if the user is not found.
+    :rtype: User | None
+    """
     
     try:
         result = await db.execute(select(User).filter(User.id == user_id))
@@ -302,13 +312,14 @@ async def add_to_blacklist(token: str, db: AsyncSession) -> None:
 
 async def is_blacklisted_token(token: str, db: AsyncSession) -> bool:
     """
-    Function takes checks if a token is blacklisted.
+    Check if a Token is Blacklisted
 
-    Arguments:
-        token (str): token to be checked
-        db (Session): SQLAlchemy session object for accessing the database
-    Returns:
-        bool
+    This function checks if a given token is blacklisted in the database.
+
+    :param str token: The token to be checked.
+    :param AsyncSession db: An asynchronous database session.
+    :return: True if the token is blacklisted, False otherwise.
+    :rtype: bool
     """
 
     result = await db.execute(

@@ -327,7 +327,23 @@ session (AsyncSession): Об’єкт сесії бази даних.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.repository.users.get_user_by_user_id">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.repository.users.</span></span><span class="sig-name descname"><span class="pre">get_user_by_user_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">User</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#src.repository.users.get_user_by_user_id" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get User by User ID</p>
+<p>This function retrieves a user by their user ID from the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – The ID of the user to retrieve.</p></li>
+<li><p><strong>db</strong> (<em>AsyncSession</em>) – An asynchronous database session.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The user with the specified ID, or None if the user is not found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>User | None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.repository.users.get_user_by_username">
@@ -387,12 +403,20 @@ session (AsyncSession): Об’єкт сесії бази даних.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.repository.users.is_blacklisted_token">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.repository.users.</span></span><span class="sig-name descname"><span class="pre">is_blacklisted_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#src.repository.users.is_blacklisted_token" title="Link to this definition"></a></dt>
-<dd><p>Function takes checks if a token is blacklisted.</p>
-<dl class="simple">
-<dt>Arguments:</dt><dd><p>token (str): token to be checked
-db (Session): SQLAlchemy session object for accessing the database</p>
+<dd><p>Check if a Token is Blacklisted</p>
+<p>This function checks if a given token is blacklisted in the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> (<em>str</em>) – The token to be checked.</p></li>
+<li><p><strong>db</strong> (<em>AsyncSession</em>) – An asynchronous database session.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>bool</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the token is blacklisted, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -530,12 +554,74 @@ role (Role): The new Role for the user.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.repository.photos.get_photo_comments">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.repository.photos.</span></span><span class="sig-name descname"><span class="pre">get_photo_comments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">photo_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#src.repository.photos.get_photo_comments" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get Photo Comments</p>
+<p>This function retrieves a list of comments associated with a specific photo by its ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>photo_id</strong> (<em>int</em>) – The ID of the photo for which to retrieve comments.</p></li>
+<li><p><strong>db</strong> (<em>AsyncSession</em>) – The asynchronous database session.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of dictionaries containing comment text and the username of the commenter.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[dict]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – Raises an exception if there’s an issue with database operations.</p>
+</dd>
+</dl>
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">photo_id</span> <span class="o">=</span> <span class="mi">123</span>
+<span class="k">async</span> <span class="k">with</span> <span class="n">get_db</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+    <span class="n">comments</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_photo_comments</span><span class="p">(</span><span class="n">photo_id</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">comments</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="n">comments</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Username: </span><span class="si">{</span><span class="n">comment</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Comment: </span><span class="si">{</span><span class="n">comment</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No comments found for the photo.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This function constructs a database query to retrieve comments associated with a specific photo. It returns a list of dictionaries, where each dictionary contains the comment text and the username of the commenter.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.repository.photos.get_photo_tags">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.repository.photos.</span></span><span class="sig-name descname"><span class="pre">get_photo_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">photo_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#src.repository.photos.get_photo_tags" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get Photo Tags</p>
+<p>This function retrieves a list of tags associated with a specific photo by its ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>photo_id</strong> (<em>int</em>) – The ID of the photo for which to retrieve tags.</p></li>
+<li><p><strong>db</strong> (<em>AsyncSession</em>) – The asynchronous database session.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tag names associated with the photo, or None if there are no tags.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[str] | None</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – Raises an exception if there’s an issue with database operations.</p>
+</dd>
+</dl>
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">photo_id</span> <span class="o">=</span> <span class="mi">123</span>
+<span class="k">async</span> <span class="k">with</span> <span class="n">get_db</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_photo_tags</span><span class="p">(</span><span class="n">photo_id</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">tags</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span>  <span class="c1"># Print the list of tag names associated with the photo.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No tags found for the photo.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This function constructs a database query to retrieve tag names associated with a specific photo. If tags are found, it returns a list of tag names. If no tags are associated with the photo, it returns None.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.repository.photos.get_photos">
@@ -672,7 +758,23 @@ role (Role): The new Role for the user.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.repository.comments.get_comment">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.repository.comments.</span></span><span class="sig-name descname"><span class="pre">get_comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.repository.comments.get_comment" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get a Comment by ID</p>
+<p>This function retrieves a comment by its ID from the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>int</em>) – The ID of the comment to retrieve.</p></li>
+<li><p><strong>db</strong> (<em>AsyncSession</em>) – An asynchronous database session.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The comment with the specified ID, or None if the comment is not found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Comment | None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.repository.comments.get_photo_comments">
@@ -891,7 +993,7 @@ and also with code 400 and detail “EMAIL_ALREADY_CONFIRMED” in case of alrea
 <dl class="py function">
 <dt class="sig sig-object py" id="src.routes.auth.login">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routes.auth.</span></span><span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">OAuth2PasswordRequestForm</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(OAuth2PasswordRequestForm)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.routes.auth.login" title="Link to this definition"></a></dt>
-<dd><p># Log in and get access tokens.</p>
+<dd><p>Log in and get access tokens.</p>
 <p>This route allows the user to log in by providing the correct email and password and receive access tokens.</p>
 <p>Level of Access:</p>
 <ul class="simple">
@@ -1800,6 +1902,27 @@ Only users with the ‘admin’ or ‘moder’ role can access this endpoint.</p
 <dt class="sig sig-object py" id="src.services.auth.Auth">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.services.auth.</span></span><span class="sig-name descname"><span class="pre">Auth</span></span><a class="headerlink" href="#src.services.auth.Auth" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The <cite>Auth</cite> class provides authentication-related functionality for the application.</p>
+<p>It includes methods for password hashing, token creation and decoding, and user verification.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>pwd_context (CryptContext): An instance of <cite>CryptContext</cite> for password hashing.
+SECRET_KEY (str): The secret key used for token generation and decoding.
+ALGORITHM (str): The algorithm used for token encoding and decoding.
+oauth2_scheme (OAuth2PasswordBearer): An instance of <cite>OAuth2PasswordBearer</cite> for OAuth2 authentication.</p>
+</dd>
+<dt>Methods:</dt><dd><p>verify_password(plain_password, hashed_password): Verify a plain password against a hashed password.
+get_password_hash(password): Generate a hashed password from a plain text password.
+create_access_token(data, expires_delta=None): Create an access token with an optional expiration time.
+create_refresh_token(data, expires_delta=None): Create a refresh token with an optional expiration time.
+create_email_token(data): Create an email verification token with a fixed expiration time.
+decode_token(token): Decode a JWT token and validate its scope.
+get_authenticated_user(token, db): Get the authenticated user based on the provided token.
+get_email_from_token(token): Get the email address from an email verification token.</p>
+</dd>
+<dt>Example Usage:</dt><dd><p>auth = Auth()
+hashed_password = auth.get_password_hash(“my_password”)</p>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.services.auth.Auth.ALGORITHM">
 <span class="sig-name descname"><span class="pre">ALGORITHM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'HS256'</span></em><a class="headerlink" href="#src.services.auth.Auth.ALGORITHM" title="Link to this definition"></a></dt>
@@ -1834,7 +1957,20 @@ Only users with the ‘admin’ or ‘moder’ role can access this endpoint.</p
 <dl class="py method">
 <dt class="sig sig-object py" id="src.services.auth.Auth.create_email_token">
 <span class="sig-name descname"><span class="pre">create_email_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.services.auth.Auth.create_email_token" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Create an email verification token.</p>
+<p>This function generates an email verification token with an expiration time of 3 days.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – dict: The data to include in the token payload.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The encoded email verification token.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.services.auth.Auth.create_refresh_token">
@@ -1926,7 +2062,19 @@ Only users with the ‘admin’ or ‘moder’ role can access this endpoint.</p
 <dl class="py method">
 <dt class="sig sig-object py" id="src.services.auth.Auth.get_password_hash">
 <span class="sig-name descname"><span class="pre">get_password_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.services.auth.Auth.get_password_hash" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Generate a hashed password from a plain text password.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>password</strong> (<em>str</em>) – The plain text password.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The hashed password.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.services.auth.Auth.oauth2_scheme">
@@ -1956,7 +2104,22 @@ Only users with the ‘admin’ or ‘moder’ role can access this endpoint.</p
 <dl class="py method">
 <dt class="sig sig-object py" id="src.services.auth.Auth.verify_password">
 <span class="sig-name descname"><span class="pre">verify_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plain_password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hashed_password</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.services.auth.Auth.verify_password" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Verify a plain password against a hashed password.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plain_password</strong> (<em>str</em>) – The plain text password.</p></li>
+<li><p><strong>hashed_password</strong> (<em>str</em>) – The hashed password to compare against.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the plain password matches the hashed password, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

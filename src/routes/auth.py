@@ -137,7 +137,7 @@ async def login(
     body: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
     """
-    # Log in and get access tokens.
+    Log in and get access tokens.
 
     This route allows the user to log in by providing the correct email and password and receive access tokens.
 

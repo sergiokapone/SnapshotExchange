@@ -27,7 +27,18 @@ async def create_comment(content: str, user: str, photos_id: int, db: AsyncSessi
         await db.rollback()
         raise e
 
-async def get_comment(id: int, db: AsyncSession):   
+async def get_comment(id: int, db: AsyncSession):
+    """
+    Get a Comment by ID
+
+    This function retrieves a comment by its ID from the database.
+
+    :param int id: The ID of the comment to retrieve.
+    :param AsyncSession db: An asynchronous database session.
+    :return: The comment with the specified ID, or None if the comment is not found.
+    :rtype: Comment | None
+    """
+     
     comment = await db.get(Comment, id)
     if comment:
         return comment
@@ -88,6 +99,7 @@ async def get_photo_comments(
     limit: int, 
     photo_id: int, 
     db: AsyncSession):
+    
     """
     Gets comments on a specific photo with pagination.
 
