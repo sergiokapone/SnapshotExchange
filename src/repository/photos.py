@@ -259,7 +259,11 @@ async def get_my_photos(
     :return: A list of all photos
     """
     query = (
-        select(Photo).where(Photo.user_id == current_user.id).offset(skip).limit(limit)
+        select(Photo)
+        .where(Photo.user_id == current_user.id)
+        .options(selectinload(Photo.tags))
+        .offset(skip)
+        .limit(limit)
     )
     result = await db.execute(query)
     photos = result.scalars().all()

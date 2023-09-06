@@ -274,7 +274,19 @@ async def get_all_photos(
       ]
     """
     photos = await repository_photos.get_my_photos(skip, limit, current_user, db)
-    return photos
+    response = [
+        PhotosDb(
+            id=photo.id,
+            url=photo.url,
+            description=photo.description,
+            user_id=photo.user_id,
+            created_at=photo.created_at,
+            tags=[tag.name for tag in photo.tags]
+        )
+        for photo in photos
+    ]
+
+    return response
 
 
 @router.get("/get_all/view",
