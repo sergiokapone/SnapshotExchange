@@ -357,7 +357,7 @@ async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
             await db.rollback()
             raise e
 
-async def get_URL_Qr(photo_id: int, db: AsyncSession):
+async def get_URL_QR(photo_id: int, db: AsyncSession):
     """
     Generate and retrieve a QR code URL for a photo.
 
