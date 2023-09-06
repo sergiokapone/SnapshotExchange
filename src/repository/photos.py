@@ -167,6 +167,7 @@ async def upload_photo(
         width: int | None,
         height: int | None,
         crop_mode: str | None,
+        rounding: int | None,
         background_color: str,
         rotation_angle: int | None,
         tags: List[str] = [],
@@ -204,7 +205,8 @@ async def upload_photo(
     transformations = [{"width": width,
                         "height": height,
                         "angle": rotation_angle,
-                        "background": background_color
+                        "background": background_color,
+                        "radius": rounding,
                         }]
     if crop_mode is not None:
         transformations.append({"crop": crop_mode})
