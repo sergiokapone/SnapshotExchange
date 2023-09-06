@@ -79,6 +79,7 @@ async def upload_photo(
     :param width: int: The desired width for the photo transformation.
     :param height: int: The desired height for the photo transformation.
     :param crop_mode: CropMode: The cropping mode for the photo transformation.
+    :param rounding: int: Desired rounding of photo corners when transforming the photo.
     :param background_color: BGColor: The background color for the photo transformation
     :param rotation_angle: int: The angle for the photo transformation.
     :param current_user: User: The currently authenticated user.
@@ -143,7 +144,7 @@ async def get_all_photos(
         limit: int = 10,
         current_user: User = Depends(auth_service.get_authenticated_user),
         db: AsyncSession = Depends(get_db),
-) -> list:
+) -> list[PhotosDb]:
     """
    Get All Photos
    ------------------
@@ -193,7 +194,18 @@ async def get_all_photos(
     """
 
     photos = await repository_photos.get_photos(skip, limit, db)
-    return photos
+    response = [
+        PhotosDb(
+            id=photo.id,
+            url=photo.url,
+            description=photo.description,
+            user_id=photo.user_id,
+            created_at=photo.created_at,
+            tags=[tag.name for tag in photo.tags]
+        )
+        for photo in photos
+    ]
+    return response
 
 
 @router.get(

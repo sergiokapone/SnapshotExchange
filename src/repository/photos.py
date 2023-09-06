@@ -7,6 +7,7 @@ import uuid
 import cloudinary
 import cloudinary.uploader
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import File, HTTPException, status
 from src.conf.config import init_cloudinary
@@ -276,10 +277,15 @@ async def get_photos(
     :return: A list of all photos
     """
     query = (
-        select(Photo).offset(skip).limit(limit)
+        select(Photo)
+        .join(Photo.tags)
+        .options(selectinload(Photo.tags))
+        .offset(skip)
+        .limit(limit)
     )
     result = await db.execute(query)
     photos = result.scalars().all()
+
     return photos
 
 
