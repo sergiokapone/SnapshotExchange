@@ -22,6 +22,7 @@ from src.routes.ratings import router as ratings_router
 from src.routes.photos import router as photos_router
 from src.routes.comments import router as comments_router
 from src.views.photos import router as photo_views_router
+from src.views.users import router as user_views_router
 from src.views.info import router as info_views_router
 from src.views.chat import router as chat_router
 
@@ -98,6 +99,7 @@ app.include_router(photos_router, prefix='/api')
 app.include_router(comments_router, prefix='/api')
 app.include_router(ratings_router, prefix="/api")
 app.include_router(photo_views_router, prefix="/views")
+app.include_router(user_views_router, prefix="/views")
 app.include_router(info_views_router, prefix="/views")
 app.include_router(chat_router, prefix="/views")
 

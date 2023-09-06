@@ -133,7 +133,7 @@ async def get_user_profile(username: str, db: AsyncSession) -> User:
             username=user.username,
             email=user.email,
             avatar=user.avatar,
-            created_at=user.created_at,
+            created_at=user.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             is_active=user.is_active,
             photos_count=photos_count,
             comments_count=comments_count,
