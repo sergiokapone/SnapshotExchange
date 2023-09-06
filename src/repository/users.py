@@ -31,13 +31,14 @@ async def create_user(body: UserSchema, db: AsyncSession) -> User:
     except Exception as e:
         print(e)
 
-    new_user = User(**body.dict())
+    new_user = User(**body.model_dump())
+    new_user.role=Role.user
 
-    users_result = await db.execute(select(User))
-    users_count = len(users_result.scalars().all())
+    # users_result = await db.execute(select(User))
+    # # users_count =  await users_result.all()
 
-    if not users_count:  #  First user always admin
-        new_user.role = Role.admin
+    # # if len(users_count) == 0:  
+    # #     new_user.role = Role.admin
     try:
         db.add(new_user)
         await db.commit()
@@ -46,6 +47,8 @@ async def create_user(body: UserSchema, db: AsyncSession) -> User:
     except Exception as e:
         await db.rollback()
         raise e 
+
+
 
 
 async def edit_my_profile(
@@ -61,7 +64,7 @@ async def edit_my_profile(
     :return: A user object
     """
     result = await db.execute(select(User).filter(User.id == user.id))
-    me = result.scalar_one_or_none()
+    me = await result.scalar_one_or_none()
     if new_username:
         me.username = new_username
         me.description = new_description
@@ -97,7 +100,7 @@ async def get_users(skip: int, limit: int, db: AsyncSession) -> list[User]:
     """
     query = select(User).offset(skip).limit(limit)
     result = await db.execute(query)
-    users = result.scalars().all()
+    users =  result.scalars().all()
     return users
 
 
@@ -152,7 +155,7 @@ async def get_user_by_email(email: str, db: AsyncSession) -> User:
     """
     try:
         result = await db.execute(select(User).filter(User.email == email))
-        user = result.scalar_one_or_none()
+        user =  await result.scalar_one_or_none()
         return user
     except NoResultFound:
         return None
