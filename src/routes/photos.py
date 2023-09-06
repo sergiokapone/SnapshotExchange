@@ -478,7 +478,15 @@ async def get_one_photo(
     photo = await repository_photos.get_photo_by_id(photo_id, db)
 
     if photo:
-        return photo
+        response = PhotosDb(
+            id=photo.id,
+            url=photo.url,
+            description=photo.description,
+            user_id=photo.user_id,
+            created_at=photo.created_at,
+            tags=[tag.name for tag in photo.tags]
+        )
+        return response
     else:
         raise HTTPException(
             status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID

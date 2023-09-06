@@ -295,7 +295,7 @@ async def get_photos(
     return photos
 
 
-async def get_photo_by_id(photo_id: int, db: AsyncSession) -> dict:
+async def get_photo_by_id(photo_id: int, db: AsyncSession) -> Photo:
     """
     Retrieve a photo by its ID from the database.
 
@@ -303,7 +303,11 @@ async def get_photo_by_id(photo_id: int, db: AsyncSession) -> dict:
     :param db: AsyncSession: Pass the database session to the function
     :return: A dictionary containing the details of the retrieved photo, or None if not found
     """
-    query = select(Photo).filter(Photo.id == photo_id)
+    query = (
+        select(Photo)
+        .where(Photo.id == photo_id)
+        .options(selectinload(Photo.tags))
+    )
     result = await db.execute(query)
     photo = result.scalar_one_or_none()
     if photo:
