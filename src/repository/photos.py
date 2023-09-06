@@ -20,7 +20,6 @@ from src.database.models import (
     Comment
 )
 
-from src.services.photos import validate_crop_mode, validate_gravity_mode
 
 # ------------------------------- ## TAGS ## ----------------------------------
 
@@ -72,7 +71,7 @@ async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
         .join(Photo.tags)
         .filter(Photo.id == photo_id)
     )
-    
+
     """
     .. function:: async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None
 
@@ -109,6 +108,7 @@ async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
     if tags:
         return tags
     return None
+
 
 # ---------------------------- ## Comments ## ---------------------------------
 
@@ -157,6 +157,7 @@ async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]:
         return [{"text": comment.text, "username": comment.username} for comment in comments]
     return []
 
+
 # ----------------------------- ### CRUD ### ---------------------------------#
 async def upload_photo(
         current_user: User,
@@ -166,7 +167,7 @@ async def upload_photo(
         width: int | None,
         height: int | None,
         crop_mode: str | None,
-        gravity_mode: str | None,
+        background_color: str,
         rotation_angle: int | None,
         tags: List[str] = [],
 ) -> bool:
@@ -187,8 +188,8 @@ async def upload_photo(
     :type height: int | None
     :param crop_mode: The cropping mode for the photo transformation.
     :type crop_mode: str | None
-    :param gravity_mode: The gravity mode for the photo transformation.
-    :type gravity_mode: str | None
+    :param background_color: The background color for the photo transformation.
+    :type background_color: str | None
     :param rotation_angle: The angle for the photo transformation.
     :type rotation_angle: int | None
     :param tags: A list of tags for the photo.
@@ -200,22 +201,18 @@ async def upload_photo(
     unique_photo_id = uuid.uuid4()
     public_photo_id = f"Photos_of_users/{current_user.username}/{unique_photo_id}"
 
-    if validate_gravity_mode(gravity_mode) and validate_crop_mode(crop_mode):
-        transformations = {
-            "width": width,
-            "height": height,
-            "crop": crop_mode,
-            "gravity": gravity_mode,
-            "angle": rotation_angle,
-            "background": "transparent",
-        }
-    else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    transformations = [{"width": width,
+                        "height": height,
+                        "angle": rotation_angle,
+                        "background": background_color
+                        }]
+    if crop_mode is not None:
+        transformations.append({"crop": crop_mode})
 
     init_cloudinary()
 
     uploaded_file_info = cloudinary.uploader.upload(
-        photo.file, public_id=public_photo_id, overwrite=True, **transformations
+        photo.file, public_id=public_photo_id, overwrite=True,  transformation=transformations
     )
 
     photo_url = uploaded_file_info["secure_url"]

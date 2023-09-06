@@ -47,8 +47,6 @@ class UserResponseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-
-
 class UserProfileSchema(BaseModel):
     username: str
     email: EmailStr
@@ -100,7 +98,7 @@ class PhotosDb(BaseModel):
     created_at: datetime
     # tags: list[str]
 
-    model_config = ConfigDict(from_attributes = True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CommentSchema(BaseModel):

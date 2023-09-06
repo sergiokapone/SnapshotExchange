@@ -21,7 +21,7 @@ from src.database.connect_db import get_db
 from src.repository import photos as repository_photos
 from src.repository import users as repository_users
 from src.repository import ratings as repository_rating
-from src.database.models import User, CropMode, GravityMode
+from src.database.models import User, CropMode, BGColor
 from src.schemas import MessageResponseSchema
 
 from src.schemas import PhotosDb
@@ -60,7 +60,7 @@ async def upload_photo(
         width: int | None = Form(None, description="The desired width for the photo transformation (integer)"),
         height: int | None = Form(None, description="The desired height for the photo transformation (integer)"),
         crop_mode: CropMode = Form(None, description="The cropping mode for the photo transformation (string)"),
-        gravity_mode: GravityMode = Form(None, description="The gravity mode for the photo transformation (string)"),
+        background_color: BGColor = Form(None, description="The background color for the photo transformation (string)"),
         rotation_angle: int | None = Form(None, description="The angle for the photo transformation (integer)"),
         current_user: User = Depends(auth_service.get_authenticated_user),
         db: AsyncSession = Depends(get_db),
@@ -78,7 +78,7 @@ async def upload_photo(
     :param width: int: The desired width for the photo transformation.
     :param height: int: The desired height for the photo transformation.
     :param crop_mode: CropMode: The cropping mode for the photo transformation.
-    :param gravity_mode: GravityMode: The gravity mode for the photo transformation.
+    :param background_color: BGColor: The background color for the photo transformation
     :param rotation_angle: int: The angle for the photo transformation.
     :param current_user: User: The currently authenticated user.
     :param db: AsyncSession: The database session.
@@ -104,6 +104,16 @@ async def upload_photo(
                 detail="Tag name should be no more than 25 characters long.",
             )
 
+    if crop_mode is not None:
+        crop_mode = crop_mode.name
+    else:
+        crop_mode = None
+
+    if background_color is not None:
+        background_color = background_color.name
+    else:
+        background_color = "transparent"
+
     # uploading a new photo
     new_photo = await repository_photos.upload_photo(
         current_user,
@@ -113,7 +123,7 @@ async def upload_photo(
         width,
         height,
         crop_mode,
-        gravity_mode,
+        background_color,
         rotation_angle,
         list_tags,
     )

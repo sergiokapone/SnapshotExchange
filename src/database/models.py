@@ -33,17 +33,16 @@ class CropMode(str, enum.Enum):
     scale = "scale"
 
 
-class GravityMode(str, enum.Enum):
-    center = "center"
-    north = "north"
-    north_east = "north_east"
-    east = "east"
-    south_east = "south_east"
-    south = "south"
-    south_west = "south_west"
-    west = "west"
-    north_west = "north_west"
-    auto = "auto"
+class BGColor(str, enum.Enum):
+    black = "black"
+    white = "white"
+    red = "red"
+    green = "green"
+    blue = "blue"
+    yellow = "yellow"
+    gray = "gray"
+    brown = "brown"
+    transparent = "transparent"
 
 
 class User(Base):
