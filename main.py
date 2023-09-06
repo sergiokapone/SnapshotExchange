@@ -7,7 +7,7 @@ from fastapi import FastAPI, HTTPException, Depends, Request, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_limiter import FastAPILimiter
-from fastapi.responses import HTMLResponse
+
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
@@ -21,12 +21,14 @@ from src.routes.users import router as users_router
 from src.routes.ratings import router as ratings_router
 from src.routes.photos import router as photos_router
 from src.routes.comments import router as comments_router
-from src.routes.chat import router as chat_router
+from src.views.photos import router as photo_views_router
+from src.views.users import router as user_views_router
+from src.views.info import router as info_views_router
+from src.views.chat import router as chat_router
 
 
 from src.conf.config import settings
 from src.conf.config import init_async_redis
-from src.conf.info_dict import project_info
 
 
 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -65,14 +67,6 @@ async def root(request: Request):
     return project_info
 
 
-@app.get("/info", response_class=HTMLResponse, include_in_schema=False)
-async def root(request: Request):
-    project_info.update({"request": request})
-    return templates.TemplateResponse(
-        "index.html", project_info
-    )
-
-
 @app.get("/api/healthchecker", tags=["Root"])
 async def healthchecker(session: AsyncSession = Depends(get_db)):
     try:
@@ -104,7 +98,10 @@ app.include_router(users_router, prefix="/api")
 app.include_router(photos_router, prefix='/api')
 app.include_router(comments_router, prefix='/api')
 app.include_router(ratings_router, prefix="/api")
-app.include_router(chat_router, prefix="/api")
+app.include_router(photo_views_router, prefix="/views")
+app.include_router(user_views_router, prefix="/views")
+app.include_router(info_views_router, prefix="/views")
+app.include_router(chat_router, prefix="/views")
 
 
 

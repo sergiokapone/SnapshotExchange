@@ -89,7 +89,7 @@ async def get_rating(photos_id: int, db: AsyncSession):
     
     average_rating = res / count_ratings
    
-    return average_rating
+    return int(average_rating)
 
 
 async def get_all_ratings(photos_id: int, db: AsyncSession):

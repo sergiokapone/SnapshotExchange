@@ -13,24 +13,14 @@ from fastapi import (
     status,
 )
 
-router = APIRouter(prefix="/chat", tags=["Chat"])
+router = APIRouter(tags=["Chat"])
 templates = Jinja2Templates(directory="templates")
 
-@router.get("/")
+@router.get("/chat")
 async def get(request: Request):
     return templates.TemplateResponse(
         "chat.html", {"request": request}
     )
-
-# async def get_cookie_or_token(
-#     websocket: WebSocket,
-#     session: Annotated[str | None, Cookie()] = None,
-#     token: Annotated[str | None, Query()] = None,
-# ):
-
-#     if session is None and token is None:
-#         raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION)
-#     return session or token
 
 active_connections = []
 
@@ -40,8 +30,7 @@ async def websocket_endpoint(websocket: WebSocket):
     active_connections.append(websocket)  
     try:
         while True:
-            data = await websocket.receive_text()
-            
+            data = await websocket.receive_text()  
             for connection in active_connections:
                 await connection.send_text(f"Message text was: {data}")
     except WebSocketDisconnect:
