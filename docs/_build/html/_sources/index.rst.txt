@@ -13,37 +13,9 @@ Is a comprehensive documentation that provides detailed information about our se
   :maxdepth: 4
   :caption: Contents:
 
-REST API repository Users
-==========================
-.. automodule:: src.repository.users
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-REST API repository Photos
-===========================
-.. automodule:: src.repository.photos
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-
-REST API repository Comments
-=============================
-.. automodule:: src.repository.comments
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-REST API repository Ratings
-============================
-.. automodule:: src.repository.ratings
-  :members:
-  :undoc-members:
-  :show-inheritance:
 
 REST API routes Auth
-====================
+=====================
 .. automodule:: src.routes.auth
   :members:
   :undoc-members:
@@ -77,14 +49,70 @@ REST API routes Ratings
   :undoc-members:
   :show-inheritance:
 
-REST API service Auth
+VIEWS routes Photos
+=========================
+.. automodule:: src.views.photos
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+VIEWS routes Users
+=========================
+.. automodule:: src.views.users
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+VIEWS routes Info
+=========================
+.. automodule:: src.views.info
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+VIEWS routes Chat
+=========================
+.. automodule:: src.views.chat
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+Repository Users
+==========================
+.. automodule:: src.repository.users
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+Repository Photos
+===========================
+.. automodule:: src.repository.photos
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+Repository Comments
+=============================
+.. automodule:: src.repository.comments
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+Repository Ratings
+============================
+.. automodule:: src.repository.ratings
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+Service Auth
 =========================
 .. automodule:: src.services.auth
   :members:
   :undoc-members:
   :show-inheritance:
 
-REST API service Email
+Service Email
 =========================
 .. automodule:: src.services.email
   :members:
@@ -92,16 +120,23 @@ REST API service Email
   :show-inheritance:
 
 
-REST API service Photos
+Service Photos
 ==========================
 .. automodule:: src.services.photos
   :members:
   :undoc-members:
   :show-inheritance:
 
-REST API service Roles
+Service Roles
 ==========================
 .. automodule:: src.services.roles
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+Schemas
+====================
+.. automodule:: src.schemas
   :members:
   :undoc-members:
   :show-inheritance:
