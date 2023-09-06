@@ -1,0 +1,25 @@
+
+/* Styles for the header */
+.display-4 {
+    text-align: center;
+}
+
+/* Styles for images */
+.table img {
+    max-width: 100px;
+    max-height: 100px;
+    display: block;
+    margin: 0 auto;
+    cursor: pointer; /* Add hover pointer for images */
+}
+
+/* Coloring of lines with alternating colors */
+tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Styles for table header */
+thead th {
+    background-color: #007bff; /* Header background color */
+    color: #fff; /* Header text color */
+}

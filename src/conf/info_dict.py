@@ -26,5 +26,5 @@ project_info = {
     ],
     "license": "This API is distributed under the MIT License.",
     "site": "https://snapshotexchange.onrender.com/docs",
-    "repository": "https://github.com/sergiokapone/SnapshotExchange."
+    "repository": "https://github.com/sergiokapone/SnapshotExchange"
 }

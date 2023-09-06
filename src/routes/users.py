@@ -70,11 +70,12 @@ async def read_my_profile(
     current_user: User = Depends(auth_service.get_authenticated_user),
 ):
     """
-    # Get the profile of the current user.
+    **Get the profile of the current user.**
 
     This route retrieves the profile of the current authenticated user.
 
     Level of Access:
+
     - Current authorized user
 
     :param current_user: User: The current authenticated user.
@@ -94,7 +95,7 @@ async def edit_my_profile(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    # Edit the current user's profile.
+    **Edit the current user's profile.**
 
     This route allows the current user to edit own profile, including uploading an avatar, changing the username and description.
 
@@ -142,11 +143,12 @@ async def get_users(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    # Get a list of users.
+    **Get a list of users.**
 
     This route allows  to get a list of pagination-aware users.
 
     Level of Access:
+    
     - Current authorized user
 
     :param skip: int: Number of users to skip.
@@ -169,11 +171,12 @@ async def user_profile(
     db: AsyncSession = Depends(get_db),
 ) -> dict | None:
     """
-    # Get a user's profile by username.
+    **Get a user's profile by username.**
 
     This route allows to retrieve a user's profile by their username.
 
     Level of Access:
+    
     - Current authorized user
 
     :param username: str: The username of the user whose profile is to be retrieved.
@@ -200,11 +203,12 @@ async def user_profile(
 )
 async def ban_user_by_email(email: EmailStr, db: AsyncSession = Depends(get_db)):
     """
-    # Block a user by email.
+    **Block a user by email.**
 
     This route allows to block a user by their email.
 
     Level of Access:
+    
     - Administartor
 
     :param email: EmailStr: Email of the user to block.
@@ -230,20 +234,21 @@ async def ban_user_by_email(email: EmailStr, db: AsyncSession = Depends(get_db))
 
 
 @router.patch(
-    "/asign_role", dependencies=[Depends(Admin)], response_model=MessageResponseSchema
+    "/asign_role/{role}", dependencies=[Depends(Admin)], response_model=MessageResponseSchema
 )
 async def assign_role(
     email: EmailStr,
-    selected_role: Role,
+    role: Role,
     db: AsyncSession = Depends(get_db),
     redis_client: Redis = Depends(init_async_redis),
 ):
     """
-    # Assign a role to a user by email.
+    **Assign a role to a user by email.**
 
     This route allows to assign the selected role to a user by their email.
 
     Level of Access:
+    
     - Administartor
 
     :param email: EmailStr: Email of the user to whom you want to assign the role.
@@ -266,8 +271,8 @@ async def assign_role(
             status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_EMAIL
         )
 
-    if selected_role == user.role:
+    if role == user.role:
         return {"message": USER_ROLE_IN_USE}
     else:
-        await repository_users.make_user_role(email, selected_role, db)
-        return {"message": f"{USER_CHANGE_ROLE_TO} {selected_role.value}"}
+        await repository_users.make_user_role(email, role, db)
+        return {"message": f"{USER_CHANGE_ROLE_TO} {role.value}"}

@@ -42,7 +42,6 @@ async def create_user(body: UserSchema, db: AsyncSession) -> User:
         db.add(new_user)
         await db.commit()
         await db.refresh(new_user)
-        print("Done")
         return new_user
     except Exception as e:
         await db.rollback()
@@ -134,7 +133,7 @@ async def get_user_profile(username: str, db: AsyncSession) -> User:
             username=user.username,
             email=user.email,
             avatar=user.avatar,
-            created_at=user.created_at,
+            created_at=user.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             is_active=user.is_active,
             photos_count=photos_count,
             comments_count=comments_count,
@@ -162,16 +161,16 @@ async def get_user_by_reset_token(
     reset_token: str, db: AsyncSession
 ) -> User | None:
     """
-    Отримує об'єкт користувача за токеном скидання пароля.
+    Retrieve a user by their reset token.
 
-    Parameters:
-        reset_token (str): Токен скидання пароля.
-        session (AsyncSession): Об'єкт сесії бази даних.
+    This function queries the database to retrieve a user based on their reset token.
 
-    Returns:
-        User: Об'єкт користувача, якщо знайдено, або None, якщо не знайдено.
-
+    :param reset_token: str: The reset token associated with the user.
+    :param db: AsyncSession: The asynchronous database session.
+    :return: The user if found, or None if not found.
+    :rtype: User | None
     """
+    
     try:
         result = await db.execute(
             select(User).filter(User.reset_token == reset_token)
@@ -180,8 +179,27 @@ async def get_user_by_reset_token(
         return user
     except NoResultFound:
         return None
+
+async def get_user_by_user_id(user_id: int, db: AsyncSession) -> User | None:
+    """
+    Get User by User ID
+
+    This function retrieves a user by their user ID from the database.
+
+    :param int user_id: The ID of the user to retrieve.
+    :param AsyncSession db: An asynchronous database session.
+    :return: The user with the specified ID, or None if the user is not found.
+    :rtype: User | None
+    """
     
-async def get_user_by_username(username: str, db: AsyncSession) -> User:
+    try:
+        result = await db.execute(select(User).filter(User.id == user_id))
+        user = result.scalar_one_or_none()
+        return user
+    except NoResultFound:
+        return None
+
+async def get_user_by_username(username: str, db: AsyncSession) -> User | None:
     """
     The get_user_by_email function takes in an email and a database session, then returns the user with that email.
 
@@ -272,10 +290,7 @@ async def make_user_role(email: str, role: Role, db: AsyncSession) -> None:
 
 async def add_to_blacklist(token: str, db: AsyncSession) -> None:
     """
-    The add_to_blacklist function adds a token to the blacklist.
-        Args:
-            token (str): The JWT that is being blacklisted.
-            db (AsyncSession): The database session object used for querying and updating the database.
+    **Adds a token to the blacklist.**
 
     :param token: str: Pass the token to be blacklisted
     :param db: AsyncSession: Create a new session with the database
@@ -297,13 +312,14 @@ async def add_to_blacklist(token: str, db: AsyncSession) -> None:
 
 async def is_blacklisted_token(token: str, db: AsyncSession) -> bool:
     """
-    Function takes checks if a token is blacklisted.
+    Check if a Token is Blacklisted
 
-    Arguments:
-        token (str): token to be checked
-        db (Session): SQLAlchemy session object for accessing the database
-    Returns:
-        bool
+    This function checks if a given token is blacklisted in the database.
+
+    :param str token: The token to be checked.
+    :param AsyncSession db: An asynchronous database session.
+    :return: True if the token is blacklisted, False otherwise.
+    :rtype: bool
     """
 
     result = await db.execute(

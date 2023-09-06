@@ -25,7 +25,7 @@ async def init_async_redis():
 
 class Settings(BaseSettings):
     sqlalchemy_database_url: str = (
-        "postgresql+psycopg2://user:password@localhost:5432/postgres"
+        "postgresql+asyncpg://user:password@localhost:5432/postgres"
     )
     secret_key: str = "secretkey"
     algorithm: str = "HS256"
@@ -45,6 +45,7 @@ class Settings(BaseSettings):
     class Config:
         extra = "ignore"
         env_file = ".env"
+        extra = 'ignore'
         env_file_encoding = "utf-8"
 
 

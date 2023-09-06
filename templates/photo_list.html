@@ -4,19 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Photo List</title>
-    <!-- Подключаем стили Bootstrap -->
+    
+    <!-- Connecting Bootstrap styles -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    
+    <!-- Styles to improve appearance -->
+    <link rel="stylesheet" href="/static/styles.css">
+
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="display-4">Photo List</h1>
+        <h1 class="display-4"><b>Snapshots</b></h1>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Image</th>
+                    <th>QR</th>
                     <th>Description</th>
-                    <th>User ID</th>
+                    <th>Username</th>
+                    <th>Tags</th>
+                    <th>Comments</th>
+                    <th>Rating</th>
                     <th>Created At</th>
                 </tr>
             </thead>
@@ -24,46 +35,75 @@
                 {% for photo in photos %}
                 <tr>
                     <td>{{ photo.id }}</td>
-                    <td><img src="{{ photo.url }}" alt="Photo"></td>
+                    <!-- Add a "modal-photo" class to handle the click -->
+                    <td><img src="{{ photo.url }}" alt="Photo" class="modal-photo" data-description="{{ photo.description }}"></td>
+                    <td><img src="{{ photo.QR }}" alt="Photo" class="modal-photo" data-description="{{ photo.description }}"></td>
                     <td>{{ photo.description }}</td>
-                    <td>{{ photo.user_id }}</td>
-                    <td>{{ photo.created_at }}</td>
+                    <td><a href="{{ url_for('view_user_profile', username=photo.username) }}">{{ photo.username }}</a></td>
+                    <td>
+                        {% for tag in photo.tags %}
+                            {{ tag }}
+                            {% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <ul>
+                            {% for comment in photo.comments %}
+                            <li>{{ comment.text }} (<i>{{ comment.username }}</i>)</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>
+                        <div class="rating">
+                            {% for _ in range(photo.rating) %}
+                                <i class="fas fa-star" style="color: orange; font-size: 8px;"></i>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td style="font-size: 14px;">{{ photo.created_at }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        
+        <!-- Modal window for displaying a photo -->
+        <div class="modal fade" id="photoModal" tabindex="-1" role="dialog" aria-labelledby="photoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="photoModalLabel">
+                            Фото</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <img id="modalPhoto" src="" alt="Selected Photo" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item{% if skip == 0 %} disabled{% endif %}">
+                    <a class="page-link" href="?skip={{ skip - limit }}&limit={{ limit }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item{% if photos|length < limit %} disabled{% endif %}">
+                    <a class="page-link" href="?skip={{ skip + limit }}&limit={{ limit }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>        
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Получить access_token из localStorage
-            var accessToken = localStorage.getItem("access_token");
-
-            // Если access_token существует, добавьте его к заголовкам HTTP-запроса
-            if (accessToken) {
-                // Здесь можно использовать Fetch API или другие методы для отправки запроса
-                // Ниже приведен пример использования Fetch API
-                fetch("/api/photos/get_all/view", {
-                    method: "GET",
-                    headers: {
-                        "Authorization": "Bearer " + accessToken
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Обработка ответа от сервера
-                    console.log(data);
-                })
-                .catch(error => {
-                    // Обработка ошибки
-                    console.error(error);
-                });
-            }
-        });
-    </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="/static/modal.js"></script>
 </body>
 </html>

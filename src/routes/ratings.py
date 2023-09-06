@@ -11,8 +11,8 @@ from src.schemas import (
     RequestEmail,
     UserDb,
     RequestRole,
-    PhotoRat,
-    Rating,
+    PhotoRating,
+    RatingSchema,
 )
 
 
@@ -35,8 +35,13 @@ from src.conf.messages import (
 router = APIRouter(prefix="/ratings", tags=["Ratings"])
 
 
-@router.post("/created_rating/", response_model=Rating)
-async def created_rating(rating:int,photo_id:int,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
+@router.post("/created_rating/", response_model=RatingSchema)
+async def created_rating(
+    photo_id: int,
+    rating: int,
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
+):
     """
     Create a new rating for a photo.
 
@@ -48,15 +53,18 @@ async def created_rating(rating:int,photo_id:int,current_user: User = Depends(au
     :param current_user: User: The currently authenticated user.
     :param db: AsyncSession: The database session.
     :return: The newly created rating record.
-    :rtype: Rating
+    :rtype: RatingSchema
     """
-    new_rating=await repository_ratings.create_rating(rating,photo_id,current_user,db)
 
+    new_rating = await repository_ratings.create_rating(
+        rating, photo_id, current_user, db
+    )
+    
     return new_rating
 
 
 @router.get("/get_rating/")
-async def get_rating(photo_id:int, db: AsyncSession = Depends(get_db)):
+async def get_rating(photo_id: int, db: AsyncSession = Depends(get_db)):
     """
     Get the average rating for a photo.
 
@@ -67,12 +75,20 @@ async def get_rating(photo_id:int, db: AsyncSession = Depends(get_db)):
     :return: The average rating for the photo.
     :rtype: float
     """
-    new_rating=await repository_ratings.get_rating(photo_id,db)
+    rating = await repository_ratings.get_rating(photo_id, db)
+    
+    print(rating)
+    
 
-    return new_rating
+    return rating
+
 
 @router.get("/get_rating_admin/")
-async def get_rating_ADmin_Moder(photo_id:int,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
+async def get_rating_ADmin_Moder(
+    photo_id: int,
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
+):
     """
     Get all ratings for a photo (Admin/Moderator only).
 
@@ -86,16 +102,19 @@ async def get_rating_ADmin_Moder(photo_id:int,current_user: User = Depends(auth_
     :rtype: List[Rating]
     """
     if current_user.role == Role.user:
-        raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail=FORBIDDEN
-            ) 
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=FORBIDDEN)
     else:
-        new_rating=await repository_ratings.get_all_ratings(photo_id,db)
+        new_rating = await repository_ratings.get_all_ratings(photo_id, db)
         return new_rating
-    
+
 
 @router.delete("/delete_rating_admin/")
-async def delete_rating_ADmin_Moder(photo_id:int,user_id:int,current_user: User = Depends(auth_service.get_authenticated_user), db: AsyncSession = Depends(get_db)):
+async def delete_rating_ADmin_Moder(
+    photo_id: int,
+    user_id: int,
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
+):
     """
     Delete all ratings for a photo (Admin/Moderator only).
 
@@ -110,12 +129,7 @@ async def delete_rating_ADmin_Moder(photo_id:int,user_id:int,current_user: User 
     :rtype: MessageResponseSchema
     """
     if current_user.role == Role.user:
-        raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail=FORBIDDEN
-            ) 
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=FORBIDDEN)
     else:
-        await repository_ratings.delete_all_ratings(photo_id,user_id,db)
+        await repository_ratings.delete_all_ratings(photo_id, user_id, db)
         return DELETE_SUCCESSFUL
-
-
-

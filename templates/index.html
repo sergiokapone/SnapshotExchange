@@ -16,13 +16,19 @@
         <ul>
             {% for author in authors %}
                 <li>
-                    <b><a href="{{ author.github }}" target="_blank">{{ author.name }}</a></b> - {{ author.additional_info }}                   
+                    <b><a href="{{ author.github }}" target="_blank">{{ author.name }}</a></b> - {{ author.additional_info }}
                 </li>
             {% endfor %}
         </ul>
         <p>{{ license }}</p>
         <p>Find the source code on <a href="{{ repository }}" target="_blank">GitHub</a></p>
+
+        <a href="{{ url_for('login_render') }}" class="btn btn-primary" id="btn-go-to-photos">
+            Logon
+            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+        </a>
     </div>
+
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>

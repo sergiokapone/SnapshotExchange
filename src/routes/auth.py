@@ -8,6 +8,7 @@ from fastapi import (
     status,
     Security,
     BackgroundTasks,
+    Response,
     Request,
 )
 
@@ -28,6 +29,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import EmailStr
 
 ### Import from Configurations ###
+
+from src.conf.constants import COOKIE_KEY_NAME
 
 from src.conf.messages import (
     ALREADY_EXISTS,
@@ -74,10 +77,10 @@ from src.services.auth import auth_service
 
 from src.repository import users as repository_users
 
-templates = Jinja2Templates(directory="templates")
+
+
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 security = HTTPBearer()
-
 
 @router.post(
     "/signup",
@@ -91,28 +94,27 @@ async def signup(
 ):
     """
     # Register a new user.
-    
+
     This route allows you to register a new user.
-    
+
     Level of Access:
+    
     - All comers
-        
+
 
     :param body: UserSchema: New user data.
     :param background_tasks: BackgroundTasks: Tasks to be performed in the background.
     :param request: Request: Inquiry.
     :param session: AsyncSession: Database Session.
-    
+
     :return: New user data and a message about successful registration.
-    
+
     :raises: HTTPException with code 409 and detail "ALREADY_EXISTS_EMAIL" or "ALREADY_EXISTS_USERNAME" if a user with that email or username already exists.
 
     """
-    
+
     exist_user_email = await repository_users.get_user_by_email(body.email, db)
-    exist_user_username = await repository_users.get_user_by_username(
-        body.username, db
-    )
+    exist_user_username = await repository_users.get_user_by_username(body.username, db)
 
     if exist_user_email:
         raise HTTPException(
@@ -125,7 +127,7 @@ async def signup(
         )
 
     body.password = auth_service.get_password_hash(body.password)
-    new_user = await repository_users.create_user(body, session)
+    new_user = await repository_users.create_user(body, db)
     background_tasks.add_task(
         send_email, new_user.email, new_user.username, request.base_url
     )
@@ -134,20 +136,21 @@ async def signup(
 
 @router.post("/login", response_model=TokenSchema)
 async def login(
+    response:Response,
     body: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
-    
     """
-    # Log in and get access tokens.
-    
+    Log in and get access tokens.
+
     This route allows the user to log in by providing the correct email and password and receive access tokens.
-    
+
     Level of Access:
+    
     - Verified users
 
     :param body: OAuth2PasswordRequestForm: A form with the user's email and password.
     :param db: AsyncSession: Database Session.
-    
+
     :return: Access tokens (access_token and refresh_token).
     :rtype: TokenSchema
 
@@ -182,14 +185,11 @@ async def login(
     refresh_token = await auth_service.create_refresh_token(data={"email": user.email})
     await repository_users.update_token(user, refresh_token, db)
     
+    response.set_cookie(key=COOKIE_KEY_NAME, value=access_token, httponly=True)
+
     tokens = TokenSchema(access_token=access_token, refresh_token=refresh_token)
-    
+
     return tokens
-
-
-@router.get("/login/view")
-async def login_view(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
 
 
 @router.post("/logout", response_model=MessageResponseSchema)
@@ -199,17 +199,18 @@ async def logout(
     current_user: User = Depends(auth_service.get_authenticated_user),
 ):
     """
-    # Log out user and add the token to the blacklist.
+    **Log out user and add the token to the blacklist.**
 
     This route allows the user to log out and their access token will be added to the blacklist.
-    
+
     Level of Access:
+    
     - Current authorized user
 
     :param credentials: HTTPAuthorizationCredentials: User authentication data (token).
     :param db: AsyncSession: Database Session.
     :param current_user: User: Current authenticated user.
-    
+
     :return: A message informing you that the user has successfully logged out of the system.
     :rtype: MessageResponseSchema
     """
@@ -225,13 +226,13 @@ async def refresh_token(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(auth_service.get_authenticated_user),
 ):
-
     """
-    # Updates the user's access token.
+    Updates the user's access token.
 
     This route allows the user's access token to be refreshed if a valid refresh token is present.
-    
+
     Level of Access:
+    
     - Current authorized user
 
     :param credentials: HTTPAuthorizationCredentials: User authentication data (access token).
@@ -243,7 +244,7 @@ async def refresh_token(
 
     :raises: HTTPException with code 401 and detail "INVALID_TOKEN" in case of invalid access token.
     """
-    
+
     token = credentials.credentials
     email = await auth_service.decode_token(token)
     user = await repository_users.get_user_by_email(email, db)
@@ -266,23 +267,24 @@ async def refresh_token(
 @router.get("/confirmed_email/{token}", response_model=MessageResponseSchema)
 async def confirmed_email(token: str, db: AsyncSession = Depends(get_db)):
     """
-    # Confirmation of the user's email.
+    Confirmation of the user's email.
 
     This route allows the user to confirm their email by providing the correct confirmation token.
-    
+
     Level of Access:
+    
     - Users who have registered
-        
+
     :param token: str: Email confirmation token.
     :param db: AsyncSession: Database session.
-    
+
     :return: Successful email confirmation message.
     :rtype: MessageResponseSchema
-    
+
     :raises: HTTPException with code 400 and detail "VERIFICATION_ERROR" in case of invalid token,
              and also with code 400 and detail "EMAIL_ALREADY_CONFIRMED" in case of already confirmed email.
     """
-    
+
     email = await auth_service.get_email_from_token(token)
     user = await repository_users.get_user_by_email(email, db)
     if user is None:
@@ -302,13 +304,13 @@ async def request_email(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ):
-    
     """
-    # Request to confirm the user's email.
+    Request to confirm the user's email.
 
     This route allows the user to request that an email be sent to confirm the user's email.
-    
+
     Level of Access:
+    
     - Any user
     - Email is only sent to registered users.
 
@@ -316,7 +318,7 @@ async def request_email(
     :param background_tasks: BackgroundTasks: Tasks that are running in the background (sending an email).
     :param request: Request: Client request.
     :param db: AsyncSession: Database session.
-    
+
     :return: Email confirmation request message.
     :rtype: MessageResponseSchema
     :raises: HTTPException with the code 400 and detail "EMAIL_CONFIRMED" in case of already confirmed email.
@@ -342,25 +344,26 @@ async def forgot_password(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    # User password recovery request.
+    User password recovery request.
 
     This route allows the user to request password recovery via email.
-    
+
     Level of Access:
-        - Any user
-        - Email is only sent to registered users.
+    
+    - Any user
+    - Email is only sent to registered users.
 
     :param email: EmailStr: Email of the user for whom password recovery is requested.
     :param background_tasks: BackgroundTasks: Tasks that are executed in the background (sending an email with instructions).
     :param request: Request: Client request.
     :param db: AsyncSession: Database session.
-    
+
     :return: Message that password recovery instructions have been sent to email.
     :rtype: MessageResponseSchema
-    
+
     :raises: HTTPException with code 201 and detail "EMAIL_HAS_BEEN_SEND" in case of successful password recovery request.
     """
-    
+
     user = await repository_users.get_user_by_email(email, db)
     if user is None:
         raise HTTPException(
@@ -382,29 +385,30 @@ async def reset_password(
     reset_token: str, new_password: str, db: AsyncSession = Depends(get_db)
 ):
     """
-    # Reset user password.
-    
+    Reset user password.
+
     Level of Access:
-        - Any user
+    
+    - Any user
 
     This route allows the user to reset their password by providing the correct reset token and a new password.
 
     :param reset_token: str: Password reset token.
     :param new_password: str: The user's new password.
     :param db: AsyncSession: Database session.
-    
+
     :return: Password reset success message.
     :rtype: MessageResponseSchema
-    
+
     :raises: HTTPException with code 401 and detail "INVALID_TOKEN" in case of invalid token,
              and with code 401 and detail "PASWORD_RESET_SUCCESS" in case of successful password reset.
     """
-    
+
     email = await auth_service.get_email_from_token(reset_token)
 
     user = await repository_users.get_user_by_email(email, db)
     user.password = auth_service.get_password_hash(new_password)
-    
+
     try:
         await db.commit()
         return {"message": PASWORD_RESET_SUCCESS}
