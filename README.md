@@ -43,7 +43,6 @@ $ python main.py
 Once the application is running *locally*, you can browse to run it on your local host using the following links[^1]:
 - To view detailed information on our project [http://localhost:8000/views/info](http://localhost:8000/views/info)
 - To view detailed information on our project in `JSON` format  [http://localhost:8000/](http://localhost:8000)
-
 - To test the connection to the database and server time information [http://localhost:8000/api/healthchecker](http://localhost:8000/api/healthchecker)
 
 For comfortable viewing of `JSON` respone in your browser we recommend to install the extension for Google Chrome
@@ -73,7 +72,7 @@ Also our app is equipped with a chat for short messaging via websocket. The chat
 -  [http://localhost:8000/views/chat](http://localhost:8000/views/chat)
 
 
-## Sphinx Documentstion for Developers
+## Information for Developers
 
 Our project is equipped with Sphinx documentation, which you can find at [https://sergiokapone.github.io/SnapshotExchange/](https://sergiokapone.github.io/SnapshotExchange/). The documentation may be useful to other developers who
 can use it to develop our project.
