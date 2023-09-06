@@ -5,6 +5,19 @@ The project is available online at [https://snapshotexchange.onrender.com](https
 ![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
+## Table of contents
+
+  * [Using Technologies](#using-technologies)
+  * [Description](#description)
+  * [Project Installation](#project-installation)
+  * [Implementation](#implementation)
+    + [API routes](#api-routes)
+    + [Server side rendering](#server-side-rendering)
+    + [Chat](#chat)
+  * [Information for Developers](#information-for-developers)
+  * [License](#license)
+    + [MIT License](#mit-license)
+
 ## Using Technologies
 
 ![Language](https://img.shields.io/badge/Language-Python-blue.svg)
