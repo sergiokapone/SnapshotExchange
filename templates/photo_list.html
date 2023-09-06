@@ -29,6 +29,7 @@
                     <th>Comments</th>
                     <th>Rating</th>
                     <th>Created At</th>
+                    <th>Operation</th>
                 </tr>
             </thead>
             <tbody>
@@ -61,6 +62,14 @@
                         </div>
                     </td>
                     <td style="font-size: 14px;">{{ photo.created_at }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('delete_photo', photo_id=photo.id) }}">
+
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

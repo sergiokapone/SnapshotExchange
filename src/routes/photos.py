@@ -312,6 +312,7 @@ async def make_URL_QR(
 
 @router.get(
     "/{photo_id}",
+    name="get_photo",
     status_code=status.HTTP_200_OK,
     response_model=PhotosDb,
     description="No more than 10 requests per minute",
@@ -382,6 +383,7 @@ async def get_one_photo(
 
 @router.patch(
     "/{photo_id}",
+    name="patch_photo",
     status_code=status.HTTP_200_OK,
     description="No more than 10 requests per minute",
     dependencies=[Depends(RateLimiter(times=10, seconds=60))],
@@ -460,7 +462,10 @@ async def patch_pdate_photo(
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NO_PHOTO_BY_ID)
 
 
-@router.delete("/{photo_id}", response_model=MessageResponseSchema)
+@router.delete("/{photo_id}",
+               response_model=MessageResponseSchema,
+               name="delete_photo"
+               )
 async def remove_photo(
     photo_id: int,
     current_user: User = Depends(auth_service.get_authenticated_user),
@@ -507,7 +512,7 @@ async def remove_photo(
         }
 
     """
-
+    
     result = await repository_photos.remove_photo(photo_id, current_user, db)
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NOT_FOUND)
