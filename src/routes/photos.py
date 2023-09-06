@@ -1,3 +1,5 @@
+from typing import Type
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -22,7 +24,7 @@ from src.repository import photos as repository_photos
 from src.repository import users as repository_users
 from src.repository import ratings as repository_rating
 from src.database.models import User, CropMode, BGColor
-from src.schemas import MessageResponseSchema
+from src.schemas import MessageResponseSchema, PhotosDb
 
 from src.schemas import PhotosDb
 from src.services.auth import auth_service
@@ -51,7 +53,7 @@ router = APIRouter(prefix="/photos", tags=["Photos"])
         Depends(RateLimiter(times=10, seconds=60)),
         Depends(Admin_Moder_User),
     ],
-    response_model=MessageResponseSchema,
+    response_model=PhotosDb,
 )
 async def upload_photo(
         photo_file: UploadFile = File(..., description="Select a photo to upload (file in .jpg, .jpeg, .png format)"),
@@ -61,12 +63,12 @@ async def upload_photo(
         height: int | None = Form(None, description="The desired height for the photo transformation (integer)"),
         crop_mode: CropMode = Form(None, description="The cropping mode for the photo transformation (string)"),
         rounding: int | None = Form(None, description="Rounding photo corners (in pixels)"),
-        background_color: BGColor = Form(None, description="The background color for the photo transformation (string)"),
+        background_color: BGColor = Form(None,
+                                         description="The background color for the photo transformation (string)"),
         rotation_angle: int | None = Form(None, description="The angle for the photo transformation (integer)"),
         current_user: User = Depends(auth_service.get_authenticated_user),
         db: AsyncSession = Depends(get_db),
-) -> MessageResponseSchema:
-
+) -> PhotosDb:
     """
     Upload a new photo.
 
@@ -131,8 +133,16 @@ async def upload_photo(
         list_tags,
     )
 
+    response = PhotosDb(id=new_photo.id,
+                        url=new_photo.url,
+                        description=new_photo.description,
+                        user_id=new_photo.user_id,
+                        created_at=new_photo.created_at,
+                        tags=list_tags
+                        )
+
     if new_photo:
-        return MessageResponseSchema(message="Photo uploaded successfully")
+        return response
 
 
 @router.get(

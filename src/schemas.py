@@ -96,7 +96,7 @@ class PhotosDb(BaseModel):
     description: str | None
     user_id: int
     created_at: datetime
-    tags: list[str]
+    tags: list[str] | None
 
     model_config = ConfigDict(from_attributes=True)
 

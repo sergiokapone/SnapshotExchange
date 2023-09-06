@@ -172,7 +172,7 @@ async def upload_photo(
         background_color: str,
         rotation_angle: int | None,
         tags: List[str] = [],
-) -> bool:
+) -> Photo:
     """
     Upload a photo to the cloud storage and create a database entry.
 
@@ -190,6 +190,8 @@ async def upload_photo(
     :type height: int | None
     :param crop_mode: The cropping mode for the photo transformation.
     :type crop_mode: str | None
+    :param rounding: The rounding mode for the photo transformation.
+    :type rounding: int | None
     :param background_color: The background color for the photo transformation.
     :type background_color: str | None
     :param rotation_angle: The angle for the photo transformation.
@@ -241,7 +243,7 @@ async def upload_photo(
         await db.rollback()
         raise e
 
-    return status.HTTP_201_CREATED
+    return new_photo
 
 
 async def get_my_photos(
