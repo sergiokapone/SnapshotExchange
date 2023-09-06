@@ -3,7 +3,7 @@ from uvicorn.config import logger
 
 
 from jose import JWTError, jwt
-from fastapi import HTTPException, status, Depends, Header
+from fastapi import HTTPException, status, Depends, Header, Request, Response
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
@@ -19,8 +19,10 @@ from src.conf.messages import (
     NOT_VALIDATE_CREDENTIALS,
 )
 
-from src.conf.constants import TOKEN_LIFE_TIME
+from src.conf.constants import TOKEN_LIFE_TIME, COOKIE_KEY_NAME
 from src.conf.config import init_async_redis
+from src.database.models import User
+
 
 class Auth:
     """
@@ -53,7 +55,7 @@ class Auth:
     SECRET_KEY = settings.secret_key
     ALGORITHM = settings.algorithm
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
-    
+
     def __init__(self):
         """
         Initialize a new instance of the `Auth` class.
@@ -62,7 +64,7 @@ class Auth:
 
         :return: None
         """
-        
+
         self._redis_cache = None
 
     @property
@@ -89,7 +91,7 @@ class Auth:
         :return: True if the plain password matches the hashed password, False otherwise.
         :rtype: bool
         """
-        
+
         return self.pwd_context.verify(plain_password, hashed_password)
 
     def get_password_hash(self, password: str):
@@ -100,12 +102,10 @@ class Auth:
         :return: The hashed password.
         :rtype: str
         """
-        
+
         return self.pwd_context.hash(password)
 
-    async def create_access_token(
-        self, data: dict, expires_delta: int | None = None
-    ):
+    async def create_access_token(self, data: dict, expires_delta: int | None = None):
         """
         Create an access token.
 
@@ -165,7 +165,7 @@ class Auth:
         :return: The encoded email verification token.
         :rtype: str
         """
-        
+
         to_encode = data.copy()
         expire = datetime.utcnow() + timedelta(days=3)
         to_encode.update(
@@ -185,11 +185,9 @@ class Auth:
         :rtype: dict
         :raises HTTPException: If the token is invalid.
         """
-        
+
         try:
-            payload = jwt.decode(
-                token, self.SECRET_KEY, algorithms=[self.ALGORITHM]
-            )
+            payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
             if payload["scope"] == "refresh_token":
                 email = payload["email"]
                 return email
@@ -202,7 +200,35 @@ class Auth:
                 detail=NOT_VALIDATE_CREDENTIALS,
             )
 
-            
+    async def allow_rout(
+        self, request: Request, db: AsyncSession = Depends(get_db)
+    ) -> User:
+        
+        """
+        Authenticate a user for accessing a private route.
+
+        This method is used as a dependency to authenticate a user when accessing a private route.
+
+        :param request: The request object, containing the user's access token in cookies.
+        :type request: Request
+        :param db: The asynchronous database session (Dependency).
+        :type db: AsyncSession
+        :return: The authenticated user.
+        :rtype: User
+        :raises HTTPException 401: Unauthorized if the user is not authenticated or the access token is missing.
+        """
+        
+        try:
+            token = request.cookies.get(COOKIE_KEY_NAME)
+            print(token)
+            user = await self.get_authenticated_user(token, db)
+            return user
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="No access token provided",
+            )
+
     async def get_authenticated_user(
         self, token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
     ):
@@ -217,7 +243,7 @@ class Auth:
         :rtype: User
         :raises HTTPException: If the token is invalid or the user is not found.
         """
-        
+
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail=NOT_VALIDATE_CREDENTIALS
         )
@@ -279,5 +305,6 @@ class Auth:
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail=FAIL_EMAIL_VERIFICATION,
             )
-            
+
+
 auth_service = Auth()

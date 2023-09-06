@@ -18,13 +18,52 @@ photo_m2m_tags = Table(
 )
 
 class Role(enum.Enum):
+    """
+    User Roles Enumeration
+
+    This enumeration defines the possible roles for users in the system.
+
+    - `user`: Represents a regular user.
+    - `moder`: Represents a moderator with additional privileges.
+    - `admin`: Represents an administrator with full system control.
+
+    Each role has a corresponding string value for easy identification.
+
+    **Example Usage:**
+
+    .. code-block:: python
+
+        user_role = Role.user
+        admin_role = Role.admin
+
+    """
     user: str = 'User'
     moder: str = 'Moderator'
     admin: str = 'Administrator'
 
 
 class User(Base):
+    """
+    User Model
 
+    SQLAlchemy model represents a user in the database.
+
+    :param id: The unique identifier for the user (primary key).
+    :param username: The username of the user (unique).
+    :param email: The email address of the user (unique).
+    :param password: The hashed password of the user.
+    :param created_at: The timestamp when the user was created.
+    :param updated_at: The timestamp when the user was last updated.
+    :param avatar: The URL of the user's avatar image.
+    :param refresh_token: The refresh token associated with the user.
+    :param role: The role of the user ('User' or 'Adminisrtator', 'Voderator').
+    :param confirmed: Indicates whether the user's email is confirmed.
+    :param is_active: Indicates whether the user's account is active.
+    :param description: A brief description or bio of the user.
+    :param ratings: Relationship to user ratings.
+    :param photos: Relationship to user's uploaded photos.
+
+    """
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -45,6 +84,28 @@ class User(Base):
     
 
 class Post(Base):
+    """
+    Post Model
+
+    This model represents a user post in the system.
+
+    :param int id: The unique identifier for the post (primary key).
+    :param str text: The text content of the post.
+    :param str photo: The URL or identifier of the associated photo.
+    :param int user_id: The user's ID who created the post (foreign key).
+
+    **Example Usage:**
+
+    .. code-block:: python
+
+        new_post = Post(
+            text="This is a sample post.",
+            photo="https://example.com/sample.jpg",
+            user_id=1
+        )
+
+    """
+    
     __tablename__ = "posts"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -54,6 +115,26 @@ class Post(Base):
     
 
 class Photo(Base):
+    
+    """
+    Photo Model
+
+    This SQLAlchemy model represents a photo in the database.
+
+    :param id: The unique identifier for the photo (primary key).
+    :param url: The URL of the photo.
+    :param description: A brief description of the photo.
+    :param user_id: The user ID of the owner of the photo.
+    :param created_at: The timestamp when the photo was created.
+    :param cloud_public_id: The public ID of the photo in the cloud storage.
+    :param ratings: Relationship to photo ratings.
+    :param tags: Relationship to tags associated with the photo.
+    :param QR: Relationship to QR codes associated with the photo.
+    :param user: Relationship to the user who uploaded the photo.
+    :param comments: Relationship to comments on the photo.
+
+    """
+    
     __tablename__ = "photos"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -73,6 +154,21 @@ class Photo(Base):
 
 
 class Rating(Base):
+    
+    """
+    Rating Model
+
+    This SQLAlchemy model represents a rating given by a user to a photo in the database.
+
+    :param id: The unique identifier for the rating (primary key).
+    :param user_id: The user ID of the user who gave the rating.
+    :param rating: The numerical rating value.
+    :param photo_id: The photo ID of the photo that received the rating.
+    :param user: Relationship to the user who gave the rating.
+    :param photo: Relationship to the photo that received the rating.
+
+    """
+    
     __tablename__ = "ratings"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -85,6 +181,26 @@ class Rating(Base):
 
 
 class QR_code(Base):
+    """
+    QR_code Model
+
+    This model represents a QR code associated with a photo in the system.
+
+    :param int id: The unique identifier for the QR code (primary key).
+    :param str url: The URL or identifier of the QR code.
+    :param int photo_id: The ID of the associated photo (foreign key).
+
+    **Example Usage:**
+
+    .. code-block:: python
+
+        new_qr_code = QR_code(
+            url="https://example.com/qrcode123",
+            photo_id=1
+        )
+
+    """
+    
     __tablename__ = "Qr_codes"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -95,6 +211,25 @@ class QR_code(Base):
 
 
 class BlacklistToken(Base):
+    """
+    BlacklistToken Model
+
+    This model represents a blacklisted token in the system, which is used to prevent token reuse.
+
+    :param int id: The unique identifier for the blacklisted token (primary key).
+    :param str token: The token string that has been blacklisted (unique and not nullable).
+    :param datetime blacklisted_on: The date and time when the token was blacklisted (default is the current time).
+
+    **Example Usage:**
+
+    .. code-block:: python
+
+        blacklisted_token = BlacklistToken(
+            token="your_token_string_here"
+        )
+
+    """
+    
     __tablename__ = 'blacklist_tokens'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -102,6 +237,24 @@ class BlacklistToken(Base):
     blacklisted_on : Mapped[date] = mapped_column(DateTime, default=func.now())
 
 class Tag(Base):
+    """
+    Tag Model
+
+    This model represents a tag that can be associated with photos in the system.
+
+    :param int id: The unique identifier for the tag (primary key).
+    :param str name: The name of the tag (unique and nullable).
+
+    **Example Usage:**
+
+    .. code-block:: python
+
+        tag = Tag(
+            name="your_tag_name_here"
+        )
+
+    """
+    
     __tablename__ = 'tags'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -110,6 +263,34 @@ class Tag(Base):
 
 
 class Comment(Base):
+    """
+    Comment Model
+
+    This model represents a comment left by a user on a photo in the system.
+
+    :param int id: The unique identifier for the comment (primary key).
+    :param str text: The text content of the comment (required).
+    :param datetime created_at: The timestamp when the comment was created (automatically generated).
+    :param datetime updated_at: The timestamp when the comment was last updated (automatically generated).
+    :param int user_id: The user identifier associated with the comment (foreign key to 'users.id').
+    :param int photo_id: The photo identifier associated with the comment (foreign key to 'photos.id', can be None).
+    :param bool update_status: A boolean flag indicating if the comment has been updated (default is False).
+
+    :type user: User
+    :type photo: Photo
+
+    **Example Usage:**
+
+    .. code-block:: python
+
+        comment = Comment(
+            text="Your comment text here",
+            user_id=1,
+            photo_id=2  # Optional, can be None
+        )
+
+    """
+    
     __tablename__ = 'comments'
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

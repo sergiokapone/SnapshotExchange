@@ -8,6 +8,7 @@ from fastapi import (
     status,
     Security,
     BackgroundTasks,
+    Response,
     Request,
 )
 
@@ -28,6 +29,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import EmailStr
 
 ### Import from Configurations ###
+
+from src.conf.constants import COOKIE_KEY_NAME
 
 from src.conf.messages import (
     ALREADY_EXISTS,
@@ -76,7 +79,6 @@ from src.repository import users as repository_users
 
 
 
-templates = Jinja2Templates(directory="templates")
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 security = HTTPBearer()
 
@@ -134,6 +136,7 @@ async def signup(
 
 @router.post("/login", response_model=TokenSchema)
 async def login(
+    response:Response,
     body: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
     """
@@ -181,6 +184,8 @@ async def login(
     )
     refresh_token = await auth_service.create_refresh_token(data={"email": user.email})
     await repository_users.update_token(user, refresh_token, db)
+    
+    response.set_cookie(key=COOKIE_KEY_NAME, value=access_token, httponly=True)
 
     tokens = TokenSchema(access_token=access_token, refresh_token=refresh_token)
 

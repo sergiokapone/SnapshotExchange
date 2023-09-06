@@ -34,7 +34,7 @@ class PhotoRating(BaseModel):
     """
     content: str
 
-class Rating(BaseModel):
+class RatingSchema(BaseModel):
     """
     Schema for a user's rating of a photo.
     """
