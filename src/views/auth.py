@@ -80,7 +80,7 @@ templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(prefix="/auth", tags=["Authentication View"])
 
-@router.get("/login", name='login_render')
+@router.get("/login", name='login_render', include_in_schema=False)
 async def login_page(request: Request):
     """
     Login Page
@@ -106,7 +106,7 @@ async def login_page(request: Request):
     
     return templates.TemplateResponse("login.html", {"request": request})
 
-@router.post("/login_form", name="login_form")
+@router.post("/login_form", name="login_form", include_in_schema=False)
 async def login(
     request: Request,
     response: Response,

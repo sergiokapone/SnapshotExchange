@@ -153,48 +153,71 @@ async def upload_photo(
         width: int | None,
         height: int | None,
         crop_mode: str | None,
-        gravity_mode: str | None,
+        rounding,
+        background_color,
         rotation_angle: int | None,
         tags: List[str] = [],
-) -> bool:
+) -> Photo:
     """
-    Upload a photo to the cloud storage and create a database entry.
+    Upload a Photo
 
-    :param current_user: The user who is uploading the photo.
+    This function allows users to upload a new photo with various customization options.
+
+    :param current_user: The authenticated user uploading the photo.
     :type current_user: User
     :param photo: The photo file to upload.
     :type photo: File
-    :param description: The description of the photo.
-    :type description: str | None
-    :param db: The database session.
+    :param str | None description: An optional description for the photo (string, max 500 characters).
+    :param db: The asynchronous database session.
     :type db: AsyncSession
-    :param width: The desired width for the photo transformation.
-    :type width: int | None
-    :param height: The desired height for the photo transformation.
-    :type height: int | None
-    :param crop_mode: The cropping mode for the photo transformation.
-    :type crop_mode: str | None
-    :param gravity_mode: The gravity mode for the photo transformation.
-    :type gravity_mode: str | None
-    :param rotation_angle: The angle for the photo transformation.
-    :type rotation_angle: int | None
-    :param tags: A list of tags for the photo.
-    :type tags: List[str]
-    :return: True if the upload was successful, False otherwise.
-    :rtype: bool
-    """
+    :param int | None width: The desired width for the photo transformation (integer).
+    :param int | None height: The desired height for the photo transformation (integer).
+    :param str | None crop_mode: The cropping mode for the photo transformation (string).
+    :param rounding: Rounding photo corners (in pixels).
+    :param background_color: The background color for the photo transformation (string).
+    :param int | None rotation_angle: The angle for the photo transformation (integer).
+    :param List[str] tags: Tags to associate with the photo (list of strings).
+    :return: The uploaded photo.
+    :rtype: Photo
+    :raises HTTPException 400: If the description is too long.
+    :raises HTTPException 400: If any tag name is too long.
+    :raises HTTPException 400: If the cropping mode or background color is invalid.
 
+    **Example Request:**
+
+    .. code-block:: python
+
+        uploaded_photo = await upload_photo(
+            current_user,
+            photo,
+            "A beautiful landscape",
+            db,
+            800,
+            600,
+            "crop",
+            10,
+            "white",
+            90,
+            ["nature", "scenic"]
+        )
+
+    **Example Response:**
+
+    An object containing the uploaded photo information.
+
+    """
+    
     unique_photo_id = uuid.uuid4()
     public_photo_id = f"Photos_of_users/{current_user.username}/{unique_photo_id}"
 
-    if validate_gravity_mode(gravity_mode) and validate_crop_mode(crop_mode):
+    if validate_crop_mode(crop_mode):
         transformations = {
             "width": width,
             "height": height,
             "crop": crop_mode,
-            "gravity": gravity_mode,
+            "rounding": rounding,
+            "background": background_color,
             "angle": rotation_angle,
-            "background": "transparent",
         }
     else:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
@@ -228,7 +251,7 @@ async def upload_photo(
         await db.rollback()
         raise e
 
-    return status.HTTP_201_CREATED
+    return new_photo
 
 
 async def get_my_photos(

@@ -44,6 +44,18 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">Welcome to SnapshotExchange’s documentation!</a></li>
 <li><a class="reference internal" href="#module-src.database.models">Database</a><ul>
+<li><a class="reference internal" href="#src.database.models.BGColor"><code class="docutils literal notranslate"><span class="pre">BGColor</span></code></a><ul>
+<li><a class="reference internal" href="#src.database.models.BGColor.black"><code class="docutils literal notranslate"><span class="pre">BGColor.black</span></code></a></li>
+<li><a class="reference internal" href="#src.database.models.BGColor.blue"><code class="docutils literal notranslate"><span class="pre">BGColor.blue</span></code></a></li>
+<li><a class="reference internal" href="#src.database.models.BGColor.brown"><code class="docutils literal notranslate"><span class="pre">BGColor.brown</span></code></a></li>
+<li><a class="reference internal" href="#src.database.models.BGColor.gray"><code class="docutils literal notranslate"><span class="pre">BGColor.gray</span></code></a></li>
+<li><a class="reference internal" href="#src.database.models.BGColor.green"><code class="docutils literal notranslate"><span class="pre">BGColor.green</span></code></a></li>
+<li><a class="reference internal" href="#src.database.models.BGColor.red"><code class="docutils literal notranslate"><span class="pre">BGColor.red</span></code></a></li>
+<li><a class="reference internal" href="#src.database.models.BGColor.transparent"><code class="docutils literal notranslate"><span class="pre">BGColor.transparent</span></code></a></li>
+<li><a class="reference internal" href="#src.database.models.BGColor.white"><code class="docutils literal notranslate"><span class="pre">BGColor.white</span></code></a></li>
+<li><a class="reference internal" href="#src.database.models.BGColor.yellow"><code class="docutils literal notranslate"><span class="pre">BGColor.yellow</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#src.database.models.BlacklistToken"><code class="docutils literal notranslate"><span class="pre">BlacklistToken</span></code></a><ul>
 <li><a class="reference internal" href="#src.database.models.BlacklistToken.blacklisted_on"><code class="docutils literal notranslate"><span class="pre">BlacklistToken.blacklisted_on</span></code></a></li>
 <li><a class="reference internal" href="#src.database.models.BlacklistToken.id"><code class="docutils literal notranslate"><span class="pre">BlacklistToken.id</span></code></a></li>
@@ -60,6 +72,15 @@
 <li><a class="reference internal" href="#src.database.models.Comment.updated_at"><code class="docutils literal notranslate"><span class="pre">Comment.updated_at</span></code></a></li>
 <li><a class="reference internal" href="#src.database.models.Comment.user"><code class="docutils literal notranslate"><span class="pre">Comment.user</span></code></a></li>
 <li><a class="reference internal" href="#src.database.models.Comment.user_id"><code class="docutils literal notranslate"><span class="pre">Comment.user_id</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#src.database.models.CropMode"><code class="docutils literal notranslate"><span class="pre">CropMode</span></code></a><ul>
+<li><a class="reference internal" href="#src.database.models.CropMode.fill"><code class="docutils literal notranslate"><span class="pre">CropMode.fill</span></code></a></li>
+<li><a class="reference internal" href="#src.database.models.CropMode.fit"><code class="docutils literal notranslate"><span class="pre">CropMode.fit</span></code></a></li>
+<li><a class="reference internal" href="#src.database.models.CropMode.limit"><code class="docutils literal notranslate"><span class="pre">CropMode.limit</span></code></a></li>
+<li><a class="reference internal" href="#src.database.models.CropMode.pad"><code class="docutils literal notranslate"><span class="pre">CropMode.pad</span></code></a></li>
+<li><a class="reference internal" href="#src.database.models.CropMode.scale"><code class="docutils literal notranslate"><span class="pre">CropMode.scale</span></code></a></li>
+<li><a class="reference internal" href="#src.database.models.CropMode.thumb"><code class="docutils literal notranslate"><span class="pre">CropMode.thumb</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#src.database.models.Photo"><code class="docutils literal notranslate"><span class="pre">Photo</span></code></a><ul>
@@ -445,6 +466,58 @@
 <section id="module-src.database.models">
 <span id="database"></span><h1>Database<a class="headerlink" href="#module-src.database.models" title="Permalink to this heading"></a></h1>
 <dl class="py class">
+<dt class="sig sig-object py" id="src.database.models.BGColor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.database.models.</span></span><span class="sig-name descname"><span class="pre">BGColor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.database.models.BGColor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.BGColor.black">
+<span class="sig-name descname"><span class="pre">black</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'black'</span></em><a class="headerlink" href="#src.database.models.BGColor.black" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.BGColor.blue">
+<span class="sig-name descname"><span class="pre">blue</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'blue'</span></em><a class="headerlink" href="#src.database.models.BGColor.blue" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.BGColor.brown">
+<span class="sig-name descname"><span class="pre">brown</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'brown'</span></em><a class="headerlink" href="#src.database.models.BGColor.brown" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.BGColor.gray">
+<span class="sig-name descname"><span class="pre">gray</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gray'</span></em><a class="headerlink" href="#src.database.models.BGColor.gray" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.BGColor.green">
+<span class="sig-name descname"><span class="pre">green</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'green'</span></em><a class="headerlink" href="#src.database.models.BGColor.green" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.BGColor.red">
+<span class="sig-name descname"><span class="pre">red</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'red'</span></em><a class="headerlink" href="#src.database.models.BGColor.red" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.BGColor.transparent">
+<span class="sig-name descname"><span class="pre">transparent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'transparent'</span></em><a class="headerlink" href="#src.database.models.BGColor.transparent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.BGColor.white">
+<span class="sig-name descname"><span class="pre">white</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'white'</span></em><a class="headerlink" href="#src.database.models.BGColor.white" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.BGColor.yellow">
+<span class="sig-name descname"><span class="pre">yellow</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'yellow'</span></em><a class="headerlink" href="#src.database.models.BGColor.yellow" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="src.database.models.BlacklistToken">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.database.models.</span></span><span class="sig-name descname"><span class="pre">BlacklistToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.database.models.BlacklistToken" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
@@ -552,6 +625,43 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.database.models.Comment.user_id">
 <span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#src.database.models.Comment.user_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.database.models.CropMode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.database.models.</span></span><span class="sig-name descname"><span class="pre">CropMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.database.models.CropMode" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.CropMode.fill">
+<span class="sig-name descname"><span class="pre">fill</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'fill'</span></em><a class="headerlink" href="#src.database.models.CropMode.fill" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.CropMode.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'fit'</span></em><a class="headerlink" href="#src.database.models.CropMode.fit" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.CropMode.limit">
+<span class="sig-name descname"><span class="pre">limit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'limit'</span></em><a class="headerlink" href="#src.database.models.CropMode.limit" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.CropMode.pad">
+<span class="sig-name descname"><span class="pre">pad</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'pad'</span></em><a class="headerlink" href="#src.database.models.CropMode.pad" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.CropMode.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'scale'</span></em><a class="headerlink" href="#src.database.models.CropMode.scale" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.database.models.CropMode.thumb">
+<span class="sig-name descname"><span class="pre">thumb</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'thumb'</span></em><a class="headerlink" href="#src.database.models.CropMode.thumb" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1651,28 +1761,41 @@ and with code 401 and detail “PASWORD_RESET_SUCCESS” in case of successful p
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.routes.photos.upload_photo">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routes.photos.</span></span><span class="sig-name descname"><span class="pre">upload_photo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">photo_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">UploadFile</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">File(PydanticUndefined)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Form(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Form(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gravity_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.database.models.User" title="src.database.models.User"><span class="pre">User</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_authenticated_user)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#src.schemas.MessageResponseSchema" title="src.schemas.MessageResponseSchema"><span class="pre">MessageResponseSchema</span></a></span></span><a class="headerlink" href="#src.routes.photos.upload_photo" title="Permalink to this definition"></a></dt>
-<dd><p>Upload a new photo</p>
-<p>This function allows users to upload new photos. It enforces a rate limit of 10 requests per minute. Users must be authenticated
-and have the appropriate role to perform this action. The function accepts an uploaded photo file, an optional description,
-the current authenticated user, and a database session.</p>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routes.photos.</span></span><span class="sig-name descname"><span class="pre">upload_photo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">photo_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">UploadFile</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">File(PydanticUndefined)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Form(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Form(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Form(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Form(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.database.models.CropMode" title="src.database.models.CropMode"><span class="pre">CropMode</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Form(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rounding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Form(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.database.models.BGColor" title="src.database.models.BGColor"><span class="pre">BGColor</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Form(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Form(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.database.models.User" title="src.database.models.User"><span class="pre">User</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_authenticated_user)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#src.schemas.PhotosDb" title="src.schemas.PhotosDb"><span class="pre">PhotosDb</span></a></span></span><a class="headerlink" href="#src.routes.photos.upload_photo" title="Permalink to this definition"></a></dt>
+<dd><p>Upload a Photo</p>
+<p>This endpoint allows users to upload a new photo with various customization options.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>photo_file</strong> – UploadFile: The photo file to be uploaded.</p></li>
-<li><p><strong>description</strong> – str: An optional description for the photo.</p></li>
-<li><p><strong>tags</strong> – An optional list of tags. Max number of tags - 5</p></li>
-<li><p><strong>current_user</strong> – User: The currently authenticated user.</p></li>
-<li><p><strong>db</strong> – AsyncSession: The database session.</p></li>
+<li><p><strong>photo_file</strong> (<em>UploadFile</em>) – The photo file to upload (required).</p></li>
+<li><p><strong>description</strong> (<em>str</em><em> | </em><em>None</em>) – An optional description for the photo (string, max 500 characters).</p></li>
+<li><p><strong>tags</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – Tags to associate with the photo (list of strings, max 5 tags, each tag max 25 characters).</p></li>
+<li><p><strong>width</strong> (<em>int</em><em> | </em><em>None</em>) – The desired width for the photo transformation (integer).</p></li>
+<li><p><strong>height</strong> (<em>int</em><em> | </em><em>None</em>) – The desired height for the photo transformation (integer).</p></li>
+<li><p><strong>crop_mode</strong> (<a class="reference internal" href="#src.database.models.CropMode" title="src.database.models.CropMode"><em>CropMode</em></a><em> | </em><em>None</em>) – The cropping mode for the photo transformation (string).</p></li>
+<li><p><strong>rounding</strong> (<em>int</em><em> | </em><em>None</em>) – Rounding photo corners (in pixels).</p></li>
+<li><p><strong>background_color</strong> (<a class="reference internal" href="#src.database.models.BGColor" title="src.database.models.BGColor"><em>BGColor</em></a><em> | </em><em>None</em>) – The background color for the photo transformation (string).</p></li>
+<li><p><strong>rotation_angle</strong> (<em>int</em><em> | </em><em>None</em>) – The angle for the photo transformation (integer).</p></li>
+<li><p><strong>current_user</strong> (<a class="reference internal" href="#src.database.models.User" title="src.database.models.User"><em>User</em></a>) – The authenticated user making the upload request.</p></li>
+<li><p><strong>db</strong> (<em>AsyncSession</em>) – The asynchronous database session (Dependency).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A message indicating that the photo has been uploaded.</p>
+<dd class="field-even"><p>The uploaded photo information.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#src.schemas.MessageResponseSchema" title="src.schemas.MessageResponseSchema">MessageResponseSchema</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#src.schemas.PhotosDb" title="src.schemas.PhotosDb">PhotosDb</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>HTTPException 400</strong> – If the description is too long or if there are too many tags.</p></li>
+<li><p><strong>HTTPException 400</strong> – If any tag name is too long.</p></li>
+<li><p><strong>HTTPException 400</strong> – If the cropping mode or background color is invalid.</p></li>
+</ul>
 </dd>
 </dl>
+<p><strong>Example Response:</strong></p>
+<p>An object containing the uploaded photo information.</p>
 </dd></dl>
 
 </section>
@@ -2521,30 +2644,57 @@ role (Role): The new Role for the user.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.repository.photos.upload_photo">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.repository.photos.</span></span><span class="sig-name descname"><span class="pre">upload_photo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.database.models.User" title="src.database.models.User"><span class="pre">User</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">photo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">File(PydanticUndefined)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gravity_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#src.repository.photos.upload_photo" title="Permalink to this definition"></a></dt>
-<dd><p>Upload a photo to the cloud storage and create a database entry.</p>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.repository.photos.</span></span><span class="sig-name descname"><span class="pre">upload_photo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.database.models.User" title="src.database.models.User"><span class="pre">User</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">photo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">File(PydanticUndefined)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rounding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_color</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#src.database.models.Photo" title="src.database.models.Photo"><span class="pre">Photo</span></a></span></span><a class="headerlink" href="#src.repository.photos.upload_photo" title="Permalink to this definition"></a></dt>
+<dd><p>Upload a Photo</p>
+<p>This function allows users to upload a new photo with various customization options.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>current_user</strong> (<a class="reference internal" href="#src.database.models.User" title="src.database.models.User"><em>User</em></a>) – The user who is uploading the photo.</p></li>
+<li><p><strong>current_user</strong> (<a class="reference internal" href="#src.database.models.User" title="src.database.models.User"><em>User</em></a>) – The authenticated user uploading the photo.</p></li>
 <li><p><strong>photo</strong> (<em>File</em>) – The photo file to upload.</p></li>
-<li><p><strong>description</strong> (<em>str</em><em> | </em><em>None</em>) – The description of the photo.</p></li>
-<li><p><strong>db</strong> (<em>AsyncSession</em>) – The database session.</p></li>
-<li><p><strong>width</strong> (<em>int</em><em> | </em><em>None</em>) – The desired width for the photo transformation.</p></li>
-<li><p><strong>height</strong> (<em>int</em><em> | </em><em>None</em>) – The desired height for the photo transformation.</p></li>
-<li><p><strong>crop_mode</strong> (<em>str</em><em> | </em><em>None</em>) – The cropping mode for the photo transformation.</p></li>
-<li><p><strong>gravity_mode</strong> (<em>str</em><em> | </em><em>None</em>) – The gravity mode for the photo transformation.</p></li>
-<li><p><strong>rotation_angle</strong> (<em>int</em><em> | </em><em>None</em>) – The angle for the photo transformation.</p></li>
-<li><p><strong>tags</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – A list of tags for the photo.</p></li>
+<li><p><strong>description</strong> (<em>str</em><em> | </em><em>None</em>) – An optional description for the photo (string, max 500 characters).</p></li>
+<li><p><strong>db</strong> (<em>AsyncSession</em>) – The asynchronous database session.</p></li>
+<li><p><strong>width</strong> (<em>int</em><em> | </em><em>None</em>) – The desired width for the photo transformation (integer).</p></li>
+<li><p><strong>height</strong> (<em>int</em><em> | </em><em>None</em>) – The desired height for the photo transformation (integer).</p></li>
+<li><p><strong>crop_mode</strong> (<em>str</em><em> | </em><em>None</em>) – The cropping mode for the photo transformation (string).</p></li>
+<li><p><strong>rounding</strong> – Rounding photo corners (in pixels).</p></li>
+<li><p><strong>background_color</strong> – The background color for the photo transformation (string).</p></li>
+<li><p><strong>rotation_angle</strong> (<em>int</em><em> | </em><em>None</em>) – The angle for the photo transformation (integer).</p></li>
+<li><p><strong>tags</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – Tags to associate with the photo (list of strings).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True if the upload was successful, False otherwise.</p>
+<dd class="field-even"><p>The uploaded photo.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p><a class="reference internal" href="#src.database.models.Photo" title="src.database.models.Photo">Photo</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>HTTPException 400</strong> – If the description is too long.</p></li>
+<li><p><strong>HTTPException 400</strong> – If any tag name is too long.</p></li>
+<li><p><strong>HTTPException 400</strong> – If the cropping mode or background color is invalid.</p></li>
+</ul>
 </dd>
 </dl>
+<p><strong>Example Request:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">uploaded_photo</span> <span class="o">=</span> <span class="k">await</span> <span class="n">upload_photo</span><span class="p">(</span>
+    <span class="n">current_user</span><span class="p">,</span>
+    <span class="n">photo</span><span class="p">,</span>
+    <span class="s2">&quot;A beautiful landscape&quot;</span><span class="p">,</span>
+    <span class="n">db</span><span class="p">,</span>
+    <span class="mi">800</span><span class="p">,</span>
+    <span class="mi">600</span><span class="p">,</span>
+    <span class="s2">&quot;crop&quot;</span><span class="p">,</span>
+    <span class="mi">10</span><span class="p">,</span>
+    <span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="mi">90</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;nature&quot;</span><span class="p">,</span> <span class="s2">&quot;scenic&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Example Response:</strong></p>
+<p>An object containing the uploaded photo information.</p>
 </dd></dl>
 
 </section>
@@ -3387,7 +3537,6 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 <dt class="sig sig-object py" id="src.schemas.RatingSchema">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.schemas.</span></span><span class="sig-name descname"><span class="pre">RatingSchema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photo_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.schemas.RatingSchema" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
-<p>Schema for a user’s rating of a photo.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.schemas.RatingSchema.model_config">
 <span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#src.schemas.RatingSchema.model_config" title="Permalink to this definition"></a></dt>

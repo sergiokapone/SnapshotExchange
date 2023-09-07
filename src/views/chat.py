@@ -16,7 +16,7 @@ from fastapi import (
 router = APIRouter(tags=["Chat"])
 templates = Jinja2Templates(directory="templates")
 
-@router.get("/chat")
+@router.get("/chat", include_in_schema=False)
 async def get(request: Request):
     
     """
