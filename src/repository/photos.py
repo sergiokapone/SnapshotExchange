@@ -154,7 +154,7 @@ async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]:
     result = await db.execute(query)
     comments = result.all()
     if comments:
-        return [{"text": comment.text, "username": comment.username} for comment in comments]
+        return [{"text": comment.text, "username": comment.user_id} for comment in comments]
     return []
 
 # ----------------------------- ### CRUD ### ---------------------------------#
@@ -395,42 +395,42 @@ async def get_URL_Qr(photo_id: int, db: AsyncSession):
 
     query = select(QR_code).filter(QR_code.photo_id == photo_id)
     result = await db.execute(query)
-    qr = result.scalar()
+    qr = result.scalar_one_or_none()
 
-    if qr is not None:
-        return {"source_url": photo.url, "qr_code_url": qr.url}
-
-    qr = qrcode.QRCode(
+    if qr is  None:
+        qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
         box_size=10,
         border=4,
     )
 
-    qr.add_data(photo.url)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
+        qr.add_data(photo.url)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
 
-    qr_code_file_path = "my_qr_code.png"
-    img.save(qr_code_file_path)
+        qr_code_file_path = "my_qr_code.png"
+        img.save(qr_code_file_path)
 
-    init_cloudinary()
-    upload_result = cloudinary.uploader.upload(
-        qr_code_file_path,
-        public_id=f"Qr_Code/Photo_{photo_id}",
-        overwrite=True,
-        invalidate=True,
-    )
-    qr = QR_code(url=upload_result["secure_url"], photo_id=photo_id)
+        init_cloudinary()
+        upload_result = cloudinary.uploader.upload(
+            qr_code_file_path,
+            public_id=f"Qr_Code/Photo_{photo_id}",
+            overwrite=True,
+            invalidate=True,
+        )
+        qr = QR_code(url=upload_result["secure_url"], photo_id=photo_id)
 
-    try:
-        db.add(qr)
-        await db.commit()
-        await db.refresh(qr)
-    except Exception as e:
-        await db.rollback()
-        print(e)
+        try:
+            db.add(qr)
+            await db.commit()
+            db.refresh(qr)
+        except Exception as e:
+            await db.rollback()
+            print(e)
 
-    os.remove(qr_code_file_path)
+        os.remove(qr_code_file_path)
+        return {"source_url": photo.url, "qr_code_url": qr.url}
+
 
     return {"source_url": photo.url, "qr_code_url": qr.url}

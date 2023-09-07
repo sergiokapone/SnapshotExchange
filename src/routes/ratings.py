@@ -60,10 +60,7 @@ async def created_rating(
     new_rating = await repository_ratings.create_rating(
         rating, photo_id, current_user, db
     )
-    if new_rating =='exsist_photo':
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail=ALREADY_LIKE
-            )
+
     return new_rating
 
 

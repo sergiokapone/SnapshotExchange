@@ -26,6 +26,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         
         
         self.session.execute.return_value.scalar.return_value = Photo(user_id=2)
+        
     def tearDown(self):
         del self.session
 
@@ -35,31 +36,30 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
 
         mock_query_photo = MagicMock()
         mock_query_photo.scalar.return_value = fake_photo
+
         mock_query_rating = MagicMock()
-        mock_query_rating.scalars.return_value.all.return_value = []
+        mock_query_rating.scalar_one_or_none.return_value = []
 
         mock_execute = MagicMock()
         mock_execute.side_effect = [mock_query_photo, mock_query_rating]
         self.session.execute.return_value = mock_execute
 
-        # Викликаємо функцію create_rating
+
         result = await create_rating(5, 1, fake_user, self.session)
 
-        # Перевіряємо, чи функція вернула об'єкт рейтингу Rating
         self.assertIsInstance(result, Rating)
 
-        # Перевіряємо, чи було викликано функції db.add та db.commit
+
         self.session.add.assert_called_once()
         self.session.commit.assert_called_once()
         self.session.refresh.assert_called_once()
 
-        # Перевіряємо, чи було викинуто виняток HTTPException для випадку, коли користувач оцінює свою фотографію
         with self.assertRaises(HTTPException) as context:
             await create_rating(5, 1, fake_user, self.session)
         self.assertEqual(context.exception.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(context.exception.detail, YOUR_PHOTO)
 
-        # Перевіряємо, чи було викинуто виняток HTTPException для випадку, коли користувач вже оцінив фотографію
+
         with self.assertRaises(HTTPException) as context:
             await create_rating(5, 1, fake_user, self.session)
         self.assertEqual(context.exception.status_code, status.HTTP_400_BAD_REQUEST)
