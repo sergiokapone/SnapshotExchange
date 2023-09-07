@@ -27,6 +27,7 @@ from src.conf.messages import (
     USER_NOT_ACTIVE,
     USER_ALREADY_NOT_ACTIVE,
     USER_CHANGE_ROLE_TO,
+    ALREADY_LIKE,
     FORBIDDEN,
     DELETE_SUCCESSFUL,
 )
@@ -59,7 +60,10 @@ async def created_rating(
     new_rating = await repository_ratings.create_rating(
         rating, photo_id, current_user, db
     )
-    
+    if new_rating =='exsist_photo':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail=ALREADY_LIKE
+            )
     return new_rating
 
 
@@ -77,7 +81,7 @@ async def get_rating(photo_id: int, db: AsyncSession = Depends(get_db)):
     """
     rating = await repository_ratings.get_rating(photo_id, db)
     
-    print(rating)
+
     
 
     return rating
@@ -105,6 +109,7 @@ async def get_rating_ADmin_Moder(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=FORBIDDEN)
     else:
         new_rating = await repository_ratings.get_all_ratings(photo_id, db)
+
         return new_rating
 
 

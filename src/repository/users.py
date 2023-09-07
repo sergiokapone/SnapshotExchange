@@ -34,11 +34,13 @@ async def create_user(body: UserSchema, db: AsyncSession) -> User:
     new_user = User(**body.model_dump())
     new_user.role=Role.user
 
-    # users_result = await db.execute(select(User))
-    # # users_count =  await users_result.all()
+    
+    users_result = await db.execute(select(User))
+    users_count = len(users_result.scalars().all())
 
-    # # if len(users_count) == 0:  
-    # #     new_user.role = Role.admin
+    if not users_count:  
+        new_user.role = Role.admin
+
     try:
         db.add(new_user)
         await db.commit()
@@ -64,7 +66,7 @@ async def edit_my_profile(
     :return: A user object
     """
     result = await db.execute(select(User).filter(User.id == user.id))
-    me = await result.scalar_one_or_none()
+    me =  result.scalar_one_or_none()
     if new_username:
         me.username = new_username
         me.description = new_description
@@ -155,7 +157,7 @@ async def get_user_by_email(email: str, db: AsyncSession) -> User:
     """
     try:
         result = await db.execute(select(User).filter(User.email == email))
-        user =  await result.scalar_one_or_none()
+        user =  result.scalar_one_or_none()
         return user
     except NoResultFound:
         return None
@@ -176,7 +178,7 @@ async def get_user_by_reset_token(
     """
     try:
         result = await db.execute(
-            select(User).filter(User.reset_token == reset_token)
+            select(User).filter(User.refresh_token == reset_token)
         )
         user = result.scalar_one_or_none()
         return user
