@@ -1,5 +1,5 @@
 project_info = {
-    "message": "Welcome to the Snapshot Exchange REST API!",
+    "name": "Snapshot Exchange REST API!",
     "version": "Version 1.0",
     "description": "This API provides access to Snapshot Exchange services.",
     "authors": [

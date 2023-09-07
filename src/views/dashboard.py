@@ -13,7 +13,7 @@ templates = Jinja2Templates(directory="templates")
 router = APIRouter(tags=["Views"])
 
 
-@router.get("/info", response_class=HTMLResponse, include_in_schema=False, name="project_nfo")
+@router.get("/dashboard", response_class=HTMLResponse, include_in_schema=False, name="dashboard")
 async def root(request: Request):
     """
     Project Information Page

@@ -169,7 +169,7 @@ async def login(
         )
 
 
-    access_token = await auth_service.create_access_token(data={"sub": user.email})
+    access_token = await auth_service.create_access_token(data={"email": user.email})
     
     response = RedirectResponse(url=request.url_for("view_all_photos"), status_code=302)
     

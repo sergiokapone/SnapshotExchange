@@ -9,8 +9,9 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="display-4"><b>{{ message }}</b></h1>
-        <p class="lead">Version: {{ version }}</p>
+        <h1 class="display-4"><b>Admin Dashboard</b></h1>
+        <p class="lead"><b>Name</b>: {{ name }}</p>
+        <p class="lead"><b>Version</b>: {{ version }}</p>
         <p>{{ description }}</p>
         <h2>Authors</h2>
         <ul>
@@ -25,6 +26,10 @@
 
         <a href="{{ url_for('login_render') }}" class="btn btn-primary" id="btn-go-to-photos">
             Login
+            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+        </a>
+        <a href="{{ url_for('view_all_photos') }}" class="btn btn-primary" id="btn-go-to-photos">
+            Database
             <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
         </a>
     </div>

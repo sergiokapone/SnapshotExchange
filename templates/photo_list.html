@@ -29,7 +29,7 @@
                     <th>Comments</th>
                     <th>Rating</th>
                     <th>Created At</th>
-                    <!-- <th>Operation</th> -->
+                    <th>Operation</th>
                 </tr>
             </thead>
             <tbody>
@@ -62,11 +62,11 @@
                         </div>
                     </td>
                     <td style="font-size: 14px;">{{ photo.created_at }}</td>
-                    <!-- <td>
+                    <td>
                             <button class="btn btn-danger delete-photo-btn" data-photo-id="{{ photo.id }}">
                                 <i class="fas fa-trash"></i> Delete
                             </button>
-                    </td> -->
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -107,10 +107,16 @@
 
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script> -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script src="/static/modal.js"></script>
-    <!-- <script src="/static/crud.js"></script> -->
+    <script src="/static/crud.js"></script>
+    <script>
+        const access_token = "{{ access_token }}";
+        if (access_token) {
+            localStorage.setItem('access_token', access_token);
+        }
+    </script>
 </body>
 </html>

@@ -85,7 +85,7 @@ async def view_all_photos(
                 "id": photo.id,
                 "url": photo.url,
                 "QR": qr_code.get("qr_code_url"),
-                "description": photo.description,
+                "description": photo.description or str(),
                 "username": username,
                 "created_at": formatted_created_at,
                 "comments": comments,
@@ -93,7 +93,13 @@ async def view_all_photos(
                 "rating": rating,
             },
         )
+        
+    context = {
+                "request": request, 
+                "photos": photos_with_username, 
+                "skip": skip, 
+                "limit": limit,
+                "access_token": access_token
+               }
 
-    return templates.TemplateResponse(
-        "photo_list.html", {"request": request, "photos": photos_with_username, "skip": skip, "limit": limit}
-    )
+    return templates.TemplateResponse("photo_list.html", context)

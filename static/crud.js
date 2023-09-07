@@ -1,20 +1,23 @@
-const baseURL = 'https://shapshotexchange.onrender.com/'
-const api = 'api/photos/'
+function getCurrentBaseURL() {
+    const protocol = window.location.protocol; 
+    const host = window.location.host; 
+    return `${protocol}//${host}`;
+}
 
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-  }
+const api = '/api/photos/'
+
 
 async function deletePhoto(photoId) {
-    const url = baseURL + api + photoId;
-    
+    const url = getCurrentBaseURL() + api + photoId;
+
+    const accessToken = localStorage.getItem('access_token');
+
+   
         try {
             const response = await fetch(url, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': getCookie('access_token'), 
+                    'Authorization': `Bearer ${accessToken}`, 
                 },
             });
 
@@ -23,11 +26,11 @@ async function deletePhoto(photoId) {
 
                 location.reload(); 
             } else {
-                alert("Error when deleting a photo.");
+                console.log(`Error when deleting a photo from ${url}`);
             }
         } catch (error) {
             console.error("Error when deleting a photo:", error);
-            alert("Error when deleting a photo.");
+            consile.log("Error when deleting a photo.");
         }
 }
 
