@@ -21,7 +21,9 @@ from src.routes.users import router as users_router
 from src.routes.ratings import router as ratings_router
 from src.routes.photos import router as photos_router
 from src.routes.comments import router as comments_router
-
+from src.routes.search import router as search_router
+from src.conf.config import settings
+from src.conf.info_dict import project_info
 from src.views.info import router as info_views_router
 from src.views.auth import router as auth_views_router
 from src.views.users import router as user_views_router
@@ -99,6 +101,7 @@ app.include_router(auth_router, prefix="/api")
 app.include_router(users_router, prefix="/api")
 app.include_router(photos_router, prefix='/api')
 app.include_router(comments_router, prefix='/api')
+app.include_router(search_router, prefix='/api')
 app.include_router(ratings_router, prefix="/api")
 
 app.include_router(auth_views_router, prefix="/views")
@@ -106,7 +109,6 @@ app.include_router(user_views_router, prefix="/views")
 app.include_router(photo_views_router, prefix="/views")
 app.include_router(info_views_router, prefix="/views")
 app.include_router(chat_router, prefix="/views")
-
 
 
 if __name__ == "__main__":
