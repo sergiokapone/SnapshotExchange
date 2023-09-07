@@ -74,10 +74,9 @@ All documentation on interacting with our API is available at the following link
 
 ### Admin Dashboard
 
-We also tried to create routes on FastAPI that implement not only API routes, but also SSR (Server Side Rendering) technology to make your web pages more easily available to users.
+МWe also tried to implement an Admin Dashboard for our application to conveniently manage and control its content, settings and users. 
 
-Links to view images uploaded by service users can be found here:
-- To start using pur aplication type [http://localhost:8000/views/dashboard](http://localhost:8000/views/dashboard)
+- The Admin Dashboard is available at [http://localhost:8000/views/dashboard](http://localhost:8000/views/dashboard)
 
 ### Chat
 
