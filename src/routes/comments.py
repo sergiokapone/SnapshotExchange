@@ -89,11 +89,11 @@ async def change_comment(
     """
     
     # Check that the current user is the author of the comment
-    
-    comment = await reposytory_comments.update_comment(text, comment_id, db)
-    if comment:
-        if comment.user_id != current_user.id:
+    comment_check = await reposytory_comments.get_comment(comment_id, db)
+    if comment_check:
+        if comment_check.user_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        comment = await reposytory_comments.update_comment(text, comment_id, db)
         return comment
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     

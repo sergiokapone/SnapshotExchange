@@ -1,8 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo, Comment
-from src.schemas import CommentUpdateSchema, CommentList
+from src.database.models import User, Comment
 
 
 async def create_comment(content: str, user: str, photos_id: int, db: AsyncSession):
