@@ -226,7 +226,6 @@ async def logout(
     
     
     token = credentials.credentials
-    print("--------->>>>>>>>>", token)
 
     await repository_users.add_to_blacklist(token, db)
     return {"message": USER_IS_LOGOUT}

@@ -4,7 +4,32 @@ function getCurrentBaseURL() {
     return `${protocol}//${host}`;
 }
 
-const api = '/api/photos/'
+
+// document.getElementById('signup-form').addEventListener('submit', handleSignup);
+
+// async function handleSignup(e) {
+//     e.preventDefault(); 
+
+//     const formData = new FormData(e.target);
+//     const url = getCurrentBaseURL() + '/api/auth/signup'; 
+
+//     try {
+//         const response = await fetch(url, {
+//             method: 'POST',
+//             body: formData,
+//         });
+
+//         if (response.ok) {
+            
+//             window.location.href = getCurrentBaseURL() + '/views/dashboard';
+//         } else {
+//             console.error('Error during signup.');
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//     }
+// }
+
 
 document.getElementById('logout-btn').addEventListener('click', () => {
     const accessToken = localStorage.getItem('access_token');
@@ -19,7 +44,7 @@ document.getElementById('logout-btn').addEventListener('click', () => {
     .then(response => {
         if (response.ok) {
             localStorage.removeItem('access_token');
-            window.location.href = getCurrentBaseURL() + '/views/auth/login';
+            window.location.href = getCurrentBaseURL() + '/views/dashboard';
         } else {
             console.error('Error logging out.');
         }
@@ -31,7 +56,7 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 
 
 async function deletePhoto(photoId) {
-    const url = getCurrentBaseURL() + api + photoId;
+    const url = getCurrentBaseURL() + '/api/photos/' + photoId;
     const accessToken = localStorage.getItem('access_token');
 
    
@@ -64,23 +89,21 @@ deleteButtons.forEach(button => {
     button.addEventListener('click', () => deletePhoto(photoId));
 });
 
-// Обработчик события для кнопки "Add Photo"
+
 const addPhotoButton = document.getElementById('add-photo-btn');
 addPhotoButton.addEventListener('click', () => {
-    // Открываем модальное окно для добавления фото
     $('#add-photo-modal').modal('show');
 });
 
-// Обработчик события для кнопки "Upload"
+
 const uploadButton = document.getElementById('upload-button');
 uploadButton.addEventListener('click', () => {
 
-    const url = getCurrentBaseURL() + api + 'upload';
+    const url = getCurrentBaseURL() + '/api/photos/upload';
     const accessToken = localStorage.getItem('access_token');
-    // Получите данные из формы
+
     const formData = new FormData(document.getElementById('upload-photo-form'));
 
-    // Отправьте данные на сервер для загрузки фото
     fetch(url, {
         method: 'POST',
         body: formData,
@@ -91,9 +114,7 @@ uploadButton.addEventListener('click', () => {
     .then(response => {
         if (response.ok) {
             console.log('Photo uploaded successfully.');
-            // Закройте модальное окно после успешной загрузки
             $('#add-photo-modal').modal('hide');
-            // Обновите страницу или выполните другие необходимые действия
         } else {
             console.error('Error when uploading photo.');
         }
