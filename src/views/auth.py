@@ -18,6 +18,7 @@ from fastapi.security import (
 
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
+from fastapi.requests import Request
 
 
 ### Import from SQLAlchemy ###
@@ -79,6 +80,11 @@ from src.repository import users as repository_users
 templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(prefix="/auth", tags=["Authentication View"])
+security = HTTPBearer()
+
+@router.get("/signup", name='signup_render', include_in_schema=False)
+async def signup_page(request: Request):
+    return templates.TemplateResponse("signup.html", {"request": request})
 
 @router.get("/login", name='login_render', include_in_schema=False)
 async def login_page(request: Request):
@@ -169,7 +175,7 @@ async def login(
         )
 
 
-    access_token = await auth_service.create_access_token(data={"sub": user.email})
+    access_token = await auth_service.create_access_token(data={"email": user.email})
     
     response = RedirectResponse(url=request.url_for("view_all_photos"), status_code=302)
     

@@ -70,7 +70,7 @@ async def view_all_photos(
        
     photos = await repository_photos.get_photos(skip, limit, db)
 
-    photos_with_username = []
+    detailed_info = []
     for photo in photos:
         user = await repository_users.get_user_by_user_id(photo.user_id, db)
         tags = await repository_photos.get_photo_tags(photo.id, db)
@@ -80,12 +80,12 @@ async def view_all_photos(
         formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
         qr_code = await repository_photos.get_URL_QR(photo.id, db)
 
-        photos_with_username.append(
+        detailed_info.append(
             {
                 "id": photo.id,
                 "url": photo.url,
                 "QR": qr_code.get("qr_code_url"),
-                "description": photo.description,
+                "description": photo.description or str(),
                 "username": username,
                 "created_at": formatted_created_at,
                 "comments": comments,
@@ -93,7 +93,14 @@ async def view_all_photos(
                 "rating": rating,
             },
         )
+    detailed_info = sorted(detailed_info, key=lambda x: x["id"])
+    
+    context = {
+                "request": request, 
+                "photos": detailed_info, 
+                "skip": skip, 
+                "limit": limit,
+                "access_token": access_token
+               }
 
-    return templates.TemplateResponse(
-        "photo_list.html", {"request": request, "photos": photos_with_username, "skip": skip, "limit": limit}
-    )
+    return templates.TemplateResponse("database.html", context)

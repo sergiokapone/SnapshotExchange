@@ -200,16 +200,16 @@
 <li><a class="reference internal" href="#src.routes.search.search_photo"><code class="docutils literal notranslate"><span class="pre">search_photo()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-src.views.dashboard">VIEWS routes Dashboard</a><ul>
+<li><a class="reference internal" href="#src.views.dashboard.root"><code class="docutils literal notranslate"><span class="pre">root()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-src.views.photos">VIEWS routes Photos</a><ul>
 <li><a class="reference internal" href="#src.views.photos.view_all_photos"><code class="docutils literal notranslate"><span class="pre">view_all_photos()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-src.views.users">VIEWS routes Users</a><ul>
 <li><a class="reference internal" href="#src.views.users.view_user_profile"><code class="docutils literal notranslate"><span class="pre">view_user_profile()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-src.views.info">VIEWS routes Info</a><ul>
-<li><a class="reference internal" href="#src.views.info.root"><code class="docutils literal notranslate"><span class="pre">root()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-src.views.chat">VIEWS routes Chat</a><ul>
@@ -407,6 +407,7 @@
 <li><a class="reference internal" href="#src.schemas.UserProfileSchema.comments_count"><code class="docutils literal notranslate"><span class="pre">UserProfileSchema.comments_count</span></code></a></li>
 <li><a class="reference internal" href="#src.schemas.UserProfileSchema.created_at"><code class="docutils literal notranslate"><span class="pre">UserProfileSchema.created_at</span></code></a></li>
 <li><a class="reference internal" href="#src.schemas.UserProfileSchema.email"><code class="docutils literal notranslate"><span class="pre">UserProfileSchema.email</span></code></a></li>
+<li><a class="reference internal" href="#src.schemas.UserProfileSchema.id"><code class="docutils literal notranslate"><span class="pre">UserProfileSchema.id</span></code></a></li>
 <li><a class="reference internal" href="#src.schemas.UserProfileSchema.is_active"><code class="docutils literal notranslate"><span class="pre">UserProfileSchema.is_active</span></code></a></li>
 <li><a class="reference internal" href="#src.schemas.UserProfileSchema.model_config"><code class="docutils literal notranslate"><span class="pre">UserProfileSchema.model_config</span></code></a></li>
 <li><a class="reference internal" href="#src.schemas.UserProfileSchema.model_fields"><code class="docutils literal notranslate"><span class="pre">UserProfileSchema.model_fields</span></code></a></li>
@@ -1086,8 +1087,7 @@
 <dd class="field-odd"><p><a class="reference internal" href="#src.schemas.MessageResponseSchema" title="src.schemas.MessageResponseSchema">MessageResponseSchema</a></p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p>HTTPException with code 400 and detail “VERIFICATION_ERROR” in case of invalid token,
-and also with code 400 and detail “EMAIL_ALREADY_CONFIRMED” in case of already confirmed email.</p>
+<dd class="field-even"><p>HTTPException with code 400 and detail “VERIFICATION_ERROR” in case of invalid token, and also with code 400 and detail “EMAIL_ALREADY_CONFIRMED” in case of already confirmed email.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1261,8 +1261,7 @@ and also with code 400 and detail “EMAIL_ALREADY_CONFIRMED” in case of alrea
 <dd class="field-odd"><p><a class="reference internal" href="#src.schemas.MessageResponseSchema" title="src.schemas.MessageResponseSchema">MessageResponseSchema</a></p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p>HTTPException with code 401 and detail “INVALID_TOKEN” in case of invalid token,
-and with code 401 and detail “PASWORD_RESET_SUCCESS” in case of successful password reset.</p>
+<dd class="field-even"><p>HTTPException with code 401 and detail “INVALID_TOKEN” in case of invalid token, and with code 401 and detail “PASWORD_RESET_SUCCESS” in case of successful password reset.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2100,6 +2099,27 @@ minimum and maximum rating values, as well as a date range. The search is perfor
 </dd></dl>
 
 </section>
+<section id="module-src.views.dashboard">
+<span id="views-routes-dashboard"></span><h1>VIEWS routes Dashboard<a class="headerlink" href="#module-src.views.dashboard" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.views.dashboard.root">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.views.dashboard.</span></span><span class="sig-name descname"><span class="pre">root</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.views.dashboard.root" title="Permalink to this definition"></a></dt>
+<dd><p>Project Information Page</p>
+<p>This endpoint serves an HTML page displaying information about the project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>Request</em>) – The HTTP request object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The HTML page displaying project information.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HTMLResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="module-src.views.photos">
 <span id="views-routes-photos"></span><h1>VIEWS routes Photos<a class="headerlink" href="#module-src.views.photos" title="Permalink to this heading"></a></h1>
 <dl class="py function">
@@ -2160,27 +2180,6 @@ minimum and maximum rating values, as well as a date range. The search is perfor
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>HTTPException 404</strong> – User not found if the user with the specified username is not found.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-src.views.info">
-<span id="views-routes-info"></span><h1>VIEWS routes Info<a class="headerlink" href="#module-src.views.info" title="Permalink to this heading"></a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="src.views.info.root">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.views.info.</span></span><span class="sig-name descname"><span class="pre">root</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.views.info.root" title="Permalink to this definition"></a></dt>
-<dd><p>Project Information Page</p>
-<p>This endpoint serves an HTML page displaying information about the project.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>request</strong> (<em>Request</em>) – The HTTP request object.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The HTML page displaying project information.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>HTMLResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3069,7 +3068,7 @@ hashed_password = auth.get_password_hash(“my_password”)</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.services.auth.Auth.SECRET_KEY">
-<span class="sig-name descname"><span class="pre">SECRET_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'secretkey'</span></em><a class="headerlink" href="#src.services.auth.Auth.SECRET_KEY" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SECRET_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'secret_key'</span></em><a class="headerlink" href="#src.services.auth.Auth.SECRET_KEY" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -3839,7 +3838,7 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 
 <dl class="py class">
 <dt class="sig sig-object py" id="src.schemas.UserProfileSchema">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.schemas.</span></span><span class="sig-name descname"><span class="pre">UserProfileSchema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">EmailStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avatar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photos_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comments_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.schemas.UserProfileSchema" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.schemas.</span></span><span class="sig-name descname"><span class="pre">UserProfileSchema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">EmailStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avatar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photos_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comments_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.schemas.UserProfileSchema" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <p>Schema for user profile data.</p>
 <dl class="py attribute">
@@ -3863,6 +3862,11 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="src.schemas.UserProfileSchema.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.schemas.UserProfileSchema.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="src.schemas.UserProfileSchema.is_active">
 <span class="sig-name descname"><span class="pre">is_active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.schemas.UserProfileSchema.is_active" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -3875,7 +3879,7 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.schemas.UserProfileSchema.model_fields">
-<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'avatar':</span> <span class="pre">FieldInfo(annotation=Union[str,</span> <span class="pre">NoneType],</span> <span class="pre">required=True),</span> <span class="pre">'comments_count':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=True),</span> <span class="pre">'created_at':</span> <span class="pre">FieldInfo(annotation=datetime,</span> <span class="pre">required=True),</span> <span class="pre">'email':</span> <span class="pre">FieldInfo(annotation=EmailStr,</span> <span class="pre">required=True),</span> <span class="pre">'is_active':</span> <span class="pre">FieldInfo(annotation=Union[bool,</span> <span class="pre">NoneType],</span> <span class="pre">required=True),</span> <span class="pre">'photos_count':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=True),</span> <span class="pre">'username':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#src.schemas.UserProfileSchema.model_fields" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'avatar':</span> <span class="pre">FieldInfo(annotation=Union[str,</span> <span class="pre">NoneType],</span> <span class="pre">required=True),</span> <span class="pre">'comments_count':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=True),</span> <span class="pre">'created_at':</span> <span class="pre">FieldInfo(annotation=datetime,</span> <span class="pre">required=True),</span> <span class="pre">'email':</span> <span class="pre">FieldInfo(annotation=EmailStr,</span> <span class="pre">required=True),</span> <span class="pre">'id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'is_active':</span> <span class="pre">FieldInfo(annotation=Union[bool,</span> <span class="pre">NoneType],</span> <span class="pre">required=True),</span> <span class="pre">'photos_count':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=True),</span> <span class="pre">'username':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#src.schemas.UserProfileSchema.model_fields" title="Permalink to this definition"></a></dt>
 <dd><p>Metadata about the fields defined on the model,
 mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
 <p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>

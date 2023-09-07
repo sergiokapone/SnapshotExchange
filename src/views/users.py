@@ -55,7 +55,7 @@ async def view_user_profile(
        
     user = await repository_users.get_user_profile(username, db)
     
-    print(user)
+    print("=================>>>>", user)
 
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")

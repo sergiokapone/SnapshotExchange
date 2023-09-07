@@ -126,6 +126,7 @@ async def upload_photo(
         raise HTTPException(status_code=400, detail=LONG_DESCRIPTION)
 
     # check number of tags
+
     list_tags = tags[0].split(",")
     if len(list_tags) > 5:
         if len(list_tags) > 5:

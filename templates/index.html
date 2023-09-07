@@ -9,8 +9,9 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="display-4"><b>{{ message }}</b></h1>
-        <p class="lead">Version: {{ version }}</p>
+        <h1 class="display-4"><b>Admin Dashboard</b></h1>
+        <p class="lead"><b>Name</b>: {{ name }}</p>
+        <p class="lead"><b>Version</b>: {{ version }}</p>
         <p>{{ description }}</p>
         <h2>Authors</h2>
         <ul>
@@ -22,11 +23,27 @@
         </ul>
         <p>{{ license }}</p>
         <p>Find the source code on <a href="{{ repository }}" target="_blank">GitHub</a></p>
+        <div class="row">
+            <div class="col">
+                <a href="{{ url_for('signup_render') }}" class="btn btn-primary btn-block" id="btn-go-to-signup">
+                    Signup
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="col">
+                <a href="{{ url_for('login_render') }}" class="btn btn-primary btn-block" id="btn-go-to-login">
+                    Login
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="col">
+                <a href="{{ url_for('view_all_photos') }}" class="btn btn-primary btn-block" id="btn-go-to-database">
+                    Database
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                </a>
+            </div>
+        </div>
 
-        <a href="{{ url_for('login_render') }}" class="btn btn-primary" id="btn-go-to-photos">
-            Login
-            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-        </a>
     </div>
 
 

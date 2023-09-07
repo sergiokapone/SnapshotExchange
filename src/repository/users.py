@@ -130,6 +130,7 @@ async def get_user_profile(username: str, db: AsyncSession) -> User:
         comments_count = comments_result.scalar()
         
         user_profile = UserProfileSchema(
+            id=user.id,
             username=user.username,
             email=user.email,
             avatar=user.avatar,

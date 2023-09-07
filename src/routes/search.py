@@ -27,13 +27,21 @@ async def search_photo(tag: str = Path(min_length=2), rating_low: float = Query(
     minimum and maximum rating values, as well as a date range. The search is performed within the specified parameters.
 
     :param tag: str: The search text or tag to filter photos.
+    
     :param rating_low: float: The minimum rating value to filter photos.
+    
     :param rating_high: float: The maximum rating value to filter photos.
+    
     :param start_data: str: The start date for the search range in 'YYYY-MM-DD' format.
+    
     :param end_data: str: The end date for the search range in 'YYYY-MM-DD' format.
+    
     :param current_user: User: The currently authenticated user.
+    
     :param db: AsyncSession: The database session.
+    
     :return: A list of photos that match the search criteria.
+    
     :rtype: List[Photo]
     """
     try:
@@ -59,14 +67,23 @@ async def admin_search(tag: str = Path(min_length=2), user_id: int = Query(None)
     user, minimum and maximum rating values, as well as a date range. The search is performed within the specified parameters.
 
     :param tag: str: The search text or tag to filter photos.
+    
     :param user_id: int: The user ID to filter photos. Leave as None to search all users' photos.
+    
     :param rating_low: float: The minimum rating value to filter photos.
+    
     :param rating_high: float: The maximum rating value to filter photos.
+    
     :param start_data: str: The start date for the search range in 'YYYY-MM-DD' format.
+    
     :param end_data: str: The end date for the search range in 'YYYY-MM-DD' format.
+    
     :param current_user: User: The currently authenticated user (administrator).
+    
     :param db: AsyncSession: The database session.
+    
     :return: A list of photos that match the search criteria.
+    
     :rtype: List[Photo]
     """
     try:

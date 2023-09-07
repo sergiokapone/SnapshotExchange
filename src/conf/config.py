@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     sqlalchemy_database_url: str = (
         "postgresql+asyncpg://user:password@localhost:5432/postgres"
     )
-    secret_key: str = "secretkey"
+    secret_key: str = "secret_key"
     algorithm: str = "HS256"
     mail_username: str = "example@meta.ua"
     mail_password: str = "secretPassword"
