@@ -103,13 +103,19 @@ async def edit_my_profile(
     - Current authorized user
 
     :param avatar: UploadFile: User avatar file (optional).
+    
     :param new_username: str: New username (optional).
+    
     :param new_description: str: New user description (optional).
+    
     :param current_user: User: Current authenticated user.
+    
     :param redis_client: Redis: Redis client.
+    
     :param db: AsyncSession: Database session.
 
     :return: Updated user profile.
+    
     :rtype: UserDb
     
     :raises: HTTPException with code 400 and detail "USER_EXISTS" if the new username already exists.
@@ -152,11 +158,15 @@ async def get_users(
     - Current authorized user
 
     :param skip: int: Number of users to skip.
+    
     :param limit: int: Maximum number of users to return.
+    
     :param current_user: User: Current authenticated user.
+    
     :param db: AsyncSession: Database session.
 
     :return: List of users.
+    
     :rtype: List[UserDb]
     """
 
@@ -180,10 +190,13 @@ async def user_profile(
     - Current authorized user
 
     :param username: str: The username of the user whose profile is to be retrieved.
+    
     :param current_user: User: The current authenticated user (optional).
+    
     :param db: AsyncSession: Database session.
 
     :return: User profile or None if no user is found.
+    
     :rtype: dict | None
 
     :raises: HTTPException with code 404 and detail "NOT_FOUND" if the user is not found.
@@ -212,6 +225,7 @@ async def ban_user_by_email(email: EmailStr, db: AsyncSession = Depends(get_db))
     - Administartor
 
     :param email: EmailStr: Email of the user to block.
+    
     :param db: AsyncSession: Database session.
 
     :return: Successful user blocking message or error message.
@@ -252,11 +266,15 @@ async def assign_role(
     - Administartor
 
     :param email: EmailStr: Email of the user to whom you want to assign the role.
+    
     :param selected_role: Role: The selected role for the assignment (Administrator, Moderator or User).
+    
     :param db: AsyncSession: Database Session.
+    
     :param redis_client: Redis: Redis client.
 
     :return: Message about successful role change.
+    
     :rtype: dict
     """
 

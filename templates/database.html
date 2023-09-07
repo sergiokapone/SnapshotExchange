@@ -16,7 +16,15 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="display-4"><b>Snapshots</b></h1>
+        <h1 class="display-4"><b>Database</b></h1>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <button class="btn btn-primary" id="add-photo-btn">
+                <i class="fas fa-plus"></i> Add Photo
+            </button>
+            <button class="btn btn-primary" id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -63,9 +71,14 @@
                     </td>
                     <td style="font-size: 14px;">{{ photo.created_at }}</td>
                     <td>
+                        <div class="btn-group btn-block">
+                            <!-- <button class="btn btn-primary update-photo-btn" data-photo-id="{{ photo.id }}">
+                                <i class="fas fa-edit"></i> Update
+                            </button> -->
                             <button class="btn btn-danger delete-photo-btn" data-photo-id="{{ photo.id }}">
                                 <i class="fas fa-trash"></i> Delete
                             </button>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -89,6 +102,42 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal window for uploading photos and parameters -->
+        <div class="modal fade" id="add-photo-modal" tabindex="-1" role="dialog" aria-labelledby="addPhotoModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addPhotoModalLabel">Add Photo</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Form for uploading photos and parameters -->
+                        <form id="upload-photo-form" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="photo-file">Select a photo to upload:</label>
+                                <input type="file" class="form-control-file" id="photo-file" name="photo_file" accept=".jpg, .jpeg, .png" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description (optional):</label>
+                                <input type="text" class="form-control" id="description" name="description" maxlength="500">
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Tags (optional):</label>
+                                <input type="text" class="form-control" id="tags" name="tags" maxlength="500">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="upload-button">Upload</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Pagination -->
         <nav aria-label="Page navigation">
             <ul class="pagination">
                 <li class="page-item{% if skip == 0 %} disabled{% endif %}">

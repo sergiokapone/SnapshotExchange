@@ -17,6 +17,7 @@
                 <h1>User Profile</h1>
 
                 <div>
+                    <p><strong>User ID:</strong> {{ user.id }}</p>
                     <p><strong>Username:</strong> {{ user.username }}</p>
                     <p><strong>Email:</strong> <a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
                     <p><strong>Description:</strong> {{ user.description or "No description available" }}</p>

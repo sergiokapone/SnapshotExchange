@@ -62,6 +62,13 @@ REST API routes Search
   :undoc-members:
   :show-inheritance:
 
+VIEWS routes Dashboard
+=========================
+.. automodule:: src.views.dashboard
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
 VIEWS routes Photos
 =========================
 .. automodule:: src.views.photos
@@ -72,13 +79,6 @@ VIEWS routes Photos
 VIEWS routes Users
 =========================
 .. automodule:: src.views.users
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-VIEWS routes Info
-=========================
-.. automodule:: src.views.info
   :members:
   :undoc-members:
   :show-inheritance:

@@ -56,6 +56,7 @@ class UserProfileSchema(BaseModel):
     """
     Schema for user profile data.
     """
+    id: int
     username: str
     email: EmailStr
     avatar: str | None
