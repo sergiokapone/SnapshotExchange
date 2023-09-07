@@ -195,6 +195,11 @@
 <li><a class="reference internal" href="#src.routes.ratings.get_rating_ADmin_Moder"><code class="docutils literal notranslate"><span class="pre">get_rating_ADmin_Moder()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-src.routes.search">REST API routes Search</a><ul>
+<li><a class="reference internal" href="#src.routes.search.admin_search"><code class="docutils literal notranslate"><span class="pre">admin_search()</span></code></a></li>
+<li><a class="reference internal" href="#src.routes.search.search_photo"><code class="docutils literal notranslate"><span class="pre">search_photo()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-src.views.photos">VIEWS routes Photos</a><ul>
 <li><a class="reference internal" href="#src.views.photos.view_all_photos"><code class="docutils literal notranslate"><span class="pre">view_all_photos()</span></code></a></li>
 </ul>
@@ -256,6 +261,11 @@
 <li><a class="reference internal" href="#src.repository.ratings.delete_all_ratings"><code class="docutils literal notranslate"><span class="pre">delete_all_ratings()</span></code></a></li>
 <li><a class="reference internal" href="#src.repository.ratings.get_all_ratings"><code class="docutils literal notranslate"><span class="pre">get_all_ratings()</span></code></a></li>
 <li><a class="reference internal" href="#src.repository.ratings.get_rating"><code class="docutils literal notranslate"><span class="pre">get_rating()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-src.repository.search">Repository Search</a><ul>
+<li><a class="reference internal" href="#src.repository.search.search"><code class="docutils literal notranslate"><span class="pre">search()</span></code></a></li>
+<li><a class="reference internal" href="#src.repository.search.search_admin"><code class="docutils literal notranslate"><span class="pre">search_admin()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-src.services.auth">Service Auth</a><ul>
@@ -2032,6 +2042,64 @@ Only users with the ‘admin’ or ‘moder’ role can access this endpoint.</p
 </dd></dl>
 
 </section>
+<section id="module-src.routes.search">
+<span id="rest-api-routes-search"></span><h1>REST API routes Search<a class="headerlink" href="#module-src.routes.search" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routes.search.admin_search">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routes.search.</span></span><span class="sig-name descname"><span class="pre">admin_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">Path(PydanticUndefined)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">Query(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rating_low:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">Query(0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rating_high:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">Query(999)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_data:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">Query(1963-09-22)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_data:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">Query(2023-09-07)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_user:</span> <span class="pre">~src.database.models.User</span> <span class="pre">=</span> <span class="pre">Depends(get_authenticated_user)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db:</span> <span class="pre">~sqlalchemy.ext.asyncio.session.AsyncSession</span> <span class="pre">=</span> <span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.routes.search.admin_search" title="Permalink to this definition"></a></dt>
+<dd><p>Search photos for administrators with optional filtering by tag, user, rating, and date range.</p>
+<p>This function allows administrators to search for photos based on a provided tag and filter search results by specifying
+user, minimum and maximum rating values, as well as a date range. The search is performed within the specified parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tag</strong> – str: The search text or tag to filter photos.</p></li>
+<li><p><strong>user_id</strong> – int: The user ID to filter photos. Leave as None to search all users’ photos.</p></li>
+<li><p><strong>rating_low</strong> – float: The minimum rating value to filter photos.</p></li>
+<li><p><strong>rating_high</strong> – float: The maximum rating value to filter photos.</p></li>
+<li><p><strong>start_data</strong> – str: The start date for the search range in ‘YYYY-MM-DD’ format.</p></li>
+<li><p><strong>end_data</strong> – str: The end date for the search range in ‘YYYY-MM-DD’ format.</p></li>
+<li><p><strong>current_user</strong> – User: The currently authenticated user (administrator).</p></li>
+<li><p><strong>db</strong> – AsyncSession: The database session.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of photos that match the search criteria.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#src.database.models.Photo" title="src.database.models.Photo">Photo</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routes.search.search_photo">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routes.search.</span></span><span class="sig-name descname"><span class="pre">search_photo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">Path(PydanticUndefined)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rating_low:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">Query(0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rating_high:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">Query(999)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_data:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">Query(1963-09-22)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_data:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">Query(2023-09-07)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_user:</span> <span class="pre">~src.database.models.User</span> <span class="pre">=</span> <span class="pre">Depends(get_authenticated_user)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db:</span> <span class="pre">~sqlalchemy.ext.asyncio.session.AsyncSession</span> <span class="pre">=</span> <span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.routes.search.search_photo" title="Permalink to this definition"></a></dt>
+<dd><p>Search photos with optional filtering by tag, rating, and date range.</p>
+<p>This function allows users to search for photos based on a provided tag. Users can also filter search results by specifying
+minimum and maximum rating values, as well as a date range. The search is performed within the specified parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tag</strong> – str: The search text or tag to filter photos.</p></li>
+<li><p><strong>rating_low</strong> – float: The minimum rating value to filter photos.</p></li>
+<li><p><strong>rating_high</strong> – float: The maximum rating value to filter photos.</p></li>
+<li><p><strong>start_data</strong> – str: The start date for the search range in ‘YYYY-MM-DD’ format.</p></li>
+<li><p><strong>end_data</strong> – str: The end date for the search range in ‘YYYY-MM-DD’ format.</p></li>
+<li><p><strong>current_user</strong> – User: The currently authenticated user.</p></li>
+<li><p><strong>db</strong> – AsyncSession: The database session.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of photos that match the search criteria.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#src.database.models.Photo" title="src.database.models.Photo">Photo</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="module-src.views.photos">
 <span id="views-routes-photos"></span><h1>VIEWS routes Photos<a class="headerlink" href="#module-src.views.photos" title="Permalink to this heading"></a></h1>
 <dl class="py function">
@@ -2910,6 +2978,58 @@ role (Role): The new Role for the user.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.repository.search">
+<span id="repository-search"></span><h1>Repository Search<a class="headerlink" href="#module-src.repository.search" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.repository.search.search">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.repository.search.</span></span><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rating_low</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rating_high</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">[&lt;class</span> <span class="pre">'src.database.models.Photo'&gt;]</span></span></span><a class="headerlink" href="#src.repository.search.search" title="Permalink to this definition"></a></dt>
+<dd><p>Search photos by tag, with optional filtering by rating and date range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tag</strong> (<em>str</em>) – Search text</p></li>
+<li><p><strong>rating_low</strong> (<em>float</em>) – Minimum rating</p></li>
+<li><p><strong>rating_high</strong> (<em>float</em>) – Maximum rating</p></li>
+<li><p><strong>start_data</strong> (<em>Date</em>) – Start date for the search range.</p></li>
+<li><p><strong>end_data</strong> (<em>Date</em>) – End date for the search range.</p></li>
+<li><p><strong>db</strong> (<em>AsyncSession</em>) – The database session</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of photos</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#src.database.models.Photo" title="src.database.models.Photo">Photo</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.repository.search.search_admin">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.repository.search.</span></span><span class="sig-name descname"><span class="pre">search_admin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rating_low</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rating_high</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">[&lt;class</span> <span class="pre">'src.database.models.Photo'&gt;]</span></span></span><a class="headerlink" href="#src.repository.search.search_admin" title="Permalink to this definition"></a></dt>
+<dd><p>Search photos for admin by tag, user, with optional filtering by rating and date range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tag</strong> (<em>str</em>) – Search text</p></li>
+<li><p><strong>user_id</strong> (<em>int</em>) – user id for search</p></li>
+<li><p><strong>rating_low</strong> (<em>float</em>) – Minimum rating</p></li>
+<li><p><strong>rating_high</strong> (<em>float</em>) – Maximum rating</p></li>
+<li><p><strong>start_data</strong> (<em>Date</em>) – Start date for the search range.</p></li>
+<li><p><strong>end_data</strong> (<em>Date</em>) – End date for the search range.</p></li>
+<li><p><strong>db</strong> (<em>AsyncSession</em>) – The database session</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of photos</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#src.database.models.Photo" title="src.database.models.Photo">Photo</a>]</p>
 </dd>
 </dl>
 </dd></dl>

@@ -55,6 +55,13 @@ REST API routes Ratings
   :undoc-members:
   :show-inheritance:
 
+REST API routes Search
+=========================
+.. automodule:: src.routes.search
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
 VIEWS routes Photos
 =========================
 .. automodule:: src.views.photos
@@ -107,6 +114,13 @@ Repository Comments
 Repository Ratings
 ============================
 .. automodule:: src.repository.ratings
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+Repository Search
+============================
+.. automodule:: src.repository.search
   :members:
   :undoc-members:
   :show-inheritance:

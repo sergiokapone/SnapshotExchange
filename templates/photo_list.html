@@ -63,12 +63,9 @@
                     </td>
                     <td style="font-size: 14px;">{{ photo.created_at }}</td>
                     <td>
-                        <form method="post" action="{{ url_for('delete_photo', photo_id=photo.id) }}">
-
-                            <button type="submit" class="btn btn-danger">
+                            <button class="btn btn-danger delete-photo-btn" data-photo-id="{{ photo.id }}">
                                 <i class="fas fa-trash"></i> Delete
                             </button>
-                        </form>
                     </td>
                 </tr>
                 {% endfor %}
@@ -114,5 +111,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script src="/static/modal.js"></script>
+    <script src="/static/crud.js"></script>
 </body>
 </html>
