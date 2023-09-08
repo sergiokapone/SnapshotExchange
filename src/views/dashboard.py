@@ -9,8 +9,27 @@ from fastapi import APIRouter
 
 from src.conf.info_dict import project_info
 
+from src.services.documentation import rst_to_html
+
 templates = Jinja2Templates(directory="templates")
+templates.env.globals['rst_to_html'] = rst_to_html
 router = APIRouter(tags=["Views"])
+
+
+@router.get("/list", tags=["Root"], include_in_schema=False)
+async def show_route_list(request: Request):
+    routes = [
+        {
+            "path": str(request.base_url)[:-1] + route.path, 
+            "name": route.name, 
+            "method": route.methods,
+            "description": route.description,
+        } 
+        for route in request.app.routes
+        if hasattr(route, 'description') and route.description is not None
+    ]
+    return templates.TemplateResponse("api_description.html", {"request": request, "routes": routes})
+
 
 
 @router.get("/dashboard", response_class=HTMLResponse, include_in_schema=False, name="dashboard")

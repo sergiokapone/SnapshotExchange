@@ -63,6 +63,11 @@ For comfortable viewing of `JSON` respone in your browser we recommend to instal
 [JSON Viewer](https://chrome.google.com/webstore/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh/related?hl=ru) or
 [JSON Formatter](https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=ru) (according to your taste)
 
+### Admin Dashboard
+
+We also tried to implement an Admin Dashboard for our application to conveniently manage and control its content, settings and users.
+
+- The Admin Dashboard is available at [http://localhost:8000/views/dashboard](http://localhost:8000/views/dashboard)
 
 ### API routes
 
@@ -72,12 +77,6 @@ All documentation on interacting with our API is available at the following link
 - To view swagger documentation [http://localhost:8000/docs](http://localhost:8000/docs)
 - To view redoc documentation [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
-
-### Admin Dashboard
-
-We also tried to implement an Admin Dashboard for our application to conveniently manage and control its content, settings and users.
-
-- The Admin Dashboard is available at [http://localhost:8000/views/dashboard](http://localhost:8000/views/dashboard)
 
 ### Chat
 

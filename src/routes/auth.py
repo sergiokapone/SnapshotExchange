@@ -85,6 +85,7 @@ security = HTTPBearer()
 @router.post(
     "/signup",
     name="signup",
+    description="Root is designed for user registration",
     status_code=status.HTTP_201_CREATED,
 )
 async def signup(

@@ -30,13 +30,19 @@
                 </a>
             </div>
             <div class="col">
-                <a href="{{ url_for('view_all_photos') }}" class="btn btn-primary btn-block" id="btn-go-to-database">
+                <a href="{{ url_for('view_all_photos') }}" class="btn btn btn-info btn-block" id="btn-go-to-database">
                     Database
                     <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                 </a>
             </div>
             <div class="col">
-                <a href="{{ url_for('chat') }}" class="btn btn-primary btn-block" id="btn-go-to-database">
+                <a href="{{ url_for('show_route_list') }}" class="btn btn btn-info btn-block" id="btn-go-to-database">
+                    API List
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="col">
+                <a href="{{ url_for('chat') }}" class="btn btn btn-info btn-block" id="btn-go-to-database">
                     Chat
                     <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                 </a>

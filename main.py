@@ -24,6 +24,7 @@ from src.routes.comments import router as comments_router
 from src.routes.search import router as search_router
 from src.conf.config import settings
 from src.conf.info_dict import project_info
+
 from src.views.dashboard import router as dashboard_views_router
 from src.views.auth import router as auth_views_router
 from src.views.users import router as user_views_router
@@ -96,6 +97,18 @@ async def healthchecker(session: AsyncSession = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=DB_CONNECT_ERROR,
         )
+        
+
+@app.get("/list", 
+         tags=["Root"])
+def get_all_urls_from_request(request: Request):
+    url_list = [
+        {"path": route.path, 
+         "name": route.name, 
+         "method": route.methods,
+        }
+    ]
+    return url_list
 
 
 app.include_router(auth_router, prefix="/api")
