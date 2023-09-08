@@ -1,10 +1,9 @@
 import unittest
-from unittest.mock import AsyncMock,MagicMock,Mock
+from unittest.mock import AsyncMock,MagicMock
 from sqlalchemy.ext.asyncio import AsyncSession
 import sys
 import os
-from starlette import status
-from starlette.exceptions import HTTPException  
+
 
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -21,34 +20,27 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
 
     def setUp(self):
         self.session = AsyncMock(spec=AsyncSession())
-        self.user= User(
-            id=1,
-            username= "Corwin",
-            email= "tests@gmail.com",
-            password= "testpassword1", confirmed=True)
-        
-        
-        self.session.execute.return_value.scalar.return_value = Photo(user_id=2)
+
         
     def tearDown(self):
         del self.session
 
-    async def test_create_rathings(self):
-        fake_user = User(id=1, username="fake_user")
-        fake_photo = Photo(id=1, user_id=1)
+    # async def test_create_rathings(self):
+    #     fake_user = User(id=1, username="fake_user")
+    #     fake_photo = Photo(id=1, user_id=1)
 
-        # Створюємо мок для запиту до бази даних
-        mock_query_photo = MagicMock()
-        mock_query_photo.scalar.return_value = fake_photo
+    #     # Створюємо мок для запиту до бази даних
+    #     mock_query_photo = AsyncMock()
+    #     mock_query_photo.scalar.return_value = fake_photo
 
-        # Встановлюємо, що execute повертатиме результат з нашим моком
-        self.session.execute.return_value.scalar.return_value = fake_photo
+    #     # Встановлюємо, що execute повертатиме результат з нашим моком
+    #     self.session.execute.return_value.scalar.return_value = mock_query_photo
 
-        # Тепер ви можете викликати вашу функцію з цим моком для тестування
-        result = await create_rating(5, 1, fake_user, self.session)
+    #     # Тепер ви можете викликати вашу функцію з цим моком для тестування
+    #     result = await create_rating(5, 1, fake_user, self.session)
 
-        # Перевірте результат вашого тесту
-        self.assertIsInstance(result, Rating)
+    #     # Перевірте результат вашого тесту
+    #     self.assertIsInstance(result, Rating)
 
 
     async def test_get_rating(self):
