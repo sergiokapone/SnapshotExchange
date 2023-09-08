@@ -1,13 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-    <!-- Подключение стилей Bootstrap -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body class="bg-light">
+{% extends "base.html" %}
+{% block content %}
     <div class="container mt-5">
         <h2><b>Signup</b></h2>
         <form id="signup-form" method="POST" action="{{ url_for('signup') }}">
@@ -30,14 +22,4 @@
             <button type="submit" class="btn btn-primary">Sign Up</button>
         </form>
     </div>
-   
-    
-    <!-- Connecting Bootstrap scripts (jQuery and Popper.js) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
-    <!-- Connecting the Bootstrap script -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- Your custom JavaScript -->
-    <script src="/static/crud.js"></script>
-</body>
-</html>
+{% endblock %}

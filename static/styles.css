@@ -1,4 +1,3 @@
-
 /* Styles for the header */
 .display-4 {
     text-align: center;
@@ -10,7 +9,7 @@
     max-height: 100px;
     display: block;
     margin: 0 auto;
-    cursor: pointer; /* Add hover pointer for images */
+    cursor: pointer;
 }
 
 /* Coloring of lines with alternating colors */
@@ -20,6 +19,6 @@ tbody tr:nth-child(even) {
 
 /* Styles for table header */
 thead th {
-    background-color: #007bff; /* Header background color */
-    color: #fff; /* Header text color */
+    background-color: #007bff;
+    color: #fff;
 }

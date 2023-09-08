@@ -20,14 +20,15 @@ The project is available online at [https://snapshotexchange.onrender.com](https
 
 ## Using Technologies
 
-![Language](https://img.shields.io/badge/Language-Python-blue.svg)
+![Language](https://img.shields.io/badge/Language-Python_3.10-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.103.0-blue.svg)
 ![Pydantic](https://img.shields.io/badge/Pydantic-2.3-blue.svg)
-![asyncio](https://img.shields.io/badge/asyncio-included-green.svg)
+![Jinja2](https://img.shields.io/badge/jinja2-3.1.2-blue.svg)
+![asyncio](https://img.shields.io/badge/asyncio-included-blue.svg)
 ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0.20-blue.svg)
 ![Alembic](https://img.shields.io/badge/Alembic-1.7.3-blue.svg)
 ![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue.svg)
-![Redis](https://img.shields.io/badge/Database-Redis-red.svg)
+![Redis](https://img.shields.io/badge/Database-Redis-blue.svg)
 
 ## Description
 
@@ -74,7 +75,7 @@ All documentation on interacting with our API is available at the following link
 
 ### Admin Dashboard
 
-МWe also tried to implement an Admin Dashboard for our application to conveniently manage and control its content, settings and users. 
+We also tried to implement an Admin Dashboard for our application to conveniently manage and control its content, settings and users.
 
 - The Admin Dashboard is available at [http://localhost:8000/views/dashboard](http://localhost:8000/views/dashboard)
 

@@ -1,22 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo List</title>
-    
-    <!-- Connecting Bootstrap styles -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    
-    <!-- Styles to improve appearance -->
-    <link rel="stylesheet" href="/static/styles.css">
-
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
     <div class="container mt-5">
-        <h1 class="display-4"><b>Database</b></h1>
+        <!-- <h1 class="display-4"><b>Database</b></h1> -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <button class="btn btn-primary" id="add-photo-btn">
                 <i class="fas fa-plus"></i> Add Photo
@@ -71,14 +56,9 @@
                     </td>
                     <td style="font-size: 14px;">{{ photo.created_at }}</td>
                     <td>
-                        <div class="btn-group btn-block">
-                            <!-- <button class="btn btn-primary update-photo-btn" data-photo-id="{{ photo.id }}">
-                                <i class="fas fa-edit"></i> Update
-                            </button> -->
-                            <button class="btn btn-danger delete-photo-btn" data-photo-id="{{ photo.id }}">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </div>
+                        <button class="btn btn-danger delete-photo-btn" data-photo-id="{{ photo.id }}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -153,19 +133,4 @@
             </ul>
         </nav>        
     </div>
-
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script> -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    <script src="/static/modal.js"></script>
-    <script src="/static/crud.js"></script>
-    <script>
-        const access_token = "{{ access_token }}";
-        if (access_token) {
-            localStorage.setItem('access_token', access_token);
-        }
-    </script>
-</body>
-</html>
+{% endblock %}
