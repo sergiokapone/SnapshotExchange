@@ -28,13 +28,13 @@ async function handleLogin(e) {
             setCookie('access_token', access_token, 1)
             
             window.location.href = getCurrentBaseURL() + '/views/database';
-            console.log('Login successful.');
+            Notiflix.Notify.success('Login successful.');
 
         } else {
-            console.error('Error during login.');
+            Notiflix.Notify.failure('Error during login.');
         }
     } catch (error) {
-        console.error('Error:', error);
+        Notiflix.Notify.failure('Error:', error);
     }
 }
 

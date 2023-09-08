@@ -18,7 +18,7 @@ async function handleSignup(e) {
     const confirm_password = document.getElementById('confirm_password').value;
 
     if (password !== confirm_password) {
-        console.error('Passwords do not match.');
+        Notiflix.Notify.failure('Passwords do not match.');
         return;
     }
 
@@ -35,13 +35,13 @@ async function handleSignup(e) {
 
         if (response.ok) {
             window.location.href = getCurrentBaseURL() + '/views/dashboard';
-            console.log('User registered successfully.');
+            Notiflix.Notify.success('User registered successfully.');
 
         } else {
 
-            console.error('Error during signup.');
+            Notiflix.Notify.failure('Error during signup.');
         }
     } catch (error) {
-        console.error('Error:', error);
+        Notiflix.Notify.failure('Error:', error);
     }
 }
