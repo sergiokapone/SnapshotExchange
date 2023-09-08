@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.database.models import Rating,Photo,User,Comment,QR_code,Tag,Role
 from src.schemas import UserSchema,PhotosDb
-from src.repository.photos import get_or_create_tag,get_photo_tags,get_photo_comments,upload_photo,get_my_photos,get_photos,get_photo_by_id,update_photo,remove_photo,get_URL_Qr
+from src.repository.photos import get_or_create_tag,get_photo_tags,get_photo_comments,upload_photo,get_my_photos,get_photos,get_photo_by_id,update_photo,remove_photo,get_URL_QR
 from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE
 
 
@@ -269,7 +269,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         self.session.execute.side_effect = [mock_query, mock_query]
 
         photo_id = 1
-        result = await get_URL_Qr(photo_id, self.session)
+        result = await get_URL_QR(photo_id, self.session)
 
         expected_result = {"source_url": photo.url, "qr_code_url": qr.url}
         self.assertEqual(result, expected_result)
