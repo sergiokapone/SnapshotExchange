@@ -12,15 +12,15 @@ async function deletePhoto(photoId) {
             });
 
             if (response.ok) {
-                console.log("The photo has been successfully deleted.");
+                Notiflix.Notify.success("The photo has been successfully deleted.");
 
                 location.reload(); 
             } else {
-                console.log(`Error when deleting a photo from ${url}`);
+                Notiflix.Notify.failure(`Error when deleting a photo from ${url}`);
             }
         } catch (error) {
-            console.error("Error when deleting a photo:", error);
-            console.log("Error when deleting a photo.");
+            Notiflix.Notify.failure("Error when deleting a photo:", error);
+            Notiflix.Notify.failure("Error when deleting a photo.");
         }
 }
 
@@ -56,14 +56,14 @@ uploadButton.addEventListener('click', () => {
     })
     .then(response => {
         if (response.ok) {
-            console.log('Photo uploaded successfully.');
+            Notiflix.Notify.success('Photo uploaded successfully.');
             $('#add-photo-modal').modal('hide');
         } else {
-            console.error('Error when uploading photo.');
+            Notiflix.Notify.failure('Error when uploading photo.');
         }
     })
     .catch(error => {
-        console.error('Error when uploading photo:', error);
+        Notiflix.Notify.failure('Error when uploading photo:', error);
     });
 });
 
@@ -82,10 +82,10 @@ document.getElementById('logout-btn').addEventListener('click', () => {
             eraseCookie('access_token')
             window.location.href = getCurrentBaseURL() + '/views/dashboard';
         } else {
-            console.error('Error logging out.');
+            Notiflix.Notify.failure('Error logging out.');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        Notiflix.Notify.failure('Error:', error);
     });
 });
