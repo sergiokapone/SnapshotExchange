@@ -1,0 +1,26 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h1 class="mt-5">List of routes</h1>
+  <ul class="list-group mt-4">
+    {% for route in routes %}
+
+    <li class="list-group-item">
+      <p>
+        <strong>Endpoint:</strong>
+        <strong>
+          <a href="{{ route.path }}" id="endpoint-placeholder"
+            >{{ route.path }}</a
+          >
+        </strong>
+      </p>
+      <p>
+        <strong>Method:</strong>
+        <strong class="text-primary">{{ route.method }}</strong>
+      </p>
+      <!-- <p><strong>Description:</strong> {{  rst_to_html(route.description) | safe }}</p> -->
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+<script src="/static/service.js"></script>
+{% endblock %}
