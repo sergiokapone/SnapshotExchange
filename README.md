@@ -24,6 +24,7 @@ The project is available online at [https://snapshotexchange.onrender.com/views/
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.103.0-blue.svg)
 ![Pydantic](https://img.shields.io/badge/Pydantic-2.3-blue.svg)
 ![Jinja2](https://img.shields.io/badge/jinja2-3.1.2-blue.svg)
+![Language](https://img.shields.io/badge/Language-JavaScript-blue.svg)
 ![asyncio](https://img.shields.io/badge/asyncio-included-blue.svg)
 ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0.20-blue.svg)
 ![Alembic](https://img.shields.io/badge/Alembic-1.7.3-blue.svg)

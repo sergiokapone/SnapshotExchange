@@ -10,22 +10,15 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import File, HTTPException, status
 from src.conf.config import init_cloudinary
-from src.database.models import (
-    User,
-    Role,
-    Rating,
-    Photo,
-    QR_code,
-    Tag,
-    Comment
-)
+from src.database.models import User, Role, Rating, Photo, QR_code, Tag, Comment
 
 from src.services.photos import validate_crop_mode, validate_gravity_mode
+
 
 async def get_or_create_tag(tag_name: str, db: AsyncSession) -> Tag:
     """
     Get or Create Tag
-    
+
     This function retrieves an existing tag with the specified name from the database or creates a new one if it doesn't exist.
 
     :param str tag_name: The name of the tag to retrieve or create.
@@ -61,10 +54,10 @@ async def get_or_create_tag(tag_name: str, db: AsyncSession) -> Tag:
     return tag
 
 
-async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:  
+async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
     """
     Get Photo Tags
-    
+
     This function retrieves a list of tags associated with a specific photo by its ID.
 
     :param int photo_id: The ID of the photo for which to retrieve tags.
@@ -89,18 +82,15 @@ async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
     This function constructs a database query to retrieve tag names associated with a specific photo. If tags are found, it returns a list of tag names. If no tags are associated with the photo, it returns None.
 
     """
-    
-    query = (
-        select(Tag.name)
-        .join(Photo.tags)
-        .filter(Photo.id == photo_id)
-    )
+
+    query = select(Tag.name).join(Photo.tags).filter(Photo.id == photo_id)
 
     result = await db.execute(query)
     tags = result.scalars().all()
     if tags:
         return tags
     return None
+
 
 async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]:
     """
@@ -132,31 +122,34 @@ async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]:
     This function constructs a database query to retrieve comments associated with a specific photo. It returns a list of dictionaries, where each dictionary contains the comment text and the username of the commenter.
 
     """
-    
+
     query = (
         select(Comment.text, User.username)
         .join(User)
         .filter(Comment.photo_id == photo_id)
     )
-        
+
     result = await db.execute(query)
     comments = result.all()
     if comments:
-        return [{"text": comment.text, "username": comment.user_id} for comment in comments]
+        return [
+            {"text": comment.text, "username": comment.user_id} for comment in comments
+        ]
     return []
 
+
 async def upload_photo(
-        current_user: User,
-        photo: File(),
-        description: str | None,
-        db: AsyncSession,
-        width: int | None,
-        height: int | None,
-        crop_mode: str | None,
-        rounding,
-        background_color,
-        rotation_angle: int | None,
-        tags: List[str] = [],
+    current_user: User,
+    photo: File(),
+    description: str | None,
+    db: AsyncSession,
+    width: int | None,
+    height: int | None,
+    crop_mode: str | None,
+    rounding,
+    background_color,
+    rotation_angle: int | None,
+    tags: List[str] = [],
 ) -> Photo:
     """
     Upload a Photo
@@ -206,7 +199,7 @@ async def upload_photo(
     An object containing the uploaded photo information.
 
     """
-    
+
     unique_photo_id = uuid.uuid4()
     public_photo_id = f"Photos_of_users/{current_user.username}/{unique_photo_id}"
 
@@ -237,12 +230,13 @@ async def upload_photo(
         existing_tag = await get_or_create_tag(tag_name, db)
         photo_tags.append(existing_tag)
 
-    new_photo = Photo(url=photo_url,
-                      cloud_public_id=public_id,
-                      description=description,
-                      user_id=current_user.id,
-                      tags=photo_tags
-                      )
+    new_photo = Photo(
+        url=photo_url,
+        cloud_public_id=public_id,
+        description=description,
+        user_id=current_user.id,
+        tags=photo_tags,
+    )
     try:
         db.add(new_photo)
         await db.commit()
@@ -255,7 +249,7 @@ async def upload_photo(
 
 
 async def get_my_photos(
-        skip: int, limit: int, current_user: User, db: AsyncSession
+    skip: int, limit: int, current_user: User, db: AsyncSession
 ) -> list[Photo]:
     """
     The get_photos function returns a list of all photos of current_user from the database.
@@ -274,9 +268,7 @@ async def get_my_photos(
     return photos
 
 
-async def get_photos(
-        skip: int, limit: int, db: AsyncSession
-) -> list[Photo]:
+async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[Photo]:
     """
     The get_photos function returns a list of all photos of current_user from the database.
 
@@ -286,9 +278,7 @@ async def get_photos(
     :param db: AsyncSession: Pass the database session to the function
     :return: A list of all photos
     """
-    query = (
-        select(Photo).offset(skip).limit(limit)
-    )
+    query = select(Photo).offset(skip).limit(limit)
     result = await db.execute(query)
     photos = result.scalars().all()
     return photos
@@ -310,9 +300,7 @@ async def get_photo_by_id(photo_id: int, db: AsyncSession) -> dict:
 
 
 async def update_photo(
-        current_user: User, photo_id: int,
-        description: str,
-        db: AsyncSession
+    current_user: User, photo_id: int, description: str, db: AsyncSession
 ) -> dict:
     """
     Update the description of a photo owned by the current user.
@@ -380,6 +368,7 @@ async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
             await db.rollback()
             raise e
 
+
 async def get_URL_QR(photo_id: int, db: AsyncSession):
     """
     Generate and retrieve a QR code URL for a photo.
@@ -403,13 +392,13 @@ async def get_URL_QR(photo_id: int, db: AsyncSession):
     result = await db.execute(query)
     qr = result.scalar_one_or_none()
 
-    if qr is  None:
+    if qr is None:
         qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
 
         qr.add_data(photo.url)
         qr.make(fit=True)
@@ -437,6 +426,5 @@ async def get_URL_QR(photo_id: int, db: AsyncSession):
 
         os.remove(qr_code_file_path)
         return {"source_url": photo.url, "qr_code_url": qr.url}
-
 
     return {"source_url": photo.url, "qr_code_url": qr.url}
