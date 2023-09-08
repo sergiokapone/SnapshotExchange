@@ -9,6 +9,25 @@ from sqlalchemy import Enum
 
 Base = declarative_base()
 
+class CropMode(str, enum.Enum):
+    fill = "fill"
+    thumb = "thumb"
+    fit = "fit"
+    limit = "limit"
+    pad = "pad"
+    scale = "scale"
+
+
+class BGColor(str, enum.Enum):
+    black = "black"
+    white = "white"
+    red = "red"
+    green = "green"
+    blue = "blue"
+    yellow = "yellow"
+    gray = "gray"
+    brown = "brown"
+    transparent = "transparent"
 
 photo_m2m_tags = Table(
     'photo_m2m_tags',

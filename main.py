@@ -24,7 +24,8 @@ from src.routes.comments import router as comments_router
 from src.routes.search import router as search_router
 from src.conf.config import settings
 from src.conf.info_dict import project_info
-from src.views.info import router as info_views_router
+
+from src.views.dashboard import router as dashboard_views_router
 from src.views.auth import router as auth_views_router
 from src.views.users import router as user_views_router
 from src.views.photos import router as photo_views_router
@@ -48,6 +49,7 @@ app.add_middleware(
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True,
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -95,6 +97,22 @@ async def healthchecker(session: AsyncSession = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=DB_CONNECT_ERROR,
         )
+        
+
+@app.get("/list", 
+         tags=["Root"])
+def get_all_urls_from_request(request: Request) -> list[dict]:
+    routes = [
+        {
+            "path": str(request.base_url)[:-1] + route.path, 
+            "name": route.name, 
+            "method": route.methods,
+            "description": route.description,
+        } 
+        for route in request.app.routes
+        if hasattr(route, 'description') and route.description is not None
+    ]
+    return routes
 
 
 app.include_router(auth_router, prefix="/api")
@@ -104,10 +122,10 @@ app.include_router(comments_router, prefix='/api')
 app.include_router(search_router, prefix='/api')
 app.include_router(ratings_router, prefix="/api")
 
+app.include_router(dashboard_views_router, prefix="/views")
 app.include_router(auth_views_router, prefix="/views")
 app.include_router(user_views_router, prefix="/views")
 app.include_router(photo_views_router, prefix="/views")
-app.include_router(info_views_router, prefix="/views")
 app.include_router(chat_router, prefix="/views")
 
 

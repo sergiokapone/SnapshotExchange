@@ -1,10 +1,17 @@
-const baseURL = "ws://localhost:8000"
+function getCurrentBaseURL() {
+    const protocol = window.location.protocol; 
+    const host = window.location.host; 
+    return `${protocol}//${host}`;
+}
+
 // const basURL = "wss://snapshotexchange.onrender.com"
-const ws = new WebSocket(`${baseURL}/views/ws`);
+const ws = new WebSocket(`${getCurrentBaseURL()}/views/ws`);
 ws.onmessage = function(event) {
-    var messages = document.getElementById('messages')
-    var message = document.createElement('li')
-    var content = document.createTextNode(event.data)
+
+
+    const messages = document.getElementById('messages')
+    const message = document.createElement('li')
+    const content = document.createTextNode(event.data)
     message.appendChild(content)
     messages.appendChild(message)
 };

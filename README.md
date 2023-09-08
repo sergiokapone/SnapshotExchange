@@ -1,6 +1,6 @@
 # [SnapShot Exchange](https://snapshotexchange.onrender.com/) <span><img align="right" width="32px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"/><span> </span><img align="right" width="32px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg"/></span>
 
-The project is available online at [https://snapshotexchange.onrender.com](https://snapshotexchange.onrender.com/)
+The project is available online at [https://snapshotexchange.onrender.com/views/dashboard](https://snapshotexchange.onrender.com/views/dashboard)
 
 ![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
@@ -20,14 +20,16 @@ The project is available online at [https://snapshotexchange.onrender.com](https
 
 ## Using Technologies
 
-![Language](https://img.shields.io/badge/Language-Python-blue.svg)
+![Language](https://img.shields.io/badge/Language-Python_3.10-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.103.0-blue.svg)
 ![Pydantic](https://img.shields.io/badge/Pydantic-2.3-blue.svg)
-![asyncio](https://img.shields.io/badge/asyncio-included-green.svg)
+![Jinja2](https://img.shields.io/badge/jinja2-3.1.2-blue.svg)
+![Language](https://img.shields.io/badge/Language-JavaScript-blue.svg)
+![asyncio](https://img.shields.io/badge/asyncio-included-blue.svg)
 ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0.20-blue.svg)
 ![Alembic](https://img.shields.io/badge/Alembic-1.7.3-blue.svg)
 ![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue.svg)
-![Redis](https://img.shields.io/badge/Database-Redis-red.svg)
+![Redis](https://img.shields.io/badge/Database-Redis-blue.svg)
 
 ## Description
 
@@ -62,6 +64,11 @@ For comfortable viewing of `JSON` respone in your browser we recommend to instal
 [JSON Viewer](https://chrome.google.com/webstore/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh/related?hl=ru) or
 [JSON Formatter](https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=ru) (according to your taste)
 
+### Admin Dashboard
+
+We also tried to implement an Admin Dashboard for our application to conveniently manage and control its content, settings and users.
+
+- The Admin Dashboard is available at [http://localhost:8000/views/dashboard](http://localhost:8000/views/dashboard)
 
 ### API routes
 
@@ -71,13 +78,6 @@ All documentation on interacting with our API is available at the following link
 - To view swagger documentation [http://localhost:8000/docs](http://localhost:8000/docs)
 - To view redoc documentation [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
-
-### Server side rendering
-
-We also tried to create routes on FastAPI that implement not only API routes, but also SSR (Server Side Rendering) technology to make your web pages more easily available to users.
-
-Links to view images uploaded by service users can be found here:
-- To start using pur aplication type [http://localhost:8000/views/info](http://localhost:8000/views/info)
 
 ### Chat
 

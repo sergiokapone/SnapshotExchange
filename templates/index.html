@@ -1,37 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snapshot Exchange API</title>
-    <!-- Подключаем стили Bootstrap -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
+
     <div class="container mt-5">
-        <h1 class="display-4"><b>{{ message }}</b></h1>
-        <p class="lead">Version: {{ version }}</p>
-        <p>{{ description }}</p>
-        <h2>Authors</h2>
-        <ul>
-            {% for author in authors %}
-                <li>
-                    <b><a href="{{ author.github }}" target="_blank">{{ author.name }}</a></b> - {{ author.additional_info }}
-                </li>
-            {% endfor %}
-        </ul>
-        <p>{{ license }}</p>
-        <p>Find the source code on <a href="{{ repository }}" target="_blank">GitHub</a></p>
-
-        <a href="{{ url_for('login_render') }}" class="btn btn-primary" id="btn-go-to-photos">
-            Logon
-            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-        </a>
+        <div class="row">
+            <div class="col-md-6">
+                <p class="lead"><b>Name</b>: {{ name }}</p>
+                <p class="lead"><b>Version</b>: {{ version }}</p>
+                <p>{{ description }}</p>
+                <h2>Authors</h2>
+                <ul>
+                    {% for author in authors %}
+                        <li>
+                            <b><a href="{{ author.github }}" target="_blank">{{ author.name }}</a></b> - {{ author.additional_info }}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <p>{{ license }}</p>
+                <p>Find the source code on <a href="{{ repository }}" target="_blank">GitHub</a></p>
+            </div>
+            <div class="col-md-6">
+                <div class="btn-group-vertical" role="group">
+                    <a href="{{ url_for('signup_render') }}" class="btn btn-primary mb-2">
+                        Signup
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                    <a href="{{ url_for('login_render') }}" class="btn btn-primary mb-2">
+                        Login
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                    <a href="{{ url_for('view_all_photos') }}" class="btn btn-success mb-2">
+                        Database
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                    <a href="{{ url_for('show_route_list') }}" class="btn btn-info mb-2">
+                        API List
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                    <a href="{{ current_base }}/docs" class="btn btn-info mb-2">
+                        Swagger
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                    <a href="{{ current_base }}/redoc" class="btn btn-info mb-2">
+                        Redoc
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                    <a href="{{ url_for('chat') }}" class="btn btn-dark">
+                        Chat
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+{% endblock %}

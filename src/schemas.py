@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from sqlalchemy import Enum
 from src.database.models import Role
 
 class UserSchema(BaseModel):
@@ -35,33 +36,8 @@ class PhotoRating(BaseModel):
     content: str
 
 
-class CommentSchema(BaseModel):
-    text: str = "some text"
-    photo_id: int
 
-
-class CommentList(BaseModel):
-    limit: int = 10
-    offset: int = 0
-    photo_id: int
-
-
-class CommentUpdateSchema(BaseModel):
-    id: int
-    text: str
-
-
-class CommentResponse(BaseModel):
-    username: str
-    text: str
-    photo_id: int
-
-
-class CommentRemoveSchema(BaseModel):
-    id: int
-
-
-class Rating(BaseModel):
+class RatingSchema(BaseModel):
     user_id: int
     rating: int
     photo_id: int
@@ -87,6 +63,7 @@ class UserProfileSchema(BaseModel):
     """
     Schema for user profile data.
     """
+    id: int
     username: str
     email: EmailStr
     avatar: str | None

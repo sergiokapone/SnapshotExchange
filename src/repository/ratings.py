@@ -28,16 +28,13 @@ async def create_rating(rating: int, photos_id: int, user: User, db: AsyncSessio
     :return: The created rating object.
     :rtype: Rating
     """
-    query = select(Photo).filter(Photo.id == photos_id)  # Получить информацию о фотографии по её ID
+    query = select(Photo).filter(Photo.id == photos_id)  
     photo = await db.execute(query)
     photo = photo.scalar()
 
-    if not photo:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=PHOTO_NOT_FOUND
-        )
 
     if photo.user_id == user.id:
+
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=YOUR_PHOTO
         )
@@ -47,8 +44,8 @@ async def create_rating(rating: int, photos_id: int, user: User, db: AsyncSessio
         Rating.photo_id == photos_id,
     )
     result = await db.execute(query)
-    exsist_photo = result.scalars().all()
-    if exsist_photo:
+    exsist_photo =  result.scalar_one_or_none()
+    if exsist_photo is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=ALREADY_LIKE
         )
@@ -57,7 +54,7 @@ async def create_rating(rating: int, photos_id: int, user: User, db: AsyncSessio
     try:
         db.add(new_rating)
         await db.commit()
-        await db.refresh(new_rating)
+        db.refresh(new_rating)
     except Exception as e:
         raise e
 

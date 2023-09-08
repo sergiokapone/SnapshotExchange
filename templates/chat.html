@@ -1,9 +1,5 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Chat</title>
-    </head>
-    <body>
+{% extends "base.html" %}
+{% block content %}
         <h1>WebSocket Chat</h1>
         <form action="" onsubmit="sendMessage(event)">
             <input type="text" id="messageText" autocomplete="off"/>
@@ -12,5 +8,4 @@
         <ul id='messages'>
         </ul>
         <script src="/static/chat.js"></script>
-    </body>
-</html>
+{% endblock %}

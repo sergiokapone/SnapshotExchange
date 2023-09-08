@@ -1,3 +1,5 @@
+import random
+from pathlib import Path
 from fastapi import (
     APIRouter,
     Depends,
@@ -7,7 +9,7 @@ from fastapi import (
     UploadFile,
     status,
     Query,
-    Request
+    Request,
 )
 
 from fastapi.encoders import jsonable_encoder
@@ -18,7 +20,7 @@ from src.database.connect_db import get_db
 from src.repository import photos as repository_photos
 from src.repository import users as repository_users
 from src.repository import ratings as repository_rating
-from src.database.models import User, Role
+from src.database.models import User, Role, CropMode, BGColor
 from src.schemas import (
     UserProfileSchema,
     UserResponseSchema,
@@ -49,6 +51,7 @@ from src.services.roles import Admin_Moder_User, Admin
 
 router = APIRouter(prefix="/photos", tags=["Photos"])
 
+
 @router.post(
     "/upload",
     status_code=status.HTTP_201_CREATED,
@@ -57,42 +60,75 @@ router = APIRouter(prefix="/photos", tags=["Photos"])
         Depends(RateLimiter(times=10, seconds=60)),
         Depends(Admin_Moder_User),
     ],
-    response_model=MessageResponseSchema,
+    response_model=PhotosDb,
 )
 async def upload_photo(
-    photo_file: UploadFile = File(..., file_extension=[".jpg", ".jpeg", ".png"]),
-    description: str | None = Form(None),
-    tags: list[str] = Form(None),
-    width: int = None,
-    height: int = None,
-    crop_mode: str = None,
-    gravity_mode: str = None,
-    rotation_angle: int = None,
+    photo_file: UploadFile = File(
+        ...,
+        description="Select a photo to upload (file in .jpg, .jpeg, .png format)",
+        file_extension=[".jpg", ".jpeg", ".png"],
+    ),
+    description: str
+    | None = Form(None, description="Add a description to your photo (string)"),
+    tags: list[str] = Form(
+        None, description="Tags to associate with the photo (list of strings)"
+    ),
+    width: int
+    | None = Form(
+        None, description="The desired width for the photo transformation (integer)"
+    ),
+    height: int
+    | None = Form(
+        None, description="The desired height for the photo transformation (integer)"
+    ),
+    crop_mode: CropMode = Form(
+        None, description="The cropping mode for the photo transformation (string)"
+    ),
+    rounding: int | None = Form(None, description="Rounding photo corners (in pixels)"),
+    background_color: BGColor = Form(
+        None, description="The background color for the photo transformation (string)"
+    ),
+    rotation_angle: int
+    | None = Form(None, description="The angle for the photo transformation (integer)"),
     current_user: User = Depends(auth_service.get_authenticated_user),
     db: AsyncSession = Depends(get_db),
-) -> MessageResponseSchema:
+) -> PhotosDb:
     """
-    
-    Upload a new photo
-    
+    Upload a Photo
 
-    This function allows users to upload new photos. It enforces a rate limit of 10 requests per minute. Users must be authenticated
-    and have the appropriate role to perform this action. The function accepts an uploaded photo file, an optional description,
-    the current authenticated user, and a database session.
+    This endpoint allows users to upload a new photo with various customization options.
 
-    :param photo_file: UploadFile: The photo file to be uploaded.
-    :param description: str: An optional description for the photo.
-    :param tags: An optional list of tags. Max number of tags - 5
-    :param current_user: User: The currently authenticated user.
-    :param db: AsyncSession: The database session.
-    :return: A message indicating that the photo has been uploaded.
-    :rtype: MessageResponseSchema
+    :param photo_file: The photo file to upload (required).
+    :type photo_file: UploadFile
+    :param str | None description: An optional description for the photo (string, max 500 characters).
+    :param list[str] tags: Tags to associate with the photo (list of strings, max 5 tags, each tag max 25 characters).
+    :param int | None width: The desired width for the photo transformation (integer).
+    :param int | None height: The desired height for the photo transformation (integer).
+    :param CropMode | None crop_mode: The cropping mode for the photo transformation (string).
+    :param int | None rounding: Rounding photo corners (in pixels).
+    :param BGColor | None background_color: The background color for the photo transformation (string).
+    :param int | None rotation_angle: The angle for the photo transformation (integer).
+    :param current_user: The authenticated user making the upload request.
+    :type current_user: User
+    :param db: The asynchronous database session (Dependency).
+    :type db: AsyncSession
+    :return: The uploaded photo information.
+    :rtype: PhotosDb
+    :raises HTTPException 400: If the description is too long or if there are too many tags.
+    :raises HTTPException 400: If any tag name is too long.
+    :raises HTTPException 400: If the cropping mode or background color is invalid.
+
+    **Example Response:**
+
+    An object containing the uploaded photo information.
+
     """
-    
+
     if description is not None and len(description) > 500:
         raise HTTPException(status_code=400, detail=LONG_DESCRIPTION)
 
     # check number of tags
+
     list_tags = tags[0].split(",")
     if len(list_tags) > 5:
         if len(list_tags) > 5:
@@ -107,6 +143,16 @@ async def upload_photo(
                 detail="Tag name should be no more than 25 characters long.",
             )
 
+    if crop_mode is not None:
+        crop_mode = crop_mode.name
+    else:
+        crop_mode = None
+
+    if background_color is not None:
+        background_color = background_color.name
+    else:
+        background_color = "transparent"
+
     # uploading a new photo
     new_photo = await repository_photos.upload_photo(
         current_user,
@@ -116,13 +162,22 @@ async def upload_photo(
         width,
         height,
         crop_mode,
-        gravity_mode,
+        rounding,
+        background_color,
         rotation_angle,
         list_tags,
     )
 
+    response = PhotosDb(
+        id=new_photo.id,
+        url=new_photo.url,
+        description=new_photo.description,
+        user_id=new_photo.user_id,
+        created_at=new_photo.created_at,
+        tags=list_tags,
+    )
     if new_photo:
-        return {"message": PHOTO_UPLOADED}
+        return response
 
 
 @router.get(
@@ -137,7 +192,7 @@ async def get_all_photos(
 ) -> list:
     """
     Get All Photos
-    
+
     This endpoint retrieves a list of photos from the database.
 
     :param int skip: The number of photos to skip (default is 0).
@@ -160,9 +215,9 @@ async def get_all_photos(
         Authorization: Bearer your_access_token
 
     **Example Response:**
-    
+
     .. code-block:: http
-    
+
         HTTP/1.1 200 OK
         Content-Type: application/json
 
@@ -183,16 +238,14 @@ async def get_all_photos(
         ]
 
     This documentation provides information about the /get_all endpoint, its parameters, the expected response, and potential error responses. You can include this in your Sphinx documentation for your API. If you need further details or have any specific requirements, please let me know.
-    
+
     """
-    
+
     photos = await repository_photos.get_photos(skip, limit, db)
     return photos
 
-@router.get(
-    "/get_my",
-    response_model=list[PhotosDb]
-)
+
+@router.get("/get_my", response_model=list[PhotosDb])
 async def get_my_photos(
     skip: int = 0,
     limit: int = 10,
@@ -201,7 +254,7 @@ async def get_my_photos(
 ) -> list:
     """
     Get My Photos
-    
+
 
     This endpoint retrieves a list of photos that belong to the authenticated user from the database.
 
@@ -215,7 +268,7 @@ async def get_my_photos(
     :rtype: list[PhotosDb]
     :raises HTTPException 401: Unauthorized if the user is not authenticated.
     :raises HTTPException 500: Internal Server Error if there's a database issue.
-    
+
     **Example Request:**
 
     .. code-block:: http
@@ -227,10 +280,10 @@ async def get_my_photos(
     **Example Response:**
 
     .. code-block:: http
-    
+
         HTTP/1.1 200 OK
         Content-Type: application/json
-    
+
     .. code-block:: json
 
         [
@@ -265,7 +318,7 @@ async def make_URL_QR(
 ):
     """
     Make QR Code for Photo URL
-    
+
 
     This endpoint generates a QR code for a specific photo URL.
 
@@ -291,7 +344,7 @@ async def make_URL_QR(
     **Example Response:**
 
     The response contains the generated QR code data, which can be used to display or download the QR code image.
-   
+
     .. code-block:: http
 
         HTTP/1.1 200 OK
@@ -312,6 +365,7 @@ async def make_URL_QR(
 
 @router.get(
     "/{photo_id}",
+    name="get_photo",
     status_code=status.HTTP_200_OK,
     response_model=PhotosDb,
     description="No more than 10 requests per minute",
@@ -350,7 +404,7 @@ async def get_one_photo(
     **Example Response:**
 
     The response contains the Photo object with the specified ID.
-    
+
     .. code-block:: http
 
         HTTP/1.1 200 OK
@@ -369,7 +423,7 @@ async def get_one_photo(
 
     This endpoint is rate-limited to no more than 10 requests per minute.
 
-   """
+    """
 
     photo = await repository_photos.get_photo_by_id(photo_id, db)
 
@@ -380,8 +434,10 @@ async def get_one_photo(
             status_code=status.HTTP_204_NO_CONTENT, detail=NO_PHOTO_BY_ID
         )
 
+
 @router.patch(
     "/{photo_id}",
+    name="patch_photo",
     status_code=status.HTTP_200_OK,
     description="No more than 10 requests per minute",
     dependencies=[Depends(RateLimiter(times=10, seconds=60))],
@@ -427,14 +483,14 @@ async def patch_pdate_photo(
     **Example Response:**
 
     The response contains the updated Photo object with the specified ID.
-    
+
     .. code-block:: http
 
         HTTP/1.1 200 OK
         Content-Type: application/json
 
     .. code-block:: json
-    
+
         {
             "id": 123,
             "title": "Photo 123",
@@ -448,7 +504,7 @@ async def patch_pdate_photo(
 
 
     """
-    
+
     # Updating a photo by its id
     updated_photo = await repository_photos.update_photo(
         current_user, photo_id, new_photo_description, db
@@ -460,14 +516,14 @@ async def patch_pdate_photo(
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NO_PHOTO_BY_ID)
 
 
-@router.delete("/{photo_id}", response_model=MessageResponseSchema)
+@router.delete("/{photo_id}", response_model=MessageResponseSchema, name="delete_photo")
 async def remove_photo(
     photo_id: int,
     current_user: User = Depends(auth_service.get_authenticated_user),
     db: AsyncSession = Depends(get_db),
 ) -> MessageResponseSchema:
     """
-    
+
     Remove Photo by ID
 
     This endpoint removes a specific photo by its unique ID.
@@ -494,12 +550,12 @@ async def remove_photo(
     **Example Response:**
 
     The response contains a message indicating that the photo has been successfully removed.
-   
+
     .. code-block:: http
 
         HTTP/1.1 200 OK
         Content-Type: application/json
-        
+
     .. code-block:: json
 
         {
@@ -512,3 +568,7 @@ async def remove_photo(
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NOT_FOUND)
     return {"message": PHOTO_REMOVED}
+
+
+
+

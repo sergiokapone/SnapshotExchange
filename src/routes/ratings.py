@@ -27,6 +27,7 @@ from src.conf.messages import (
     USER_NOT_ACTIVE,
     USER_ALREADY_NOT_ACTIVE,
     USER_CHANGE_ROLE_TO,
+    ALREADY_LIKE,
     FORBIDDEN,
     DELETE_SUCCESSFUL,
 )
@@ -49,17 +50,22 @@ async def created_rating(
     The function accepts the rating value, the ID of the photo being rated, the current authenticated user, and a database session.
 
     :param rating: int: The rating value.
+    
     :param photo_id: int: The ID of the photo being rated.
+    
     :param current_user: User: The currently authenticated user.
+    
     :param db: AsyncSession: The database session.
+    
     :return: The newly created rating record.
+    
     :rtype: RatingSchema
     """
 
     new_rating = await repository_ratings.create_rating(
         rating, photo_id, current_user, db
     )
-    
+
     return new_rating
 
 
@@ -71,13 +77,16 @@ async def get_rating(photo_id: int, db: AsyncSession = Depends(get_db)):
     This function retrieves the average rating for a photo with the specified ID from the database.
 
     :param photo_id: int: The ID of the photo.
+    
     :param db: AsyncSession: The database session.
+    
     :return: The average rating for the photo.
+    
     :rtype: float
     """
     rating = await repository_ratings.get_rating(photo_id, db)
     
-    print(rating)
+
     
 
     return rating
@@ -96,15 +105,20 @@ async def get_rating_ADmin_Moder(
     Only users with the 'admin' or 'moder' role can access this endpoint.
 
     :param photo_id: int: The ID of the photo.
+    
     :param current_user: User: The currently authenticated user (admin or moder).
+    
     :param db: AsyncSession: The database session.
+    
     :return: All ratings for the photo.
+    
     :rtype: List[Rating]
     """
     if current_user.role == Role.user:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=FORBIDDEN)
     else:
         new_rating = await repository_ratings.get_all_ratings(photo_id, db)
+
         return new_rating
 
 
@@ -122,10 +136,15 @@ async def delete_rating_ADmin_Moder(
     Only users with the 'admin' or 'moder' role can access this endpoint.
 
     :param photo_id: int: The ID of the photo.
+    
     :param user_id: int: The ID of the user.
+    
     :param current_user: User: The currently authenticated user (admin or moder).
+    
     :param db: AsyncSession: The database session.
+    
     :return: A message indicating successful deletion.
+    
     :rtype: MessageResponseSchema
     """
     if current_user.role == Role.user:

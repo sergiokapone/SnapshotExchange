@@ -11,13 +11,14 @@ from fastapi import (
     WebSocket,
     WebSocketException,
     status,
+    WebSocketDisconnect
 )
 
 router = APIRouter(tags=["Chat"])
 templates = Jinja2Templates(directory="templates")
 
-@router.get("/chat")
-async def get(request: Request):
+@router.get("/chat", name="chat", include_in_schema=False)
+async def chat(request: Request):
     
     """
     Get Chat HTML Page
