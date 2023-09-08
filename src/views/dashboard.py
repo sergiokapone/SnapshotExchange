@@ -45,5 +45,6 @@ async def root(request: Request):
     :rtype: HTMLResponse
     """
     
-    project_info.update({"request": request})
+    current_base = str(request.base_url)[:-1]
+    project_info.update({"request": request, "current_base": str(request.base_url)[:-1]})
     return templates.TemplateResponse("index.html", project_info)

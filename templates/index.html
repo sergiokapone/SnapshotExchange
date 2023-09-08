@@ -2,52 +2,54 @@
 {% block content %}
 
     <div class="container mt-5">
-        <!-- <h1 class="display-4"><b>Admin Dashboard</b></h1> -->
-        <p class="lead"><b>Name</b>: {{ name }}</p>
-        <p class="lead"><b>Version</b>: {{ version }}</p>
-        <p>{{ description }}</p>
-        <h2>Authors</h2>
-        <ul>
-            {% for author in authors %}
-                <li>
-                    <b><a href="{{ author.github }}" target="_blank">{{ author.name }}</a></b> - {{ author.additional_info }}
-                </li>
-            {% endfor %}
-        </ul>
-        <p>{{ license }}</p>
-        <p>Find the source code on <a href="{{ repository }}" target="_blank">GitHub</a></p>
         <div class="row">
-            <div class="col">
-                <a href="{{ url_for('signup_render') }}" class="btn btn-primary btn-block" id="btn-go-to-signup">
-                    Signup
-                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                </a>
+            <div class="col-md-6">
+                <p class="lead"><b>Name</b>: {{ name }}</p>
+                <p class="lead"><b>Version</b>: {{ version }}</p>
+                <p>{{ description }}</p>
+                <h2>Authors</h2>
+                <ul>
+                    {% for author in authors %}
+                        <li>
+                            <b><a href="{{ author.github }}" target="_blank">{{ author.name }}</a></b> - {{ author.additional_info }}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <p>{{ license }}</p>
+                <p>Find the source code on <a href="{{ repository }}" target="_blank">GitHub</a></p>
             </div>
-            <div class="col">
-                <a href="{{ url_for('login_render') }}" class="btn btn-primary btn-block" id="btn-go-to-login">
-                    Login
-                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                </a>
-            </div>
-            <div class="col">
-                <a href="{{ url_for('view_all_photos') }}" class="btn btn btn-info btn-block" id="btn-go-to-database">
-                    Database
-                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                </a>
-            </div>
-            <div class="col">
-                <a href="{{ url_for('show_route_list') }}" class="btn btn btn-info btn-block" id="btn-go-to-database">
-                    API List
-                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                </a>
-            </div>
-            <div class="col">
-                <a href="{{ url_for('chat') }}" class="btn btn btn-info btn-block" id="btn-go-to-database">
-                    Chat
-                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                </a>
+            <div class="col-md-6">
+                <div class="btn-group-vertical" role="group">
+                    <a href="{{ url_for('signup_render') }}" class="btn btn-primary mb-2">
+                        Signup
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                    <a href="{{ url_for('login_render') }}" class="btn btn-primary mb-2">
+                        Login
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                    <a href="{{ url_for('view_all_photos') }}" class="btn btn-success mb-2">
+                        Database
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                    <a href="{{ url_for('show_route_list') }}" class="btn btn-info mb-2">
+                        API List
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                    <a href="{{ current_base }}/docs" class="btn btn-info mb-2">
+                        Swagger
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                    <a href="{{ current_base }}/redoc" class="btn btn-info mb-2">
+                        Redoc
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                    <a href="{{ url_for('chat') }}" class="btn btn-dark">
+                        Chat
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </a>
+                </div>
             </div>
         </div>
-
     </div>
 {% endblock %}
