@@ -1,63 +1,6 @@
-function getCurrentBaseURL() {
-    const protocol = window.location.protocol; 
-    const host = window.location.host; 
-    return `${protocol}//${host}`;
-}
-
-
-// document.getElementById('signup-form').addEventListener('submit', handleSignup);
-
-// async function handleSignup(e) {
-//     e.preventDefault(); 
-
-//     const formData = new FormData(e.target);
-//     const url = getCurrentBaseURL() + '/api/auth/signup'; 
-
-//     try {
-//         const response = await fetch(url, {
-//             method: 'POST',
-//             body: formData,
-//         });
-
-//         if (response.ok) {
-            
-//             window.location.href = getCurrentBaseURL() + '/views/dashboard';
-//         } else {
-//             console.error('Error during signup.');
-//         }
-//     } catch (error) {
-//         console.error('Error:', error);
-//     }
-// }
-
-
-document.getElementById('logout-btn').addEventListener('click', () => {
-    const accessToken = localStorage.getItem('access_token');
-    const url = getCurrentBaseURL() + '/api/auth/logout';
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`, 
-        },
-        
-    })
-    .then(response => {
-        if (response.ok) {
-            localStorage.removeItem('access_token');
-            window.location.href = getCurrentBaseURL() + '/views/dashboard';
-        } else {
-            console.error('Error logging out.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-});
-
-
 async function deletePhoto(photoId) {
     const url = getCurrentBaseURL() + '/api/photos/' + photoId;
-    const accessToken = localStorage.getItem('access_token');
+    const accessToken = getCookie('access_token');
 
    
         try {
@@ -77,7 +20,7 @@ async function deletePhoto(photoId) {
             }
         } catch (error) {
             console.error("Error when deleting a photo:", error);
-            consile.log("Error when deleting a photo.");
+            console.log("Error when deleting a photo.");
         }
 }
 
@@ -100,7 +43,7 @@ const uploadButton = document.getElementById('upload-button');
 uploadButton.addEventListener('click', () => {
 
     const url = getCurrentBaseURL() + '/api/photos/upload';
-    const accessToken = localStorage.getItem('access_token');
+    const accessToken = getCookie('access_token');
 
     const formData = new FormData(document.getElementById('upload-photo-form'));
 
@@ -121,5 +64,28 @@ uploadButton.addEventListener('click', () => {
     })
     .catch(error => {
         console.error('Error when uploading photo:', error);
+    });
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+    const accessToken = getCookie('access_token');
+    const url = getCurrentBaseURL() + '/api/auth/logout';
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`, 
+        },
+        
+    })
+    .then(response => {
+        if (response.ok) {
+            eraseCookie('access_token')
+            window.location.href = getCurrentBaseURL() + '/views/dashboard';
+        } else {
+            console.error('Error logging out.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
     });
 });

@@ -140,7 +140,7 @@ async def signup(
 
 @router.post("/login", response_model=TokenSchema)
 async def login(
-    response:Response,
+    # response:Response,
     body: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
     """
@@ -191,7 +191,7 @@ async def login(
     refresh_token = await auth_service.create_refresh_token(data={"email": user.email})
     await repository_users.update_token(user, refresh_token, db)
     
-    response.set_cookie(key=COOKIE_KEY_NAME, value=access_token, httponly=True)
+    # response.set_cookie(key=COOKIE_KEY_NAME, value=access_token, httponly=True)
 
     tokens = TokenSchema(access_token=access_token, refresh_token=refresh_token)
 

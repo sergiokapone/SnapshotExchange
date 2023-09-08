@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snapshot Exchange API</title>
+    <!-- Подключаем стили Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Styles to improve appearance -->
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header class="bg-dark text-light text-center pt-2 pb-2 fixed-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1>Admin Dashboard</h1>
+                </div>
+            </div>
+        </div>
+    </header>    
+    <main class="mt-5 pt-5 mb-5 pb-5">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="bg-dark text-light text-center pt-3 fixed-bottom">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; 2023 FastAPICoders. All rights reserved.</p>
+                </div>
+                <div class="col-md-6">
+                    <ul class="list-inline">
+                        <li class="list-inline-item"><a href="https://github.com/sergiokapone/SnapshotExchange" target="_blank">Find the source code on GitHub</a></li>
+                        <li class="list-inline-item"><a href="https://choosealicense.com/licenses/mit/" target="_blank">MIT License</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/static/modal.js"></script>    
+</body>
+</html>

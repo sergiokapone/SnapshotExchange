@@ -31,8 +31,8 @@ from src.services.auth import auth_service
 router = APIRouter(tags=["Views"])
 
 
-@router.get("/view_all_photos", include_in_schema=False, name="view_all_photos")
-async def view_all_photos(
+@router.get("/database", include_in_schema=False, name="view_all_photos")
+async def view_database(
     request: Request,
     skip: int = 0,
     limit: int = 10,

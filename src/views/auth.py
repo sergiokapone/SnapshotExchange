@@ -112,73 +112,73 @@ async def login_page(request: Request):
     
     return templates.TemplateResponse("login.html", {"request": request})
 
-@router.post("/login_form", name="login_form", include_in_schema=False)
-async def login(
-    request: Request,
-    response: Response,
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    User Login
+# @router.post("/login_form", name="login_form", include_in_schema=False)
+# async def login(
+#     request: Request,
+#     response: Response,
+#     form_data: OAuth2PasswordRequestForm = Depends(),
+#     db: AsyncSession = Depends(get_db)
+# ):
+#     """
+#     User Login
 
-    This endpoint handles user authentication and login using a form submission.
+#     This endpoint handles user authentication and login using a form submission.
 
-    :param request: The HTTP request object.
-    :type request: Request
-    :param response: The HTTP response object.
-    :type response: Response
-    :param form_data: The form data containing the username and password.
-    :type form_data: OAuth2PasswordRequestForm
-    :param db: The asynchronous database session (Dependency).
-    :type db: AsyncSession
-    :return: A redirect response to the user's photo view or an error response if authentication fails.
-    :rtype: RedirectResponse or HTTPException
+#     :param request: The HTTP request object.
+#     :type request: Request
+#     :param response: The HTTP response object.
+#     :type response: Response
+#     :param form_data: The form data containing the username and password.
+#     :type form_data: OAuth2PasswordRequestForm
+#     :param db: The asynchronous database session (Dependency).
+#     :type db: AsyncSession
+#     :return: A redirect response to the user's photo view or an error response if authentication fails.
+#     :rtype: RedirectResponse or HTTPException
 
-    **Example Request:**
+#     **Example Request:**
 
-    .. code-block:: http
+#     .. code-block:: http
 
-        POST /login_form HTTP/1.1
-        Host: yourapi.com
-        Content-Type: application/x-www-form-urlencoded
+#         POST /login_form HTTP/1.1
+#         Host: yourapi.com
+#         Content-Type: application/x-www-form-urlencoded
 
-        username=user@example.com&password=your_password
+#         username=user@example.com&password=your_password
 
-    **Example Response (Success):**
+#     **Example Response (Success):**
 
-    A redirect response to the user's photo view with an access token cookie.
+#     A redirect response to the user's photo view with an access token cookie.
 
-    **Example Response (Failure):**
+#     **Example Response (Failure):**
 
-    An HTTP error response with a status code of 401 Unauthorized if authentication fails.
-    """
+#     An HTTP error response with a status code of 401 Unauthorized if authentication fails.
+#     """
     
     
-    # Get the data from the form
-    username = form_data.username
-    password = form_data.password
+#     # Get the data from the form
+#     username = form_data.username
+#     password = form_data.password
 
-    # Perform username and password verification
-    user = await repository_users.get_user_by_email(username, db)
+#     # Perform username and password verification
+#     user = await repository_users.get_user_by_email(username, db)
     
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid username or password",
-        )
+#     if user is None:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Invalid username or password",
+#         )
 
-    if not auth_service.verify_password(password, user.password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid username or password",
-        )
+#     if not auth_service.verify_password(password, user.password):
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Invalid username or password",
+#         )
 
 
-    access_token = await auth_service.create_access_token(data={"email": user.email})
+#     access_token = await auth_service.create_access_token(data={"email": user.email})
     
-    response = RedirectResponse(url=request.url_for("view_all_photos"), status_code=302)
+#     response = RedirectResponse(url=request.url_for("view_all_photos"), status_code=302)
     
-    response.set_cookie(key=COOKIE_KEY_NAME, value=access_token, httponly=True)
+#     response.set_cookie(key=COOKIE_KEY_NAME, value=access_token, httponly=True)
         
-    return response
+#     return response
