@@ -101,14 +101,18 @@ async def healthchecker(session: AsyncSession = Depends(get_db)):
 
 @app.get("/list", 
          tags=["Root"])
-def get_all_urls_from_request(request: Request):
-    url_list = [
-        {"path": route.path, 
-         "name": route.name, 
-         "method": route.methods,
-        }
+def get_all_urls_from_request(request: Request) -> list[dict]:
+    routes = [
+        {
+            "path": str(request.base_url)[:-1] + route.path, 
+            "name": route.name, 
+            "method": route.methods,
+            "description": route.description,
+        } 
+        for route in request.app.routes
+        if hasattr(route, 'description') and route.description is not None
     ]
-    return url_list
+    return routes
 
 
 app.include_router(auth_router, prefix="/api")
