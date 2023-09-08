@@ -1,6 +1,6 @@
 # [SnapShot Exchange](https://snapshotexchange.onrender.com/) <span><img align="right" width="32px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"/><span> </span><img align="right" width="32px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg"/></span>
 
-The project is available online at [https://snapshotexchange.onrender.com](https://snapshotexchange.onrender.com/)
+The project is available online at [https://snapshotexchange.onrender.com/views/dashboard](https://snapshotexchange.onrender.com/views/dashboard)
 
 ![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
