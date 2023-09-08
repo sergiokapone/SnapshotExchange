@@ -41,12 +41,7 @@ async def search_by_tag(tag: str, rating_low: float, rating_high: float, start_d
                 Photo.ratings.has(and_(
                     Rating.rating >= rating_low,
                     Rating.rating <= rating_high
-                )),
-                func.DATE(Photo.created_at) >= start_data,
-                func.DATE(Photo.created_at) <= end_data,
-                Tag.name.ilike(f'%{tag}%')
-            )
-        )
+                ))))
 
     photos = await db.execute(query)
     result = photos.scalars().all()
