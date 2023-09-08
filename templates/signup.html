@@ -2,7 +2,7 @@
 {% block content %}
     <div class="container mt-5">
         <h2><b>Signup</b></h2>
-        <form id="signup-form" method="POST" action="{{ url_for('signup') }}">
+        <form id="signup-form" method="POST">
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" class="form-control" id="username" name="username" required>
@@ -22,4 +22,6 @@
             <button type="submit" class="btn btn-primary">Sign Up</button>
         </form>
     </div>
+    <script src="/static/service.js"></script>
+    <script src="/static/signup.js"></script> 
 {% endblock %}
