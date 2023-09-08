@@ -28,9 +28,10 @@ def validate_crop_mode(crop_mode):
     
     if crop_mode in ALLOWED_CROP_MODES:
         return True
+    allowed_modes = [mode for mode in ALLOWED_CROP_MODES if mode is not None]
     raise HTTPException(
         status_code=400,
-        detail=f"Invalid crop mode. Allowed crop modes are: {', '.join(ALLOWED_CROP_MODES)}"
+        detail=f"Invalid crop mode. Allowed crop modes are: {', '.join(allowed_modes)}"
     )
 
 
@@ -56,7 +57,8 @@ def validate_gravity_mode(gravity_mode):
     
     if gravity_mode in ALLOWED_GRAVITY_MODES:
         return True
+    allowed_modes = [mode for mode in ALLOWED_GRAVITY_MODES if mode is not None]
     raise HTTPException(
         status_code=400,
-        detail=f"Invalid gravity mode. Allowed gravity modes are: {', '.join(ALLOWED_GRAVITY_MODES)}"
+        detail=f"Invalid gravity mode. Allowed gravity modes are: {', '.join(allowed_modes)}"
     )
