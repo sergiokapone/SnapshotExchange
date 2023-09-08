@@ -1,16 +1,16 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
-from sqlalchemy import select, and_, cast, Date
+from sqlalchemy import select, and_, cast, Date, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo, Comment, Tag
 
 
-async def search(tag: str, rating_low: float, rating_high: float, start_data: date, end_data: date, db: AsyncSession
-                 ) -> [Photo]:
+async def search_by_tag(tag: str, rating_low: float, rating_high: float, start_data: date, end_data: date,
+                        db: AsyncSession) -> [Photo]:
     """
-    Search photos by tag, with optional filtering by rating and date range.
+    Search photos by match in tags, with optional filtering by rating and date range.
 
     :param tag: Search text
     :type tag: str
@@ -27,57 +27,56 @@ async def search(tag: str, rating_low: float, rating_high: float, start_data: da
     :return: List of photos
     :rtype: List[Photo]
     """
-    existing_tag = await db.execute(select(Tag).filter(Tag.name == tag))
-    tag_instance = existing_tag.scalar()
+    query = select(Photo).join(Tag, Photo.tags).filter(Tag.name.ilike(f"%{tag}%"))
+    if rating_low > 0 or rating_high < 999:
+        query = query.filter(Photo.ratings.has(and_(Rating.rating >= rating_low, Rating.rating <= rating_high)))
+    if start_data != datetime.now().date() - timedelta(days=365 * 60) or end_data != datetime.now().date():
+        query = query.filter(
+            cast(Photo.created_at, Date) >= start_data, cast(Photo.created_at, Date) <= end_data)
+    photos_with_tag = await db.execute(query)
+    photos = photos_with_tag.scalars().all()
+    return photos
 
-    if tag_instance:
-        if rating_low == 0 and rating_high == 999:
-            photos_with_tag = await db.execute(
-                select(Photo)
-                .filter(cast(Photo.created_at, Date) >= start_data, cast(Photo.created_at, Date) <= end_data)
-                .join(Tag.photos)
-                .filter(Tag.id == tag_instance.id)
-                )
-            photos = photos_with_tag.scalars().all()
-            return photos
-        photos_with_tag = await db.execute(
-            select(Photo)
-            .filter(cast(Photo.created_at, Date) >= start_data, cast(Photo.created_at, Date) <= end_data)
-            .join(Tag.photos)
-            .filter(Tag.id == tag_instance.id)
-            .filter(Photo.ratings.has(and_(Rating.rating >= rating_low, Rating.rating <= rating_high)))
 
-        )
-        photos = photos_with_tag.scalars().all()
-        return photos
+async def search_by_description(text: str, rating_low: float, rating_high: float, start_data: date, end_data: date,
+                                db: AsyncSession) -> [Photo]:
+    """
+    Search photos by match in description, with optional filtering by rating and date range.
 
-    elif rating_low == 0 and rating_high == 999:
-        photos_by_description = await db.execute(
-            select(Photo)
-            .filter(Photo.description.ilike(f"%{tag}%"))
-            .filter(cast(Photo.created_at, Date) >= start_data, cast(Photo.created_at, Date) <= end_data)
-        )
-        photos = photos_by_description.scalars().all()
-        return photos
+    :param text: Search text
+    :type text: str
+    :param rating_low: Minimum rating
+    :type rating_low: float
+    :param rating_high: Maximum rating
+    :type rating_high: float
+    :param start_data: Start date for the search range.
+    :type start_data: Date
+    :param end_data: End date for the search range.
+    :type end_data: Date
+    :param db: The database session
+    :type db: AsyncSession
+    :return: List of photos
+    :rtype: List[Photo]
+    """
+    query = select(Photo).filter(Photo.description.ilike(f"%{text}%"))
+    if rating_low > 0 or rating_high < 999:
+        query = query.filter(Photo.ratings.has(and_(Rating.rating >= rating_low, Rating.rating <= rating_high)))
+    if start_data != (datetime.now().date() - timedelta(days=365 * 60)) or end_data != datetime.now().date():
+        query = query.filter(
+            cast(Photo.created_at, Date) >= start_data, cast(Photo.created_at, Date) <= end_data)
 
-    photos_by_description = await db.execute(
-        select(Photo).filter(Photo.description.ilike(f"%{tag}%"))
-        .filter(Photo.ratings.has(and_(Rating.rating >= rating_low, Rating.rating <= rating_high)))
-        .filter(cast(Photo.created_at, Date) >= start_data, cast(Photo.created_at, Date) <= end_data)
-    )
+    photos_by_description = await db.execute(query)
     photos = photos_by_description.scalars().all()
-    if photos:
-        return photos
-    return []
+    return photos
 
 
-async def search_admin(tag: str, user_id: int, rating_low: float, rating_high: float, start_data: date, end_data: date,
+async def search_admin(user_id: int, text: str, rating_low: float, rating_high: float, start_data: date, end_data: date,
                        db: AsyncSession) -> [Photo]:
     """
-    Search photos for admin by tag, user, with optional filtering by rating and date range.
+    Search photos for admin by user with optional filtering by tag, rating and date range.
 
-    :param tag: Search text
-    :type tag: str
+    :param text: Search text
+    :type text: str
     :param user_id: user id for search
     :type user_id: int
     :param rating_low: Minimum rating
@@ -93,50 +92,19 @@ async def search_admin(tag: str, user_id: int, rating_low: float, rating_high: f
     :return: List of photos
     :rtype: List[Photo]
     """
-    existing_tag = await db.execute(select(Tag).filter(Tag.name == tag))
-    tag_instance = existing_tag.scalar()
+    query = select(Photo).filter_by(user_id=user_id)
+    if text:
+        if text.startswith("#"):
+            query = query.join(Tag, Photo.tags).filter(Tag.name.ilike(f"%{text.removeprefix('#')}%"))
+        else:
+            query = query.filter(Photo.description.ilike(f"%{text}%"))
 
-    if tag_instance:
-        if rating_low == 0 and rating_high == 999:
-            photos_with_tag = await db.execute(
-                select(Photo)
-                .filter(Photo.user_id == user_id)
-                .filter(cast(Photo.created_at, Date) >= start_data, cast(Photo.created_at, Date) <= end_data)
-                .join(Tag.photos)
-                .filter(Tag.id == tag_instance.id)
-                )
-            photos = photos_with_tag.scalars().all()
-            return photos
-        photos_with_tag = await db.execute(
-            select(Photo)
-            .filter(Photo.user_id == user_id)
-            .filter(cast(Photo.created_at, Date) >= start_data, cast(Photo.created_at, Date) <= end_data)
-            .join(Tag.photos)
-            .filter(Tag.id == tag_instance.id)
-            .filter(Photo.ratings.has(and_(Rating.rating >= rating_low, Rating.rating <= rating_high)))
+    if rating_low > 0 or rating_high < 999:
+        query = query.filter(Photo.ratings.has(and_(Rating.rating >= rating_low, Rating.rating <= rating_high)))
+    if start_data != (datetime.now().date() - timedelta(days=365 * 60)) or end_data != datetime.now().date():
+        query = query.filter(
+            cast(Photo.created_at, Date) >= start_data, cast(Photo.created_at, Date) <= end_data)
 
-        )
-        photos = photos_with_tag.scalars().all()
-        return photos
-
-    elif rating_low == 0 and rating_high == 999:
-        photos_by_description = await db.execute(
-            select(Photo)
-            .filter(Photo.user_id == user_id)
-            .filter(Photo.description.ilike(f"%{tag}%"))
-            .filter(cast(Photo.created_at, Date) >= start_data, cast(Photo.created_at, Date) <= end_data)
-        )
-        photos = photos_by_description.scalars().all()
-        return photos
-
-    photos_by_description = await db.execute(
-        select(Photo)
-        .filter(Photo.user_id == user_id)
-        .filter(Photo.description.ilike(f"%{tag}%"))
-        .filter(Photo.ratings.has(and_(Rating.rating >= rating_low, Rating.rating <= rating_high)))
-        .filter(cast(Photo.created_at, Date) >= start_data, cast(Photo.created_at, Date) <= end_data)
-    )
-    photos = photos_by_description.scalars().all()
-    if photos:
-        return photos
-    return []
+    photos_by_user = await db.execute(query)
+    photos = photos_by_user.scalars().all()
+    return photos

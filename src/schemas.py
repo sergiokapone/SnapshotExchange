@@ -42,6 +42,13 @@ class RatingSchema(BaseModel):
     rating: int
     photo_id: int
 
+
+class RatingSchema(BaseModel):
+    user_id: int
+    rating: int
+    photo_id: int
+
+
 class UserResponseSchema(BaseModel):
     """
     Schema for user response data.
