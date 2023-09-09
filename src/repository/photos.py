@@ -14,9 +14,8 @@ from fastapi import File, HTTPException, status
 from src.conf.config import init_cloudinary
 from src.database.models import User, Role, Rating, Photo, QR_code, Tag, Comment
 
-from src.services.photos import validate_crop_mode, validate_gravity_mode
+from src.services.photos import validate_crop_mode
 from src.repository import ratings as repository_rating
-
 
 
 async def get_or_create_tag(tag_name: str, db: AsyncSession) -> Tag:
@@ -303,7 +302,6 @@ async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[Photo]:
 
 
 async def get_photo_info(photo: Photo, db: AsyncSession):
-    
     photo = await db.execute(
         select(Photo)
         .filter(Photo.id == photo.id)
@@ -320,17 +318,17 @@ async def get_photo_info(photo: Photo, db: AsyncSession):
 
     formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
-    return  {
-                "id": photo.id,
-                "url": photo.url,
-                "QR": photo.QR.url,
-                "description": photo.description or str(),
-                "username": photo.user.username,
-                "created_at": formatted_created_at,
-                "comments": [comment for comment in photo.comments],
-                "tags": [tag.name for tag in photo.tags],
-                "rating": ratings
-             }
+    return {
+        "id": photo.id,
+        "url": photo.url,
+        "QR": photo.QR.url,
+        "description": photo.description or str(),
+        "username": photo.user.username,
+        "created_at": formatted_created_at,
+        "comments": [comment for comment in photo.comments],
+        "tags": [tag.name for tag in photo.tags],
+        "rating": ratings,
+    }
 
 
 async def get_photo_by_id(photo_id: int, db: AsyncSession) -> dict:

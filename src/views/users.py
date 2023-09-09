@@ -1,34 +1,21 @@
-from datetime import datetime
-
 from fastapi import (
     APIRouter,
     Depends,
-    File,
-    Form,
     HTTPException,
-    UploadFile,
-    status,
-    Query,
     Request,
     Cookie,
 )
 
 from fastapi.templating import Jinja2Templates
-from fastapi.encoders import jsonable_encoder
-
-templates = Jinja2Templates(directory="templates")
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database.models import User
-
 from src.database.connect_db import get_db
-from src.repository import photos as repository_photos
 from src.repository import users as repository_users
-from src.repository import ratings as repository_rating
 from src.services.auth import auth_service
 
 
+templates = Jinja2Templates(directory="templates")
 router = APIRouter(tags=["Views"])
 
 
@@ -58,7 +45,7 @@ async def view_user_profile(
     """
     if not access_token:
         return RedirectResponse(url=request.url_for("login_page"))
-    
+
     user = await repository_users.get_user_profile(username, db)
     current_user = await auth_service.get_authenticated_user(access_token, db)
     # current_user_email = current_user.email

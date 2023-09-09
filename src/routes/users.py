@@ -7,10 +7,8 @@ from fastapi import (
     Form,
     HTTPException,
     UploadFile,
-    Cookie,
     status,
 )
-from fastapi.responses import HTMLResponse, JSONResponse
 
 ### Import from Redis ###
 
@@ -49,10 +47,7 @@ from src.database.models import User, Role
 
 from src.schemas import (
     UserProfileSchema,
-    UserResponseSchema,
-    RequestEmail,
     UserDb,
-    RequestRole,
     MessageResponseSchema,
 )
 
@@ -62,7 +57,7 @@ from src.repository import users as repository_users
 
 ### Import from Services ###
 
-from src.services.roles import RoleChecker, Admin_Moder_User, Admin
+from src.services.roles import Admin_Moder_User, Admin
 from src.services.auth import auth_service
 
 

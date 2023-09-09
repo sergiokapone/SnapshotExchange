@@ -1,16 +1,13 @@
 from datetime import datetime, date, timedelta
 
-from sqlalchemy import select, and_, cast, Date, func
+from sqlalchemy import select, and_, cast, Date
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy.orm import selectinload
 
 from src.database.models import (
     User,
-    Role,
-    BlacklistToken,
     Rating,
     Photo,
-    Comment,
     Tag,
 )
 
@@ -107,15 +104,25 @@ async def search_by_description(
     photos = photos_by_description.scalars().all()
     return photos
 
+
 async def search_by_username(
     username: str,
     db: AsyncSession,
 ) -> list[Photo]:
-    
+    """
+    Search for a user by their username and retrieve a list of their photos.
+
+    :param str username: The username to search for.
+    :param AsyncSession db: The asynchronous database session.
+
+    :return: A list of photos uploaded by the user.
+    :rtype: list[Photo]
+    """
+
     query = select(User).filter_by(username=username).options(selectinload(User.photos))
     result = await db.execute(query)
     user = result.scalar()
-   
+
     return user.photos
 
 

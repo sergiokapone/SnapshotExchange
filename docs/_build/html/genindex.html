@@ -162,6 +162,8 @@
 </li>
       <li><a href="index.html#src.views.chat.chat">chat() (in module src.views.chat)</a>
 </li>
+      <li><a href="index.html#src.database.models.Photo.cloud_public_id">cloud_public_id (src.database.models.Photo attribute)</a>
+</li>
       <li><a href="index.html#src.database.models.Comment">Comment (class in src.database.models)</a>
 </li>
       <li><a href="index.html#src.schemas.CommentList">CommentList (class in src.schemas)</a>
@@ -324,6 +326,8 @@
         <li><a href="index.html#src.repository.photos.get_photo_comments">(in module src.repository.photos)</a>
 </li>
       </ul></li>
+      <li><a href="index.html#src.repository.photos.get_photo_info">get_photo_info() (in module src.repository.photos)</a>
+</li>
       <li><a href="index.html#src.repository.photos.get_photo_tags">get_photo_tags() (in module src.repository.photos)</a>
 </li>
   </ul></td>
@@ -374,8 +378,6 @@
         <li><a href="index.html#src.database.models.Comment.id">(src.database.models.Comment attribute)</a>
 </li>
         <li><a href="index.html#src.database.models.Photo.id">(src.database.models.Photo attribute)</a>
-</li>
-        <li><a href="index.html#src.database.models.Post.id">(src.database.models.Post attribute)</a>
 </li>
         <li><a href="index.html#src.database.models.QR_code.id">(src.database.models.QR_code attribute)</a>
 </li>
@@ -606,8 +608,6 @@
       <li><a href="index.html#src.database.models.Comment.photo">photo (src.database.models.Comment attribute)</a>
 
       <ul>
-        <li><a href="index.html#src.database.models.Post.photo">(src.database.models.Post attribute)</a>
-</li>
         <li><a href="index.html#src.database.models.QR_code.photo">(src.database.models.QR_code attribute)</a>
 </li>
         <li><a href="index.html#src.database.models.Rating.photo">(src.database.models.Rating attribute)</a>
@@ -638,8 +638,6 @@
       <li><a href="index.html#src.schemas.UserProfileSchema.photos_count">photos_count (src.schemas.UserProfileSchema attribute)</a>
 </li>
       <li><a href="index.html#src.schemas.PhotosDb">PhotosDb (class in src.schemas)</a>
-</li>
-      <li><a href="index.html#src.database.models.Post">Post (class in src.database.models)</a>
 </li>
       <li><a href="index.html#src.routes.comments.post_comment">post_comment() (in module src.routes.comments)</a>
 </li>
@@ -742,6 +740,12 @@
       <li><a href="index.html#src.repository.search.search_by_description">search_by_description() (in module src.repository.search)</a>
 </li>
       <li><a href="index.html#src.repository.search.search_by_tag">search_by_tag() (in module src.repository.search)</a>
+
+      <ul>
+        <li><a href="index.html#src.views.photos.search_by_tag">(in module src.views.photos)</a>
+</li>
+      </ul></li>
+      <li><a href="index.html#src.repository.search.search_by_username">search_by_username() (in module src.repository.search)</a>
 </li>
       <li><a href="index.html#src.routes.search.search_description">search_description() (in module src.routes.search)</a>
 </li>
@@ -808,6 +812,8 @@
         <li><a href="index.html#module-src.routes.auth">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     src.routes.comments
 
@@ -815,8 +821,6 @@
         <li><a href="index.html#module-src.routes.comments">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     src.routes.photos
 
@@ -921,8 +925,6 @@
       <li><a href="index.html#src.database.models.Comment.text">text (src.database.models.Comment attribute)</a>
 
       <ul>
-        <li><a href="index.html#src.database.models.Post.text">(src.database.models.Post attribute)</a>
-</li>
         <li><a href="index.html#src.schemas.CommentResponse.text">(src.schemas.CommentResponse attribute)</a>
 </li>
         <li><a href="index.html#src.schemas.CommentSchema.text">(src.schemas.CommentSchema attribute)</a>
@@ -992,8 +994,6 @@
 
       <ul>
         <li><a href="index.html#src.database.models.Photo.user_id">(src.database.models.Photo attribute)</a>
-</li>
-        <li><a href="index.html#src.database.models.Post.user_id">(src.database.models.Post attribute)</a>
 </li>
         <li><a href="index.html#src.database.models.Rating.user_id">(src.database.models.Rating attribute)</a>
 </li>

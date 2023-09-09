@@ -24,7 +24,7 @@ conf = ConnectionConfig(
 
 async def send_email(email: EmailStr, username: str, host: str):
     """The send_email function sends an email to the user with a link to confirm their email address.
-    
+
     The function takes in three arguments:
 
     - email: the user's email address, which is used as a unique identifier for them.
@@ -78,8 +78,6 @@ async def reset_password_by_email(
         )
 
         fm = FastMail(conf)
-        await fm.send_message(
-            message, template_name="reset_password.html"
-        )
+        await fm.send_message(message, template_name="reset_password.html")
     except ConnectionErrors as err:
         print(err)

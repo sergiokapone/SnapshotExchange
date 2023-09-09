@@ -3,7 +3,7 @@ from uvicorn.config import logger
 
 
 from jose import JWTError, jwt
-from fastapi import HTTPException, status, Depends, Header, Request, Response
+from fastapi import HTTPException, status, Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
@@ -15,7 +15,6 @@ from src.conf.config import settings
 from src.conf.messages import (
     FAIL_EMAIL_VERIFICATION,
     INVALID_SCOPE,
-    INVALID_TOKEN,
     NOT_VALIDATE_CREDENTIALS,
 )
 
@@ -203,7 +202,6 @@ class Auth:
     async def allow_rout(
         self, request: Request, db: AsyncSession = Depends(get_db)
     ) -> User:
-        
         """
         Authenticate a user for accessing a private route.
 
@@ -217,13 +215,13 @@ class Auth:
         :rtype: User
         :raises HTTPException 401: Unauthorized if the user is not authenticated or the access token is missing.
         """
-        
+
         try:
             token = request.cookies.get(COOKIE_KEY_NAME)
             print(token)
             user = await self.get_authenticated_user(token, db)
             return user
-        except Exception as e:
+        except Exception:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="No access token provided",
@@ -263,7 +261,7 @@ class Auth:
             if is_invalid_token:
                 raise credentials_exception
 
-        except JWTError as e:
+        except JWTError:
             raise credentials_exception
 
         # get user from redis_cache

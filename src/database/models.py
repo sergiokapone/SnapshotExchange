@@ -7,18 +7,16 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Integer,
-    Numeric,
     String,
     Table,
     Text,
     func,
 )
-from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy_utils import aggregated
 from sqlalchemy import Enum
 
 from src.database.connect_db import Base
+
 # Base = declarative_base()
 
 
@@ -49,6 +47,7 @@ photo_m2m_tags = Table(
     Column("photo_id", Integer, ForeignKey("photos.id")),
     Column("tag_id", Integer, ForeignKey("tags.id")),
 )
+
 
 class Role(enum.Enum):
     """

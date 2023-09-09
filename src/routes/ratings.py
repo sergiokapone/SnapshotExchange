@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.connect_db import get_db
 from src.repository import ratings as repository_ratings
@@ -6,28 +6,14 @@ from src.repository import ratings as repository_ratings
 from src.database.models import User, Role
 
 from src.schemas import (
-    UserProfileSchema,
-    UserResponseSchema,
-    RequestEmail,
-    UserDb,
-    RequestRole,
-    PhotoRating,
     RatingSchema,
 )
 
 
 from src.services.auth import auth_service
 
-from src.services.roles import RoleChecker
 
 from src.conf.messages import (
-    NOT_FOUND,
-    USER_ROLE_IN_USE,
-    INVALID_EMAIL,
-    USER_NOT_ACTIVE,
-    USER_ALREADY_NOT_ACTIVE,
-    USER_CHANGE_ROLE_TO,
-    ALREADY_LIKE,
     FORBIDDEN,
     DELETE_SUCCESSFUL,
 )
@@ -36,9 +22,7 @@ from src.conf.messages import (
 router = APIRouter(prefix="/ratings", tags=["Ratings"])
 
 
-@router.post("/created_rating/",
-             status_code=201,
-             response_model=RatingSchema)
+@router.post("/created_rating/", status_code=201, response_model=RatingSchema)
 async def created_rating(
     photo_id: int,
     rating: int,
@@ -52,15 +36,15 @@ async def created_rating(
     The function accepts the rating value, the ID of the photo being rated, the current authenticated user, and a database session.
 
     :param rating: int: The rating value.
-    
+
     :param photo_id: int: The ID of the photo being rated.
-    
+
     :param current_user: User: The currently authenticated user.
-    
+
     :param db: AsyncSession: The database session.
-    
+
     :return: The newly created rating record.
-    
+
     :rtype: RatingSchema
     """
 
@@ -79,17 +63,14 @@ async def get_rating(photo_id: int, db: AsyncSession = Depends(get_db)):
     This function retrieves the average rating for a photo with the specified ID from the database.
 
     :param photo_id: int: The ID of the photo.
-    
+
     :param db: AsyncSession: The database session.
-    
+
     :return: The average rating for the photo.
-    
+
     :rtype: float
     """
     rating = await repository_ratings.get_rating(photo_id, db)
-    
-
-    
 
     return rating
 
@@ -107,13 +88,13 @@ async def get_rating_ADmin_Moder(
     Only users with the 'admin' or 'moder' role can access this endpoint.
 
     :param photo_id: int: The ID of the photo.
-    
+
     :param current_user: User: The currently authenticated user (admin or moder).
-    
+
     :param db: AsyncSession: The database session.
-    
+
     :return: All ratings for the photo.
-    
+
     :rtype: List[Rating]
     """
     if current_user.role == Role.user:
@@ -138,15 +119,15 @@ async def delete_rating_ADmin_Moder(
     Only users with the 'admin' or 'moder' role can access this endpoint.
 
     :param photo_id: int: The ID of the photo.
-    
+
     :param user_id: int: The ID of the user.
-    
+
     :param current_user: User: The currently authenticated user (admin or moder).
-    
+
     :param db: AsyncSession: The database session.
-    
+
     :return: A message indicating successful deletion.
-    
+
     :rtype: MessageResponseSchema
     """
     if current_user.role == Role.user:
