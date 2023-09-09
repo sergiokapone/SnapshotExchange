@@ -18,7 +18,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import aggregated
 from sqlalchemy import Enum
 
-Base = declarative_base()
+from src.database.connect_db import Base
+# Base = declarative_base()
 
 
 class CropMode(str, enum.Enum):
@@ -48,7 +49,6 @@ photo_m2m_tags = Table(
     Column("photo_id", Integer, ForeignKey("photos.id")),
     Column("tag_id", Integer, ForeignKey("tags.id")),
 )
-
 
 class Role(enum.Enum):
     """
@@ -117,7 +117,7 @@ class User(Base):
     description: Mapped[str] = mapped_column(String(500), nullable=True, unique=False)
 
     ratings: Mapped["Rating"] = relationship("Rating", back_populates="user")
-    photos: Mapped["Photo"] = relationship("Photo", back_populates="user")
+    photos: Mapped[list] = relationship("Photo", back_populates="user")
 
 
 class Post(Base):
@@ -191,7 +191,7 @@ class Photo(Base):
     )
     user: Mapped["User"] = relationship("User", back_populates="photos")
 
-    comments: Mapped["Comment"] = relationship(
+    comments: Mapped[list] = relationship(
         "Comment", back_populates="photo", cascade="all, delete-orphan"
     )
 

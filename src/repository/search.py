@@ -3,6 +3,7 @@ from datetime import datetime, date, timedelta
 from sqlalchemy import select, and_, cast, Date, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy.orm import selectinload
 
 from src.database.models import (
     User,
@@ -107,6 +108,17 @@ async def search_by_description(
     photos_by_description = await db.execute(query)
     photos = photos_by_description.scalars().all()
     return photos
+
+async def search_by_username(
+    username: str,
+    db: AsyncSession,
+) -> list[Photo]:
+    
+    query = select(User).filter_by(username=username).options(selectinload(User.photos))
+    result = await db.execute(query)
+    user = result.scalar()
+   
+    return user.photos
 
 
 async def search_admin(

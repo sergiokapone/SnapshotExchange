@@ -135,6 +135,10 @@ async def search_by_tag(
         photos = await repository_search.search_by_description(
             query, rating_low, rating_high, start_date, end_date, db
         )
+    elif search_type == "username":
+        photos = await repository_search.search_by_username(
+            query, db
+        )
     else:
         # Обработка неверного значения search_type, например, бросить ошибку
         return JSONResponse(content={"error": "Invalid search_type"}, status_code=400)
