@@ -11,10 +11,11 @@
           <i class="fas fa-sign-out-alt"></i> Logout
         </button>
       </div>
-      <form id="search-form" class="row align-items-center">
+      <!-- Search Form -->
+      <form method="get" action="{{ url_for('search_by_tag') }}" class="row align-items-center">
         <div class="col-md-4">
           <div class="form-group">
-            <input type="text" class="form-control" id="search-text" name="search_text">
+            <input type="text" class="form-control" id="search-text" name="query">
           </div>
         </div>
         <div class="col-md-2">
@@ -27,10 +28,11 @@
         </div>
         <div class="col-md-2">
           <div class="form-group">
-          <button type="submit" class="btn btn-primary btn-block">Search</button>
+            <button type="submit" class="btn btn-primary btn-block">Search</button>
+          </div>
         </div>
-        </div>
-      </form>                
+      </form>
+      <!-- end of Search Form -->
       <table class="table table-bordered">
         <thead>
           <tr>

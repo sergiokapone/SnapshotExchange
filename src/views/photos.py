@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from fastapi import (
     APIRouter,
@@ -10,7 +10,8 @@ from fastapi import (
     status,
     Query,
     Request,
-    Cookie
+    Cookie,
+    Path
 )
 
 from fastapi.templating import Jinja2Templates
@@ -26,6 +27,7 @@ from src.database.models import User
 from src.repository import photos as repository_photos
 from src.repository import users as repository_users
 from src.repository import ratings as repository_rating
+from src.repository import search as repository_search
 from src.services.auth import auth_service
 
 
@@ -104,6 +106,69 @@ async def view_database(
                 "photos": detailed_info, 
                 "skip": skip, 
                 "limit": limit,
+                "access_token": access_token
+               }
+
+    return templates.TemplateResponse("database.html", context)
+
+@router.get("/search", name="search_by_tag")
+async def search_by_tag(
+    request: Request,
+    query: str,
+    search_type: str,
+    access_token: str = Cookie(None),
+    rating_low: float = Query(0),
+    rating_high: float = Query(999),
+    start_data: str = Query(datetime.now().date() - timedelta(days=365 * 60)),
+    end_data: str = Query(datetime.now().date()),
+    db: AsyncSession = Depends(get_db),
+):
+    start_date = datetime.strptime(str(start_data), "%Y-%m-%d").date()
+    end_date = datetime.strptime(str(end_data), "%Y-%m-%d").date()
+          
+    if search_type == "tag":
+        photos = await repository_search.search_by_tag(
+            query, rating_low, rating_high, start_date, end_date, db
+        )
+    elif search_type == "description":
+        
+        photos = await repository_search.search_by_description(
+            query, rating_low, rating_high, start_date, end_date, db
+        )
+    else:
+        # Обработка неверного значения search_type, например, бросить ошибку
+        return JSONResponse(content={"error": "Invalid search_type"}, status_code=400)
+    
+    detailed_info = []
+    for photo in photos:
+        user = await repository_users.get_user_by_user_id(photo.user_id, db)
+        tags = await repository_photos.get_photo_tags(photo.id, db)
+        comments = await repository_photos.get_photo_comments(photo.id, db)
+        username = user.username if user else None
+        rating = await repository_rating.get_rating(photo.id, db)
+        formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        qr_code = await repository_photos.get_URL_QR(photo.id, db)
+
+        detailed_info.append(
+            {
+                "id": photo.id,
+                "url": photo.url,
+                "QR": qr_code.get("qr_code_url"),
+                "description": photo.description or str(),
+                "username": username,
+                "created_at": formatted_created_at,
+                "comments": comments,
+                "tags": tags,
+                "rating": rating,
+            },
+        )
+    detailed_info = sorted(detailed_info, key=lambda x: x["id"])
+    
+    context = {
+                "request": request, 
+                "photos": detailed_info, 
+                "skip": 0, 
+                "limit": 10,
                 "access_token": access_token
                }
 
