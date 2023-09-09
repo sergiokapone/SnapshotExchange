@@ -1,11 +1,15 @@
-function getCurrentBaseURL() {
+function getWebSocketProtocol() {
     const protocol = window.location.protocol; 
+    const isSecure = protocol === 'https:';
+    const soketprotocol = isSecure ? 'wss://' : 'ws://';
     const host = window.location.host; 
-    return `${protocol}//${host}`;
+    return `${soketprotocol}//${host}`;
 }
 
+
+
 // const basURL = "wss://snapshotexchange.onrender.com"
-const ws = new WebSocket(`${getCurrentBaseURL()}/views/ws`);
+const ws = new WebSocket(`${getWebSocketProtocol()}/views/ws`);
 ws.onmessage = function(event) {
 
 
