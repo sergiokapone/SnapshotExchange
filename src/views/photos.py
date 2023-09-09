@@ -80,8 +80,8 @@ async def search_by_tag(
     request: Request,
     query: str,
     search_type: str,
-    skip: int = 0,
-    limit: int = 10,
+    # skip: int = 0,
+    # limit: int = 10,
     access_token: str = Cookie(None),
     rating_low: float = Query(0),
     rating_high: float = Query(999),
@@ -118,8 +118,8 @@ async def search_by_tag(
     context = {
         "request": request,
         "photos": detailed_info,
-        "skip": skip,
-        "limit": limit,
+        "skip": 0,
+        "limit": len(photos)+1,
         "access_token": access_token,
     }
 

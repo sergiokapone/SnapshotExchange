@@ -119,7 +119,7 @@ async def search_by_username(
     :rtype: list[Photo]
     """
 
-    query = select(User).filter_by(username=username).options(selectinload(User.photos))
+    query = select(User).filter(User.username.ilike(f"%{username}%")).options(selectinload(User.photos))
     result = await db.execute(query)
     user = result.scalar()
 

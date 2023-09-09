@@ -219,7 +219,7 @@ class QR_code(Base):
     url: Mapped[str] = mapped_column(String(255), nullable=False)
 
     photo_id: Mapped[int] = mapped_column(Integer, ForeignKey("photos.id"))
-    photo: Mapped[int] = relationship("Photo", back_populates="QR")
+    photo: Mapped["Photo"] = relationship("Photo", back_populates="QR")
 
 
 class BlacklistToken(Base):
