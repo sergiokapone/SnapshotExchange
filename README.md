@@ -2,8 +2,13 @@
 
 The project is available online at [https://snapshotexchange.onrender.com/views/dashboard](https://snapshotexchange.onrender.com/views/dashboard)
 
+<img src="./images/QR.png" alt="drawing" width="100"/>
+
+
+
 ![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 
 ## Table of contents
 
