@@ -36,7 +36,9 @@ from src.conf.messages import (
 router = APIRouter(prefix="/ratings", tags=["Ratings"])
 
 
-@router.post("/created_rating/", response_model=RatingSchema)
+@router.post("/created_rating/",
+             status_code=201,
+             response_model=RatingSchema)
 async def created_rating(
     photo_id: int,
     rating: int,
