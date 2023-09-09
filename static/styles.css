@@ -27,3 +27,21 @@ thead th {
 td {
     font-size: small;
 }
+
+/* Comment ID styling */
+.comment-id {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+/* Stylization of the comment text */
+.comment-text {
+    color: #333; /* Цвет текста */
+}
+
+/* User name styling */
+.comment-username {
+    font-style: italic;
+    margin-left: 5px;
+    color: red; /* User name color */
+}

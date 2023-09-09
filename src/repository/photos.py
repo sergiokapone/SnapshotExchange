@@ -309,7 +309,7 @@ async def get_photo_info(photo: Photo, db: AsyncSession):
             selectinload(Photo.user),
             selectinload(Photo.comments).joinedload(Comment.user),
             selectinload(Photo.tags),
-            selectinload(Photo.QR),
+            # selectinload(Photo.QR),
         )
     )
     photo = photo.scalar_one()
@@ -317,11 +317,13 @@ async def get_photo_info(photo: Photo, db: AsyncSession):
     ratings = await repository_rating.get_rating(photos_id=photo.id, db=db)
 
     formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
+    
+    qr_code = await get_URL_QR(photo.id, db)
 
     return {
         "id": photo.id,
         "url": photo.url,
-        "QR": photo.QR.url,
+        "QR": qr_code.get("qr_code_url"),
         "description": photo.description or str(),
         "username": photo.user.username,
         "created_at": formatted_created_at,
