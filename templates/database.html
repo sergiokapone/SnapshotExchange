@@ -1,116 +1,190 @@
 {% extends "base.html" %} {% block content %}
-<div class="container mt-5">
+<div class="container-fluid">
   <div class="row">
-    <div class="col-md-12">
-      <!-- <h1 class="display-4"><b>Database</b></h1> -->
-      <div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- Sidebar -->
+    <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+      <div class="position-sticky">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" href="{{ url_for('dashboard') }}">
+              <i class="fas fa-home"></i> Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="{{ url_for('view_all_photos') }}">
+              <i class="fas fa-database"></i> Database
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active"
+              href="{{ url_for('show_route_list') }}"
+            >
+            <i class="fas fa-list"></i> API List
+              <span
+                class="spinner-border spinner-border-sm d-none"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link active" href="{{ current_base }}/docs" >
+              <i class="fas fa-list"></i> Swagger
+              <span
+                class="spinner-border spinner-border-sm d-none"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="{{ current_base }}/redoc" >
+              <i class="fas fa-list"></i> Redoc
+              <span
+                class="spinner-border spinner-border-sm d-none"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="{{ url_for('chat') }}" >
+              <i class="fas fa-comments"></i>  Chat
+              <span
+                class="spinner-border spinner-border-sm d-none"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- Main content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <!-- Header -->
+      <div
+        class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom"
+      >
+        <h1 class="h2">Database Content</h1>
+        <div class="btn-toolbar">
+          <!-- Logout Button -->
+          <button class="btn btn-danger" id="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Add Photo Button -->
+      <div class="text-right mb-3">
         <button class="btn btn-primary" id="add-photo-btn">
           <i class="fas fa-plus"></i> Add Photo
         </button>
-        <button class="btn btn-primary" id="logout-btn">
-          <i class="fas fa-sign-out-alt"></i> Logout
-        </button>
       </div>
+
       <!-- Search Form -->
-      <form method="get" action="{{ url_for('search_by_tag') }}" class="row align-items-center">
-        <div class="col-md-4">
-          <div class="form-group">
-            <input type="text" class="form-control" id="search-text" name="query">
+      <form method="get" action="{{ url_for('search_by_tag') }}" class="mb-4">
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            id="search-text"
+            name="query"
+            placeholder="Search..."
+          />
+          <div class="input-group-append">
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-search"></i> Search
+            </button>
           </div>
         </div>
-        <div class="col-md-2">
-          <div class="form-group">
-            <select class="form-control" id="search-type" name="search_type">
-              <option value="tag">by Tag</option>
-              <option value="description">by Description</option>
-              <option value="username">by Username</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-md-2">
-          <div class="form-group">
-            <button type="submit" class="btn btn-primary btn-block">Search</button>
-          </div>
+        <div class="form-group mt-2">
+          <select class="form-control" id="search-type" name="search_type">
+            <option value="tag">by Tag</option>
+            <option value="description">by Description</option>
+            <option value="username">by Username</option>
+          </select>
         </div>
       </form>
-      <!-- end of Search Form -->
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Image</th>
-            <th>QR</th>
-            <th>Description</th>
-            <th>Username</th>
-            <th>Tags</th>
-            <th>Comments</th>
-            <th>Rating</th>
-            <th>Created At</th>
-            <th>Operation</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for photo in photos %}
-          <tr>
-            <td>{{ photo.id }}</td>
-            <!-- Add a "modal-photo" class to handle the click -->
-            <td>
-              <img
-                src="{{ photo.url }}"
-                alt="Photo"
-                class="modal-photo"
-                data-description="{{ photo.description }}"
-              />
-            </td>
-            <td>
-              <img
-                src="{{ photo.QR }}"
-                alt="Photo"
-                class="modal-photo"
-                data-description="{{ photo.description }}"
-              />
-            </td>
-            <td>{{ photo.description }}</td>
-            <td>
-              <a
-                href="{{ url_for('view_user_profile', username=photo.username) }}"
-                >{{ photo.username }}</a
-              >
-            </td>
-            <td>
-              {% for tag in photo.tags %} {{ tag }} {% if not loop.last %}, {%
-              endif %} {% endfor %}
-            </td>
-            <td>
-              <ul>
-                {% for comment in photo.comments %}
-                <li>{{ comment.text }} (<i>{{ comment.username }}</i>)</li>
-                {% endfor %}
-              </ul>
-            </td>
-            <td>
-              <div class="rating">
-                {% for _ in range(photo.rating) %}
-                <i
-                  class="fas fa-star"
-                  style="color: orange; font-size: 8px"
-                ></i>
-                {% endfor %}
-              </div>
-            </td>
-            <td style="font-size: 14px">{{ photo.created_at }}</td>
-            <td>
-              <button
-                class="btn btn-danger delete-photo-btn"
-                data-photo-id="{{ photo.id }}"
-              >
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+
+      <!-- Table with Data -->
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Image</th>
+              <th>QR</th>
+              <th>Description</th>
+              <th>Username</th>
+              <th>Tags</th>
+              <th>Comments</th>
+              <th>Rating</th>
+              <th>Created At</th>
+              <th>Operation</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for photo in photos %}
+            <tr>
+              <td>{{ photo.id }}</td>
+              <!-- Add a "modal-photo" class to handle the click -->
+              <td>
+                <img
+                  src="{{ photo.url }}"
+                  alt="Photo"
+                  class="modal-photo img-fluid rounded"
+                  data-description="{{ photo.description }}"
+                />
+              </td>
+              <td>
+                <img
+                  src="{{ photo.QR }}"
+                  alt="QR Code"
+                  class="modal-photo img-fluid rounded"
+                  data-description="{{ photo.description }}"
+                />
+              </td>
+              <td>{{ photo.description }}</td>
+              <td>
+                <a
+                  href="{{ url_for('view_user_profile', username=photo.username) }}"
+                  >{{ photo.username }}</a
+                >
+              </td>
+              <td>
+                {% for tag in photo.tags %} {{ tag }} {% if not loop.last %}, {%
+                endif %} {% endfor %}
+              </td>
+              <td>
+                <ul>
+                  {% for comment in photo.comments %}
+                  <li>{{ comment.text }} (<i>{{ comment.username }}</i>)</li>
+                  {% endfor %}
+                </ul>
+              </td>
+              <td>
+                <div class="rating">
+                  {% for _ in range(photo.rating) %}
+                  <i class="fas fa-star" style="color: orange"></i>
+                  {% endfor %}
+                </div>
+              </td>
+              <td>{{ photo.created_at }}</td>
+              <td>
+                <button
+                  class="btn btn-danger delete-photo-btn"
+                  data-photo-id="{{ photo.id }}"
+                >
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
 
       <!-- Modal window for displaying a photo -->
       <div
@@ -124,7 +198,7 @@
         <div class="modal-dialog modal-lg" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="photoModalLabel">Фото</h5>
+              <h5 class="modal-title" id="photoModalLabel">Photo</h5>
               <button
                 type="button"
                 class="close"
@@ -193,7 +267,7 @@
                   />
                 </div>
                 <div class="form-group">
-                  <label for="description">Tags (optional):</label>
+                  <label for="tags">Tags (optional):</label>
                   <input
                     type="text"
                     class="form-control"
@@ -219,9 +293,10 @@
           </div>
         </div>
       </div>
+
       <!-- Pagination -->
       <nav aria-label="Page navigation">
-        <ul class="pagination">
+        <ul class="pagination justify-content-end">
           <li class="page-item{% if skip == 0 %} disabled{% endif %}">
             <a
               class="page-link"
@@ -244,7 +319,9 @@
           </li>
         </ul>
       </nav>
-    </div>
-    <script src="/static/service.js"></script>
-    <script src="/static/crud.js"></script>
+    </main>
+  </div>
+</div>
+<script src="/static/service.js"></script>
+<script src="/static/datebase.js"></script>
 {% endblock %}
