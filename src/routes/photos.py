@@ -1,3 +1,5 @@
+import random
+from pathlib import Path
 from fastapi import (
     APIRouter,
     Depends,
@@ -25,7 +27,7 @@ from src.schemas import (
     RequestEmail,
     UserDb,
     RequestRole,
-    MessageResponseSchema
+    MessageResponseSchema,
 )
 
 from src.schemas import PhotosDb
@@ -121,7 +123,7 @@ async def upload_photo(
     An object containing the uploaded photo information.
 
     """
-    
+
     if description is not None and len(description) > 500:
         raise HTTPException(status_code=400, detail=LONG_DESCRIPTION)
 
@@ -566,3 +568,7 @@ async def remove_photo(
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NOT_FOUND)
     return {"message": PHOTO_REMOVED}
+
+
+
+

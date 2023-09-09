@@ -1,25 +1,50 @@
-{% extends "base.html" %}
-{% block content %}
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-4">
-                <img src="{{ user.avatar or '/static/images/avatar.jpg' }}" class="img-fluid rounded-circle" alt="User Avatar">
-            </div>
-            <div class="col-md-8">
-                <h1>User Profile</h1>
-
-                <div>
-                    <p><strong>User ID:</strong> {{ user.id }}</p>
-                    <p><strong>Username:</strong> {{ user.username }}</p>
-                    <p><strong>Email:</strong> <a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
-                    <p><strong>Description:</strong> {{ user.description or "No description available" }}</p>
-                    <p><strong>Is active:</strong> {{ user.is_active }}</p>
-                    <p><strong>Count of comments:</strong> {{ user.comments_count }}</p>
-                    <p><strong>Count of posted photos:</strong> {{ user.photos_count }}</p>
-                    <!-- <p><strong>Role:</strong> {{ user.role }}</p> -->
-                    <p><strong>Created At:</strong> {{ user.created_at }}</p>
-                </div>
-            </div>
-        </div>
+{% extends "base.html" %} {% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-4">
+      <img
+        src="{{ user.avatar or '/static/images/avatar.jpg' }}"
+        class="img-fluid rounded-circle"
+        alt="User Avatar"
+      />
     </div>
+    <div class="col-md-8">
+      <h1>User Profile</h1>
+
+      <div>
+        <p><strong>User ID:</strong> {{ user.id }}</p>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p>
+          <strong>Email:</strong>
+          <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+        </p>
+        <p>
+          <strong>Description:</strong> {{ user.description or "No description
+          available" }}
+        </p>
+        <p><strong>Is active:</strong> {{ user.is_active }}</p>
+        <p><strong>Count of comments:</strong> {{ user.comments_count }}</p>
+        <p><strong>Count of posted photos:</strong> {{ user.photos_count }}</p>
+        <p><strong>Role:</strong> {{ user.role }}</p>
+        <p><strong>Created At:</strong> {{ user.created_at }}</p>
+        {% if current_user_email != user.email and user.role != "Administrator" %}
+        <button
+          type="button"
+          {% if user.is_active %}
+          class="btn btn-danger toggle-status-button"
+          {% else %}
+          class="btn btn-success toggle-status-button"
+          {% endif %}
+          data-email="{{ user.email }}"
+          data-status="{{ user.is_active }}"
+        >
+          {% if user.is_active %} Ban User {% else %} Activate User {% endif %}
+        </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/static/service.js"></script>
+<script src="/static/profile.js"></script>
 {% endblock %}

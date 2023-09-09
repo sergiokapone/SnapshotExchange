@@ -86,7 +86,7 @@ security = HTTPBearer()
 async def signup_page(request: Request):
     return templates.TemplateResponse("signup.html", {"request": request})
 
-@router.get("/login", name='login_render', include_in_schema=False)
+@router.get("/login", name='login_page', include_in_schema=False)
 async def login_page(request: Request):
     """
     Login Page

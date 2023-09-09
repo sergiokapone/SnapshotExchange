@@ -136,6 +136,7 @@ async def get_user_profile(username: str, db: AsyncSession) -> User:
         
         user_profile = UserProfileSchema(
             id=user.id,
+            role=user.role,
             username=user.username,
             email=user.email,
             avatar=user.avatar,
@@ -267,8 +268,30 @@ async def ban_user(email: str, db: AsyncSession) -> None:
     """
     user = await get_user_by_email(email, db)
     user.is_active = False
-    await db.commit()
+    try:
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise e
 
+async def activate_user(email: str, db: AsyncSession) -> None:
+    """
+    Activates a user account by setting their 'is_active' status to True.
+
+    :param str email: The email address of the user to activate.
+    :param AsyncSession db: The asynchronous database session.
+
+    :return: None
+    :rtype: None
+    """
+    user = await get_user_by_email(email, db)
+    user.is_active = True
+    try:
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise e
+    
 
 async def make_user_role(email: str, role: Role, db: AsyncSession) -> None:
     """
