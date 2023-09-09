@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database.models import User, Comment
+from src.database.models import Comment
 
 
 async def create_comment(content: str, user: str, photos_id: int, db: AsyncSession):
@@ -15,7 +15,7 @@ async def create_comment(content: str, user: str, photos_id: int, db: AsyncSessi
     :return: Comment: Comment created.
     :raises Exception: If an error occurred while creating the comment.
     """
-    
+
     comment = Comment(text=content, user=user, photo_id=photos_id)
     try:
         db.add(comment)
@@ -25,6 +25,7 @@ async def create_comment(content: str, user: str, photos_id: int, db: AsyncSessi
     except Exception as e:
         await db.rollback()
         raise e
+
 
 async def get_comment(id: int, db: AsyncSession):
     """
@@ -37,10 +38,11 @@ async def get_comment(id: int, db: AsyncSession):
     :return: The comment with the specified ID, or None if the comment is not found.
     :rtype: Comment | None
     """
-     
+
     comment = await db.get(Comment, id)
     if comment:
         return comment
+
 
 async def update_comment(text: str, id: int, db: AsyncSession):
     """
@@ -55,7 +57,7 @@ async def update_comment(text: str, id: int, db: AsyncSession):
     :return: The updated comment object.
     :rtype: Comment
     """
-    
+
     comment = await db.get(Comment, id)
     if comment:
         try:
@@ -81,7 +83,7 @@ async def delete_comment(id: int, db: AsyncSession):
     :return: The comment object.
     :rtype: Comment
     """
-    
+
     comment = await db.get(Comment, id)
     if comment:
         try:
@@ -93,12 +95,7 @@ async def delete_comment(id: int, db: AsyncSession):
             raise e
 
 
-async def get_photo_comments(
-    offset: int, 
-    limit: int, 
-    photo_id: int, 
-    db: AsyncSession):
-    
+async def get_photo_comments(offset: int, limit: int, photo_id: int, db: AsyncSession):
     """
     Gets comments on a specific photo with pagination.
 
@@ -108,18 +105,16 @@ async def get_photo_comments(
     :param db: AsyncSession: The database session for performing operations.
     :return: list[Comment]: Pagination-aware list of comments on the photo.
     """
-    
-    sq = select(Comment).filter(Comment.photo_id == photo_id).offset(offset).limit(limit)
+
+    sq = (
+        select(Comment).filter(Comment.photo_id == photo_id).offset(offset).limit(limit)
+    )
     comments = await db.execute(sq)
     result = comments.scalars().all()
     return result
 
 
-async def get_user_comments(
-    offset: int, 
-    limit: int, 
-    user_id: int, 
-    db: AsyncSession):
+async def get_user_comments(offset: int, limit: int, user_id: int, db: AsyncSession):
     """
     Review comments by photo
 

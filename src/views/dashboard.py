@@ -5,14 +5,13 @@ from fastapi import (
 )
 
 from fastapi.templating import Jinja2Templates
-from fastapi import APIRouter
 
 from src.conf.info_dict import project_info
 
 from src.services.documentation import rst_to_html
 
 templates = Jinja2Templates(directory="templates")
-templates.env.globals['rst_to_html'] = rst_to_html
+templates.env.globals["rst_to_html"] = rst_to_html
 router = APIRouter(tags=["Views"])
 
 
@@ -20,19 +19,22 @@ router = APIRouter(tags=["Views"])
 async def show_route_list(request: Request):
     routes = [
         {
-            "path": str(request.base_url)[:-1] + route.path, 
-            "name": route.name, 
+            "path": str(request.base_url)[:-1] + route.path,
+            "name": route.name,
             "method": route.methods,
             "description": route.description,
-        } 
+        }
         for route in request.app.routes
-        if hasattr(route, 'description') and route.description is not None
+        if hasattr(route, "description") and route.description is not None
     ]
-    return templates.TemplateResponse("api_description.html", {"request": request, "routes": routes})
+    return templates.TemplateResponse(
+        "api_description.html", {"request": request, "routes": routes}
+    )
 
 
-
-@router.get("/dashboard", response_class=HTMLResponse, include_in_schema=False, name="dashboard")
+@router.get(
+    "/dashboard", response_class=HTMLResponse, include_in_schema=False, name="dashboard"
+)
 async def root(request: Request):
     """
     Project Information Page
@@ -44,7 +46,9 @@ async def root(request: Request):
     :return: The HTML page displaying project information.
     :rtype: HTMLResponse
     """
-    
-    current_base = str(request.base_url)[:-1]
-    project_info.update({"request": request, "current_base": str(request.base_url)[:-1]})
+
+    str(request.base_url)[:-1]
+    project_info.update(
+        {"request": request, "current_base": str(request.base_url)[:-1]}
+    )
     return templates.TemplateResponse("index.html", project_info)

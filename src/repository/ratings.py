@@ -1,16 +1,8 @@
-from datetime import datetime
-import math
-from libgravatar import Gravatar
-import cloudinary
-import cloudinary.uploader
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm.exc import NoResultFound
 from fastapi import HTTPException, status
-from src.conf.config import init_cloudinary
 from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE
-from src.database.models import User, Role, BlacklistToken, Rating, Photo
-from src.schemas import UserSchema, UserProfileSchema
+from src.database.models import User, Rating, Photo
 
 
 async def create_rating(rating: int, photos_id: int, user: User, db: AsyncSession):
@@ -28,23 +20,19 @@ async def create_rating(rating: int, photos_id: int, user: User, db: AsyncSessio
     :return: The created rating object.
     :rtype: Rating
     """
-    query = select(Photo).filter(Photo.id == photos_id)  
+    query = select(Photo).filter(Photo.id == photos_id)
     photo = await db.execute(query)
     photo = photo.scalar()
 
-
     if photo.user_id == user.id:
-
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=YOUR_PHOTO
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=YOUR_PHOTO)
 
     query = select(Rating).filter(
         Rating.user_id == user.id,
         Rating.photo_id == photos_id,
     )
     result = await db.execute(query)
-    exsist_photo =  result.scalar_one_or_none()
+    exsist_photo = result.scalar_one_or_none()
     if exsist_photo is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=ALREADY_LIKE
@@ -57,7 +45,6 @@ async def create_rating(rating: int, photos_id: int, user: User, db: AsyncSessio
         db.refresh(new_rating)
     except Exception as e:
         raise e
-
 
     return new_rating
 
@@ -83,9 +70,9 @@ async def get_rating(photos_id: int, db: AsyncSession):
     res = 0
     for i in all_ratings:
         res += i.rating
-    
+
     average_rating = res / count_ratings
-   
+
     return int(average_rating)
 
 

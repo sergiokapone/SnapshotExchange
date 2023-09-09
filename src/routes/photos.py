@@ -1,5 +1,3 @@
-import random
-from pathlib import Path
 from fastapi import (
     APIRouter,
     Depends,
@@ -8,8 +6,6 @@ from fastapi import (
     HTTPException,
     UploadFile,
     status,
-    Query,
-    Request,
 )
 
 from fastapi.encoders import jsonable_encoder
@@ -18,36 +14,21 @@ from fastapi_limiter.depends import RateLimiter
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.connect_db import get_db
 from src.repository import photos as repository_photos
-from src.repository import users as repository_users
-from src.repository import ratings as repository_rating
-from src.database.models import User, Role, CropMode, BGColor
+from src.database.models import User, CropMode, BGColor
 from src.schemas import (
-    UserProfileSchema,
-    UserResponseSchema,
-    RequestEmail,
-    UserDb,
-    RequestRole,
     MessageResponseSchema,
 )
 
 from src.schemas import PhotosDb
 from src.services.auth import auth_service
-from src.services.roles import RoleChecker
 from src.conf.messages import (
     NOT_FOUND,
-    USER_ROLE_IN_USE,
-    INVALID_EMAIL,
-    USER_NOT_ACTIVE,
-    USER_ALREADY_NOT_ACTIVE,
-    USER_CHANGE_ROLE_TO,
-    PHOTO_UPLOADED,
     PHOTO_REMOVED,
-    NO_PHOTO_FOUND,
     NO_PHOTO_BY_ID,
     LONG_DESCRIPTION,
 )
 
-from src.services.roles import Admin_Moder_User, Admin
+from src.services.roles import Admin_Moder_User
 
 router = APIRouter(prefix="/photos", tags=["Photos"])
 
@@ -568,7 +549,3 @@ async def remove_photo(
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NOT_FOUND)
     return {"message": PHOTO_REMOVED}
-
-
-
-

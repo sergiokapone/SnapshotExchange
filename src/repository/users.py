@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import NoResultFound
 
 from src.conf.config import init_cloudinary
-from src.conf.messages import USER_NOT_ACTIVE
 from src.database.models import User, Role, BlacklistToken, Photo, Comment
 from src.schemas import UserSchema, UserProfileSchema
 
@@ -24,21 +23,19 @@ async def create_user(body: UserSchema, db: AsyncSession) -> User:
     :return: The created user object.
     :rtype: User
     """
-    avatar = None
     try:
         g = Gravatar(body.email)
-        avatar = g.get_image()
+        g.get_image()
     except Exception as e:
         print(e)
 
     new_user = User(**body.model_dump())
-    new_user.role=Role.user
+    new_user.role = Role.user
 
-    
     users_result = await db.execute(select(User))
     users_count = len(users_result.scalars().all())
 
-    if not users_count:  
+    if not users_count:
         new_user.role = Role.admin
 
     try:
@@ -48,9 +45,7 @@ async def create_user(body: UserSchema, db: AsyncSession) -> User:
         return new_user
     except Exception as e:
         await db.rollback()
-        raise e 
-
-
+        raise e
 
 
 async def edit_my_profile(
@@ -66,7 +61,7 @@ async def edit_my_profile(
     :return: A user object
     """
     result = await db.execute(select(User).filter(User.id == user.id))
-    me =  result.scalar_one_or_none()
+    me = result.scalar_one_or_none()
     if new_username:
         me.username = new_username
         me.description = new_description
@@ -81,14 +76,14 @@ async def edit_my_profile(
         width=250, height=250, crop="fill"
     )
     me.avatar = url
-    
+
     try:
         await db.commit()
         await db.refresh(me)
         return me
     except Exception as e:
         await db.rollback()
-        raise e 
+        raise e
 
 
 async def get_users(skip: int, limit: int, db: AsyncSession) -> list[User]:
@@ -102,7 +97,7 @@ async def get_users(skip: int, limit: int, db: AsyncSession) -> list[User]:
     """
     query = select(User).offset(skip).limit(limit)
     result = await db.execute(query)
-    users =  result.scalars().all()
+    users = result.scalars().all()
     return users
 
 
@@ -117,23 +112,22 @@ async def get_user_profile(username: str, db: AsyncSession) -> User:
     :return: The user profile.
     :rtype: User
     """
-    
+
     query = select(User).filter(User.username == username)
     result = await db.execute(query)
     user = result.scalar_one_or_none()
-    
+
     if user:
-        
         # Count number of photos of user with username
         photos_query = select(func.count()).where(Photo.user_id == user.id)
         photos_result = await db.execute(photos_query)
         photos_count = photos_result.scalar()
-    
-        # Count number of comments  of user with username    
+
+        # Count number of comments  of user with username
         comments_query = select(func.count()).where(Comment.user_id == user.id)
         comments_result = await db.execute(comments_query)
         comments_count = comments_result.scalar()
-        
+
         user_profile = UserProfileSchema(
             id=user.id,
             role=user.role,
@@ -159,14 +153,13 @@ async def get_user_by_email(email: str, db: AsyncSession) -> User:
     """
     try:
         result = await db.execute(select(User).filter(User.email == email))
-        user =  result.scalar_one_or_none()
+        user = result.scalar_one_or_none()
         return user
     except NoResultFound:
         return None
 
-async def get_user_by_reset_token(
-    reset_token: str, db: AsyncSession
-) -> User | None:
+
+async def get_user_by_reset_token(reset_token: str, db: AsyncSession) -> User | None:
     """
     Retrieve a user by their reset token.
 
@@ -177,7 +170,7 @@ async def get_user_by_reset_token(
     :return: The user if found, or None if not found.
     :rtype: User | None
     """
-    
+
     try:
         result = await db.execute(
             select(User).filter(User.refresh_token == reset_token)
@@ -186,6 +179,7 @@ async def get_user_by_reset_token(
         return user
     except NoResultFound:
         return None
+
 
 async def get_user_by_user_id(user_id: int, db: AsyncSession) -> User | None:
     """
@@ -198,13 +192,14 @@ async def get_user_by_user_id(user_id: int, db: AsyncSession) -> User | None:
     :return: The user with the specified ID, or None if the user is not found.
     :rtype: User | None
     """
-    
+
     try:
         result = await db.execute(select(User).filter(User.id == user_id))
         user = result.scalar_one_or_none()
         return user
     except NoResultFound:
         return None
+
 
 async def get_user_by_username(username: str, db: AsyncSession) -> User | None:
     """
@@ -236,7 +231,7 @@ async def update_token(user: User, token: str | None, db: AsyncSession) -> None:
         await db.commit()
     except Exception as e:
         await db.rollback()
-        raise e 
+        raise e
 
 
 async def confirm_email(email: str, db: AsyncSession) -> None:
@@ -253,7 +248,7 @@ async def confirm_email(email: str, db: AsyncSession) -> None:
         await db.commit()
     except Exception as e:
         await db.rollback()
-        raise e 
+        raise e
 
 
 async def ban_user(email: str, db: AsyncSession) -> None:
@@ -274,6 +269,7 @@ async def ban_user(email: str, db: AsyncSession) -> None:
         await db.rollback()
         raise e
 
+
 async def activate_user(email: str, db: AsyncSession) -> None:
     """
     Activates a user account by setting their 'is_active' status to True.
@@ -291,7 +287,7 @@ async def activate_user(email: str, db: AsyncSession) -> None:
     except Exception as e:
         await db.rollback()
         raise e
-    
+
 
 async def make_user_role(email: str, role: Role, db: AsyncSession) -> None:
     """
@@ -311,9 +307,9 @@ async def make_user_role(email: str, role: Role, db: AsyncSession) -> None:
         await db.commit()
     except Exception as e:
         await db.rollback()
-        raise e 
+        raise e
 
-   
+
 #### BLACKLIST #####
 
 
@@ -326,17 +322,14 @@ async def add_to_blacklist(token: str, db: AsyncSession) -> None:
     :return: None
     """
     blacklist_token = BlacklistToken(token=token, blacklisted_on=datetime.now())
-    
+
     try:
         db.add(blacklist_token)
         await db.commit()
         await db.refresh(blacklist_token)
     except Exception as e:
         await db.rollback()
-        raise e 
-
-
-
+        raise e
 
 
 async def is_blacklisted_token(token: str, db: AsyncSession) -> bool:

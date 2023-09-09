@@ -58,7 +58,7 @@ async def search_tag(
             tag, rating_low, rating_high, start_date, end_date, db
         )
         return {"photos": photos}
-    except ValueError as e:
+    except ValueError:
         return {"details": BAD_DATE_FORMAT}
 
 
@@ -99,7 +99,7 @@ async def search_description(
             description, rating_low, rating_high, start_date, end_date, db
         )
         return {"photos": photos}
-    except ValueError as e:
+    except ValueError:
         return {"details": BAD_DATE_FORMAT}
 
 
@@ -154,5 +154,5 @@ async def admin_search(
             user_id, text, rating_low, rating_high, start_date, end_date, db
         )
         return {"photos": photos}
-    except ValueError as e:
+    except ValueError:
         return {"details": BAD_DATE_FORMAT}

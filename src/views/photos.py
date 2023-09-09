@@ -1,37 +1,18 @@
-import asyncio
 from datetime import datetime, timedelta
-from fastapi import (
-    APIRouter,
-    Depends,
-    File,
-    Form,
-    HTTPException,
-    UploadFile,
-    status,
-    Query,
-    Request,
-    Cookie,
-    Path
-)
+from fastapi import APIRouter, Depends, Query, Request, Cookie
 
 from fastapi.templating import Jinja2Templates
-from fastapi.encoders import jsonable_encoder
 from fastapi.responses import RedirectResponse
 
-templates = Jinja2Templates(directory="templates")
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-from sqlalchemy import select
 
 from src.database.connect_db import get_db
-from src.database.models import User, Photo, Comment
 from src.repository import photos as repository_photos
-from src.repository import users as repository_users
 from src.repository import search as repository_search
-from src.services.auth import auth_service
 
 
+templates = Jinja2Templates(directory="templates")
 router = APIRouter(tags=["Views"])
 
 
@@ -71,24 +52,24 @@ async def view_database(
 
     A rendered HTML page displaying a list of photos with usernames, descriptions, comments, tags, and creation timestamps.
     """
-    
+
     if not access_token:
         return RedirectResponse(url=request.url_for("login_page"))
-       
+
     photos = await repository_photos.get_photos(skip, limit, db)
-        
+
     detailed_info = []
-    
+
     for photo in photos:
         info = await repository_photos.get_photo_info(photo, db)
         detailed_info.append(info)
 
     context = {
-        "request": request, 
-        "photos": detailed_info, 
-        "skip": skip, 
+        "request": request,
+        "photos": detailed_info,
+        "skip": skip,
         "limit": limit,
-        "access_token": access_token
+        "access_token": access_token,
     }
 
     return templates.TemplateResponse("database.html", context)
@@ -110,40 +91,36 @@ async def search_by_tag(
 ):
     start_date = datetime.strptime(str(start_data), "%Y-%m-%d").date()
     end_date = datetime.strptime(str(end_data), "%Y-%m-%d").date()
-          
+
     if search_type == "tag":
         photos = await repository_search.search_by_tag(
             query, rating_low, rating_high, start_date, end_date, db
         )
     elif search_type == "description":
-        
         photos = await repository_search.search_by_description(
             query, rating_low, rating_high, start_date, end_date, db
         )
     elif search_type == "username":
-        photos = await repository_search.search_by_username(
-            query, db
-        )
+        photos = await repository_search.search_by_username(query, db)
     else:
         # Обработка неверного значения search_type, например, бросить ошибку
         return JSONResponse(content={"error": "Invalid search_type"}, status_code=400)
-    
+
     if not access_token:
         return RedirectResponse(url=request.url_for("login_page"))
-       
-       
+
     detailed_info = []
-    
+
     for photo in photos:
         info = await repository_photos.get_photo_info(photo, db)
         detailed_info.append(info)
 
     context = {
-        "request": request, 
-        "photos": detailed_info, 
-        "skip": skip, 
+        "request": request,
+        "photos": detailed_info,
+        "skip": skip,
         "limit": limit,
-        "access_token": access_token
+        "access_token": access_token,
     }
 
     return templates.TemplateResponse("database.html", context)

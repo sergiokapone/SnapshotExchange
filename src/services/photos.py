@@ -1,9 +1,19 @@
-import re
 from fastapi import HTTPException
 
 ALLOWED_CROP_MODES = ("fill", "thumb", "fit", "limit", "pad", "scale", None)
-ALLOWED_GRAVITY_MODES = ("center", "north", "north_east", "east", "south_east",
-                         "south", "south_west", "west", "north_west", "auto", None)
+ALLOWED_GRAVITY_MODES = (
+    "center",
+    "north",
+    "north_east",
+    "east",
+    "south_east",
+    "south",
+    "south_west",
+    "west",
+    "north_west",
+    "auto",
+    None,
+)
 
 
 def validate_crop_mode(crop_mode):
@@ -17,7 +27,7 @@ def validate_crop_mode(crop_mode):
     :return: True if the crop mode is valid.
     :rtype: bool
     :raises HTTPException 400: If the crop mode is not in the list of allowed crop modes.
-    
+
     **Example Usage:**
 
     .. code-block:: python
@@ -25,13 +35,13 @@ def validate_crop_mode(crop_mode):
         validate_crop_mode('square')  # Returns True
 
     """
-    
+
     if crop_mode in ALLOWED_CROP_MODES:
         return True
     allowed_modes = [mode for mode in ALLOWED_CROP_MODES if mode is not None]
     raise HTTPException(
         status_code=400,
-        detail=f"Invalid crop mode. Allowed crop modes are: {', '.join(allowed_modes)}"
+        detail=f"Invalid crop mode. Allowed crop modes are: {', '.join(allowed_modes)}",
     )
 
 
@@ -46,7 +56,7 @@ def validate_gravity_mode(gravity_mode):
     :return: True if the gravity mode is valid.
     :rtype: bool
     :raises HTTPException 400: If the gravity mode is not in the list of allowed gravity modes.
-    
+
     **Example Usage:**
 
     .. code-block:: python
@@ -54,11 +64,11 @@ def validate_gravity_mode(gravity_mode):
         validate_gravity_mode('center')  # Returns True
 
     """
-    
+
     if gravity_mode in ALLOWED_GRAVITY_MODES:
         return True
     allowed_modes = [mode for mode in ALLOWED_GRAVITY_MODES if mode is not None]
     raise HTTPException(
         status_code=400,
-        detail=f"Invalid gravity mode. Allowed gravity modes are: {', '.join(allowed_modes)}"
+        detail=f"Invalid gravity mode. Allowed gravity modes are: {', '.join(allowed_modes)}",
     )
