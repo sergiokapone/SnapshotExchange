@@ -117,38 +117,7 @@ class User(Base):
     description: Mapped[str] = mapped_column(String(500), nullable=True, unique=False)
 
     ratings: Mapped["Rating"] = relationship("Rating", back_populates="user")
-    photos: Mapped[list] = relationship("Photo", back_populates="user")
-
-
-class Post(Base):
-    """
-    Post Model
-
-    This model represents a user post in the system.
-
-    :param int id: The unique identifier for the post (primary key).
-    :param str text: The text content of the post.
-    :param str photo: The URL or identifier of the associated photo.
-    :param int user_id: The user's ID who created the post (foreign key).
-
-    **Example Usage:**
-
-    .. code-block:: python
-
-        new_post = Post(
-            text="This is a sample post.",
-            photo="https://example.com/sample.jpg",
-            user_id=1
-        )
-
-    """
-
-    __tablename__ = "posts"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    text: Mapped[str] = mapped_column(String(500), nullable=False)
-    photo: Mapped[str] = mapped_column(String(500), nullable=False)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    photos: Mapped[list["Photo"]] = relationship("Photo", back_populates="user")
 
 
 class Photo(Base):
@@ -179,6 +148,7 @@ class Photo(Base):
     description: Mapped[str] = mapped_column(String(500), nullable=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     created_at: Mapped[date] = mapped_column("created_at", DateTime, default=func.now())
+    cloud_public_id: Mapped[str] = mapped_column(String, nullable=False)
 
     ratings: Mapped["Rating"] = relationship(
         "Rating", back_populates="photo", cascade="all, delete-orphan"
@@ -191,7 +161,7 @@ class Photo(Base):
     )
     user: Mapped["User"] = relationship("User", back_populates="photos")
 
-    comments: Mapped[list] = relationship(
+    comments: Mapped["Comment"] = relationship(
         "Comment", back_populates="photo", cascade="all, delete-orphan"
     )
 

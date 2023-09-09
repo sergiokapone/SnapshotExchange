@@ -9,7 +9,6 @@ from src.database.models import (
     User,
     Role,
     BlacklistToken,
-    Post,
     Rating,
     Photo,
     Comment,

@@ -9,7 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from fastapi import HTTPException, status
 from src.conf.config import init_cloudinary
 from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE
-from src.database.models import User, Role, BlacklistToken, Post, Rating, Photo
+from src.database.models import User, Role, BlacklistToken, Rating, Photo
 from src.schemas import UserSchema, UserProfileSchema
 
 
