@@ -10,6 +10,7 @@ from fastapi import (
     status,
     Query,
     Request,
+    Cookie,
 )
 
 from fastapi.templating import Jinja2Templates
@@ -19,24 +20,27 @@ templates = Jinja2Templates(directory="templates")
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.database.models import User
+
 from src.database.connect_db import get_db
 from src.repository import photos as repository_photos
 from src.repository import users as repository_users
 from src.repository import ratings as repository_rating
+from src.services.auth import auth_service
 
 
 router = APIRouter(tags=["Views"])
 
 
-@router.get("/view_user_profile/{username}", 
-            include_in_schema=False, 
-            name="view_user_profile")
+@router.get(
+    "/view_user_profile/{username}", include_in_schema=False, name="view_user_profile"
+)
 async def view_user_profile(
     username: str,
     request: Request,
+    access_token: str = Cookie(None),
     db: AsyncSession = Depends(get_db),
 ):
-    
     """
     View User Profile
 
@@ -52,14 +56,19 @@ async def view_user_profile(
     :rtype: templates.TemplateResponse
     :raises HTTPException 404: User not found if the user with the specified username is not found.
     """
-       
-    user = await repository_users.get_user_profile(username, db)
+    if not access_token:
+        return RedirectResponse(url=request.url_for("login_page"))
     
-    print("=================>>>>", user)
+    user = await repository_users.get_user_profile(username, db)
+    current_user = await auth_service.get_authenticated_user(access_token, db)
+    # current_user_email = current_user.email
 
+    context = {
+        "request": request,
+        "user": user,
+        "current_user_email": current_user.email,
+    }
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return templates.TemplateResponse(
-        "user_profile_page.html", {"request": request, "user": user}
-    )
+    return templates.TemplateResponse("user_profile_page.html", context)

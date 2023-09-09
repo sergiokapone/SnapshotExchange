@@ -66,6 +66,7 @@ class UserProfileSchema(BaseModel):
     id: int
     username: str
     email: EmailStr
+    role: Role
     avatar: str | None
     photos_count: int | None
     comments_count: int | None

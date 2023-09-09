@@ -15,6 +15,7 @@ from fastapi import (
 
 from fastapi.templating import Jinja2Templates
 from fastapi.encoders import jsonable_encoder
+from fastapi.responses import RedirectResponse
 
 templates = Jinja2Templates(directory="templates")
 
@@ -36,7 +37,7 @@ async def view_database(
     request: Request,
     skip: int = 0,
     limit: int = 10,
-    access_token: str = Cookie(...),
+    access_token: str = Cookie(None),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -67,6 +68,9 @@ async def view_database(
 
     A rendered HTML page displaying a list of photos with usernames, descriptions, comments, tags, and creation timestamps.
     """
+    
+    if not access_token:
+        return RedirectResponse(url=request.url_for("login_page"))
        
     photos = await repository_photos.get_photos(skip, limit, db)
 

@@ -7,6 +7,7 @@ from fastapi import (
     Form,
     HTTPException,
     UploadFile,
+    Cookie,
     status,
 )
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -31,9 +32,12 @@ from src.conf.messages import (
     USER_ROLE_IN_USE,
     INVALID_EMAIL,
     USER_NOT_ACTIVE,
+    USER_IS_ACTIVE,
     USER_ALREADY_NOT_ACTIVE,
+    USER_ALREADY_ACTIVE,
     USER_CHANGE_ROLE_TO,
     USER_EXISTS,
+    SELF_ACTIVATION,
 )
 
 ### Import from Database ###
@@ -103,21 +107,21 @@ async def edit_my_profile(
     - Current authorized user
 
     :param avatar: UploadFile: User avatar file (optional).
-    
+
     :param new_username: str: New username (optional).
-    
+
     :param new_description: str: New user description (optional).
-    
+
     :param current_user: User: Current authenticated user.
-    
+
     :param redis_client: Redis: Redis client.
-    
+
     :param db: AsyncSession: Database session.
 
     :return: Updated user profile.
-    
+
     :rtype: UserDb
-    
+
     :raises: HTTPException with code 400 and detail "USER_EXISTS" if the new username already exists.
     """
 
@@ -154,19 +158,19 @@ async def get_users(
     This route allows  to get a list of pagination-aware users.
 
     Level of Access:
-    
+
     - Current authorized user
 
     :param skip: int: Number of users to skip.
-    
+
     :param limit: int: Maximum number of users to return.
-    
+
     :param current_user: User: Current authenticated user.
-    
+
     :param db: AsyncSession: Database session.
 
     :return: List of users.
-    
+
     :rtype: List[UserDb]
     """
 
@@ -186,17 +190,17 @@ async def user_profile(
     This route allows to retrieve a user's profile by their username.
 
     Level of Access:
-    
+
     - Current authorized user
 
     :param username: str: The username of the user whose profile is to be retrieved.
-    
+
     :param current_user: User: The current authenticated user (optional).
-    
+
     :param db: AsyncSession: Database session.
 
     :return: User profile or None if no user is found.
-    
+
     :rtype: dict | None
 
     :raises: HTTPException with code 404 and detail "NOT_FOUND" if the user is not found.
@@ -212,20 +216,27 @@ async def user_profile(
 
 
 @router.patch(
-    "/ban", dependencies=[Depends(Admin)], response_model=MessageResponseSchema
+    "/ban",
+    name="ban_user",
+    dependencies=[Depends(Admin)],
+    response_model=MessageResponseSchema,
 )
-async def ban_user_by_email(email: EmailStr, db: AsyncSession = Depends(get_db)):
+async def ban_user(
+    email: EmailStr,
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
+):
     """
     **Block a user by email.**
 
     This route allows to block a user by their email.
 
     Level of Access:
-    
+
     - Administartor
 
     :param email: EmailStr: Email of the user to block.
-    
+
     :param db: AsyncSession: Database session.
 
     :return: Successful user blocking message or error message.
@@ -236,6 +247,12 @@ async def ban_user_by_email(email: EmailStr, db: AsyncSession = Depends(get_db))
 
     if not user:
         raise HTTPException(status_code=404, detail=INVALID_EMAIL)
+
+    if user.id == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=SELF_ACTIVATION,
+        )
 
     if user.is_active:
         await repository_users.ban_user(user.email, db)
@@ -248,7 +265,58 @@ async def ban_user_by_email(email: EmailStr, db: AsyncSession = Depends(get_db))
 
 
 @router.patch(
-    "/asign_role/{role}", dependencies=[Depends(Admin)], response_model=MessageResponseSchema
+    "/activate",
+    name="activate_user",
+    dependencies=[Depends(Admin)],
+    response_model=MessageResponseSchema,
+)
+async def activate_user(
+    email: EmailStr,
+    current_user: User = Depends(auth_service.get_authenticated_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    **Activate a user by email.**
+
+    This route allows to activate a user by their email.
+
+    Level of Access:
+
+    - Administartor
+
+    :param email: EmailStr: Email of the user to activate.
+
+    :param db: AsyncSession: Database session.
+
+    :return: Successful user blocking message or error message.
+    :rtype: dict
+    """
+
+    user = await repository_users.get_user_by_email(email, db)
+
+    if user.id == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=SELF_ACTIVATION,
+        )
+
+    if not user:
+        raise HTTPException(status_code=404, detail=INVALID_EMAIL)
+
+    if not user.is_active:
+        await repository_users.activate_user(user.email, db)
+
+        return {"message": USER_IS_ACTIVE}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=USER_ALREADY_ACTIVE
+        )
+
+
+@router.patch(
+    "/asign_role/{role}",
+    dependencies=[Depends(Admin)],
+    response_model=MessageResponseSchema,
 )
 async def assign_role(
     email: EmailStr,
@@ -262,19 +330,19 @@ async def assign_role(
     This route allows to assign the selected role to a user by their email.
 
     Level of Access:
-    
+
     - Administartor
 
     :param email: EmailStr: Email of the user to whom you want to assign the role.
-    
+
     :param selected_role: Role: The selected role for the assignment (Administrator, Moderator or User).
-    
+
     :param db: AsyncSession: Database Session.
-    
+
     :param redis_client: Redis: Redis client.
 
     :return: Message about successful role change.
-    
+
     :rtype: dict
     """
 
