@@ -15,6 +15,8 @@ from src.conf.config import init_cloudinary
 from src.database.models import User, Role, Rating, Photo, QR_code, Tag, Comment
 
 from src.services.photos import validate_crop_mode, validate_gravity_mode
+from src.repository import ratings as repository_rating
+
 
 
 async def get_or_create_tag(tag_name: str, db: AsyncSession) -> Tag:
@@ -93,15 +95,21 @@ async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
         return tags
     return None
 
+
 async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[str]:
-    
-    query = select(Photo).where(photo_idusername=photo_id).options(selectinload(Photo.comments))
+    query = (
+        select(Photo)
+        .where(photo_idusername=photo_id)
+        .options(selectinload(Photo.comments))
+    )
     result = await db.execute(query)
     comments = result.scalar()
-    
+
     print("------------>", comments)
-    
+
     return []
+
+
 # async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]:
 #     """
 #     Get Photo Comments
@@ -294,6 +302,37 @@ async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[Photo]:
     return photos
 
 
+async def get_photo_info(photo: Photo, db: AsyncSession):
+    
+    photo = await db.execute(
+        select(Photo)
+        .filter(Photo.id == photo.id)
+        .options(
+            selectinload(Photo.user),
+            selectinload(Photo.comments).joinedload(Comment.user),
+            selectinload(Photo.tags),
+            selectinload(Photo.QR),
+        )
+    )
+    photo = photo.scalar_one()
+
+    ratings = await repository_rating.get_rating(photos_id=photo.id, db=db)
+
+    formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
+
+    return  {
+                "id": photo.id,
+                "url": photo.url,
+                "QR": photo.QR.url,
+                "description": photo.description or str(),
+                "username": photo.user.username,
+                "created_at": formatted_created_at,
+                "comments": [comment for comment in photo.comments],
+                "tags": [tag.name for tag in photo.tags],
+                "rating": ratings
+             }
+
+
 async def get_photo_by_id(photo_id: int, db: AsyncSession) -> dict:
     """
     Retrieve a photo by its ID from the database.
@@ -438,47 +477,3 @@ async def get_URL_QR(photo_id: int, db: AsyncSession):
         return {"source_url": photo.url, "qr_code_url": qr.url}
 
     return {"source_url": photo.url, "qr_code_url": qr.url}
-
-
-async def get_comments(photo: Photo, db: AsyncSession):
-    
-    result = await db.execute(select(Photo).options(selectinload(Photo.comments)))
-    photo = result.scalars().first()
-    
-    comments = []
-    for comment in photo.comments:
-        comments.append(tag.text)
-
-    return comments
-
-async def get_tags(photo: Photo, db: AsyncSession):
-    
-    result = await db.execute(select(Photo).options(selectinload(Photo.tags)))
-    photo = result.scalars().first()
-    
-    tags = []
-    for tag in photo.tags:
-        tags.append(tag.name)
-
-    return tags
-
-async def get_ratings(photo: Photo, db: AsyncSession):
-    
-    result = await db.execute(select(Photo).options(selectinload(Photo.ratings)))
-    photo = result.scalars().first()
-
-    return photo.ratings
-
-async def get_QR(photo: Photo, db: AsyncSession):
-    
-    result = await db.execute(select(Photo).options(selectinload(Photo.QR)))
-    photo = result.scalars().first()
-
-    return photo.QR
-
-async def get_user(photo: Photo, db: AsyncSession):
-    
-    result = await db.execute(select(Photo).options(selectinload(Photo.user)))
-    photo = result.scalars().first()
-
-    return photo.user

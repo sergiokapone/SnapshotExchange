@@ -28,7 +28,6 @@ from src.database.connect_db import get_db
 from src.database.models import User, Photo, Comment
 from src.repository import photos as repository_photos
 from src.repository import users as repository_users
-from src.repository import ratings as repository_rating
 from src.repository import search as repository_search
 from src.services.auth import auth_service
 
@@ -81,31 +80,8 @@ async def view_database(
     detailed_info = []
     
     for photo in photos:
-
-        photo = await db.execute(select(Photo).filter(Photo.id == photo.id).options(
-            selectinload(Photo.user),
-            selectinload(Photo.comments).joinedload(Comment.user),
-            selectinload(Photo.tags),
-            selectinload(Photo.QR)
-        ))
-        photo = photo.scalar_one()
-        
-              
-        ratings = await repository_rating.get_rating(photos_id=photo.id, db=db)
-        
-        formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
-        
-        detailed_info.append({
-            "id": photo.id,
-            "url": photo.url,
-            "QR": photo.QR.url,
-            "description": photo.description or str(),
-            "username": photo.user.username,
-            "created_at": formatted_created_at,
-            "comments": [comment for comment in photo.comments],
-            "tags": [tag.name for tag in photo.tags],
-            "rating": ratings,
-        })
+        info = await repository_photos.get_photo_info(photo, db)
+        detailed_info.append(info)
 
     context = {
         "request": request, 
@@ -152,34 +128,15 @@ async def search_by_tag(
         # Обработка неверного значения search_type, например, бросить ошибку
         return JSONResponse(content={"error": "Invalid search_type"}, status_code=400)
     
+    if not access_token:
+        return RedirectResponse(url=request.url_for("login_page"))
+       
+       
     detailed_info = []
     
     for photo in photos:
-
-        photo = await db.execute(select(Photo).filter(Photo.id == photo.id).options(
-            selectinload(Photo.user),
-            selectinload(Photo.comments).joinedload(Comment.user),
-            selectinload(Photo.tags),
-            selectinload(Photo.QR)
-        ))
-        photo = photo.scalar_one()
-        
-              
-        ratings = await repository_rating.get_rating(photos_id=photo.id, db=db)
-        
-        formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
-        
-        detailed_info.append({
-            "id": photo.id,
-            "url": photo.url,
-            "QR": photo.QR.url,
-            "description": photo.description or str(),
-            "username": photo.user.username,
-            "created_at": formatted_created_at,
-            "comments": [comment for comment in photo.comments],
-            "tags": [tag.name for tag in photo.tags],
-            "rating": ratings,
-        })
+        info = await repository_photos.get_photo_info(photo, db)
+        detailed_info.append(info)
 
     context = {
         "request": request, 
