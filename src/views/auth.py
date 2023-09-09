@@ -111,3 +111,7 @@ async def login_page(request: Request):
     """
     
     return templates.TemplateResponse("login.html", {"request": request})
+
+@router.get("/forgot_form", name='forgot_form', include_in_schema=False)
+async def render_forgot_form(request: Request):
+    return templates.TemplateResponse("forgot_password.html", {"request": request})
