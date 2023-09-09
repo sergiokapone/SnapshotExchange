@@ -297,9 +297,7 @@
           </div>
         </div>
       </div>
-
       <!-- Pagination -->
-      {% if request.url == url_for('view_all_photos') %}
       <nav aria-label="Page navigation">
         <ul class="pagination justify-content-end">
           <li class="page-item{% if skip == 0 %} disabled{% endif %}">
@@ -312,7 +310,7 @@
             </a>
           </li>
           <li
-            class="page-item{% if photos|length < limit %} disabled{% endif %}"
+            class="page-item{% if photos|length < limit  %} disabled{% endif %}"
           >
             <a
               class="page-link"
@@ -324,7 +322,6 @@
           </li>
         </ul>
       </nav>
-      {% endif %}
     </main>
   </div>
 </div>
