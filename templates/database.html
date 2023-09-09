@@ -160,7 +160,7 @@
               <td>
                 <ul>
                   {% for comment in photo.comments %}
-                  <li>{{ comment.text }} (<i>{{ comment.username }}</i>)</li>
+                  <li>{{ comment.text }} (<i>{{ comment.user.username }}</i>)</li>
                   {% endfor %}
                 </ul>
               </td>

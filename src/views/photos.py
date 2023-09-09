@@ -1,5 +1,5 @@
+import asyncio
 from datetime import datetime, timedelta
-
 from fastapi import (
     APIRouter,
     Depends,
@@ -21,9 +21,11 @@ from fastapi.responses import RedirectResponse
 templates = Jinja2Templates(directory="templates")
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+from sqlalchemy import select
 
 from src.database.connect_db import get_db
-from src.database.models import User
+from src.database.models import User, Photo, Comment
 from src.repository import photos as repository_photos
 from src.repository import users as repository_users
 from src.repository import ratings as repository_rating
@@ -75,47 +77,54 @@ async def view_database(
         return RedirectResponse(url=request.url_for("login_page"))
        
     photos = await repository_photos.get_photos(skip, limit, db)
-
+        
     detailed_info = []
-    for photo in photos:
-        user = await repository_users.get_user_by_user_id(photo.user_id, db)
-        tags = await repository_photos.get_photo_tags(photo.id, db)
-        comments = await repository_photos.get_photo_comments(photo.id, db)
-        username = user.username if user else None
-        rating = await repository_rating.get_rating(photo.id, db)
-        formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
-        qr_code = await repository_photos.get_URL_QR(photo.id, db)
-
-        detailed_info.append(
-            {
-                "id": photo.id,
-                "url": photo.url,
-                "QR": qr_code.get("qr_code_url"),
-                "description": photo.description or str(),
-                "username": username,
-                "created_at": formatted_created_at,
-                "comments": comments,
-                "tags": tags,
-                "rating": rating,
-            },
-        )
-    detailed_info = sorted(detailed_info, key=lambda x: x["id"])
     
+    for photo in photos:
+
+        photo = await db.execute(select(Photo).filter(Photo.id == photo.id).options(
+            selectinload(Photo.user),
+            selectinload(Photo.comments).joinedload(Comment.user),
+            selectinload(Photo.tags),
+            selectinload(Photo.QR)
+        ))
+        photo = photo.scalar_one()
+        
+              
+        ratings = await repository_rating.get_rating(photos_id=photo.id, db=db)
+        
+        formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        
+        detailed_info.append({
+            "id": photo.id,
+            "url": photo.url,
+            "QR": photo.QR.url,
+            "description": photo.description or str(),
+            "username": photo.user.username,
+            "created_at": formatted_created_at,
+            "comments": [comment for comment in photo.comments],
+            "tags": [tag.name for tag in photo.tags],
+            "rating": ratings,
+        })
+
     context = {
-                "request": request, 
-                "photos": detailed_info, 
-                "skip": skip, 
-                "limit": limit,
-                "access_token": access_token
-               }
+        "request": request, 
+        "photos": detailed_info, 
+        "skip": skip, 
+        "limit": limit,
+        "access_token": access_token
+    }
 
     return templates.TemplateResponse("database.html", context)
+
 
 @router.get("/search", name="search_by_tag")
 async def search_by_tag(
     request: Request,
     query: str,
     search_type: str,
+    skip: int = 0,
+    limit: int = 10,
     access_token: str = Cookie(None),
     rating_low: float = Query(0),
     rating_high: float = Query(999),
@@ -144,36 +153,40 @@ async def search_by_tag(
         return JSONResponse(content={"error": "Invalid search_type"}, status_code=400)
     
     detailed_info = []
-    for photo in photos:
-        user = await repository_users.get_user_by_user_id(photo.user_id, db)
-        tags = await repository_photos.get_photo_tags(photo.id, db)
-        comments = await repository_photos.get_photo_comments(photo.id, db)
-        username = user.username if user else None
-        rating = await repository_rating.get_rating(photo.id, db)
-        formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
-        qr_code = await repository_photos.get_URL_QR(photo.id, db)
-
-        detailed_info.append(
-            {
-                "id": photo.id,
-                "url": photo.url,
-                "QR": qr_code.get("qr_code_url"),
-                "description": photo.description or str(),
-                "username": username,
-                "created_at": formatted_created_at,
-                "comments": comments,
-                "tags": tags,
-                "rating": rating,
-            },
-        )
-    detailed_info = sorted(detailed_info, key=lambda x: x["id"])
     
+    for photo in photos:
+
+        photo = await db.execute(select(Photo).filter(Photo.id == photo.id).options(
+            selectinload(Photo.user),
+            selectinload(Photo.comments).joinedload(Comment.user),
+            selectinload(Photo.tags),
+            selectinload(Photo.QR)
+        ))
+        photo = photo.scalar_one()
+        
+              
+        ratings = await repository_rating.get_rating(photos_id=photo.id, db=db)
+        
+        formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        
+        detailed_info.append({
+            "id": photo.id,
+            "url": photo.url,
+            "QR": photo.QR.url,
+            "description": photo.description or str(),
+            "username": photo.user.username,
+            "created_at": formatted_created_at,
+            "comments": [comment for comment in photo.comments],
+            "tags": [tag.name for tag in photo.tags],
+            "rating": ratings,
+        })
+
     context = {
-                "request": request, 
-                "photos": detailed_info, 
-                "skip": 0, 
-                "limit": 10,
-                "access_token": access_token
-               }
+        "request": request, 
+        "photos": detailed_info, 
+        "skip": skip, 
+        "limit": limit,
+        "access_token": access_token
+    }
 
     return templates.TemplateResponse("database.html", context)

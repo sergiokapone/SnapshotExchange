@@ -3,7 +3,6 @@ from datetime import datetime, date, timedelta
 from sqlalchemy import select, and_, cast, Date, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
-from sqlalchemy.orm import selectinload
 
 from src.database.models import (
     User,

@@ -161,7 +161,7 @@ class Photo(Base):
     )
     user: Mapped["User"] = relationship("User", back_populates="photos")
 
-    comments: Mapped["Comment"] = relationship(
+    comments: Mapped[list["Comment"]] = relationship(
         "Comment", back_populates="photo", cascade="all, delete-orphan"
     )
 
@@ -318,5 +318,5 @@ class Comment(Base):
     )
     update_status: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    user = relationship("User", backref="comments")
+    user: Mapped[int] = relationship("User", backref="comments")
     photo: Mapped["Photo"] = relationship("Photo", back_populates="comments")
