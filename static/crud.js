@@ -25,6 +25,12 @@ async function deletePhoto(photoId) {
 }
 
 
+const homeButton = document.getElementById('home-btn').addEventListener('click', function() {
+    console.log("----------------------")
+    const homeURL = getCurrentBaseURL() + 'views/dashboard'; 
+    window.location.href = homeURL;
+});
+
 
 const deleteButtons = document.querySelectorAll('.delete-photo-btn');
 deleteButtons.forEach(button => {
