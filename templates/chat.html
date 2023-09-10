@@ -1,11 +1,43 @@
-{% extends "base.html" %}
-{% block content %}
-        <h1>WebSocket Chat</h1>
-        <form action="" onsubmit="sendMessage(event)">
-            <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script src="/static/chat.js"></script>
+{% extends "base.html" %} {% block content %}
+<div class="page-content page-container" id="page-content">
+  <div class="padding">
+    <div class="row container d-flex justify-content-center">
+      <div class="col-md-6">
+        <h1>Chat room</h1>
+        <div class="card card-bordered">
+          <!-- Message container with its own scrollbar -->
+          <div
+            class="ps-container ps-theme-default ps-active-y"
+            id="chat-content"
+            style="overflow-y: scroll !important; height: 400px !important"
+          >
+            <ul id="messages"></ul>
+          </div>
+
+          <!-- Message entry form -->
+          <form
+            class="publisher bt-1 border-light"
+            onsubmit="sendMessage(event)"
+          >
+            <div class="input-group">
+              <input
+                class="publisher-input form-control"
+                type="text"
+                id="messageText"
+                autocomplete="off"
+                placeholder="Write something"
+              />
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">
+                  <i class="fa fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/static/chat.js"></script>
 {% endblock %}
