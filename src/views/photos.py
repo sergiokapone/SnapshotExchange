@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.connect_db import get_db
 from src.repository import photos as repository_photos
 from src.repository import search as repository_search
+from src.services.auth import auth_service
 
 
 templates = Jinja2Templates(directory="templates")
@@ -57,6 +58,7 @@ async def view_database(
         return RedirectResponse(url=request.url_for("login_page"))
 
     photos = await repository_photos.get_photos(skip, limit, db)
+    current_user = await auth_service.get_authenticated_user(access_token, db)
 
     detailed_info = []
 
@@ -67,6 +69,7 @@ async def view_database(
     context = {
         "request": request,
         "photos": detailed_info,
+        "current_username": current_user.username,
         "skip": skip,
         "limit": limit,
         "access_token": access_token,
@@ -91,6 +94,7 @@ async def search_by_tag(
 ):
     start_date = datetime.strptime(str(start_data), "%Y-%m-%d").date()
     end_date = datetime.strptime(str(end_data), "%Y-%m-%d").date()
+    current_user = await auth_service.get_authenticated_user(access_token, db)
 
     if search_type == "tag":
         photos = await repository_search.search_by_tag(
@@ -118,6 +122,7 @@ async def search_by_tag(
     context = {
         "request": request,
         "photos": detailed_info,
+        "current_username": current_user.username,
         "skip": 0,
         "limit": len(photos) + 1,
         "access_token": access_token,

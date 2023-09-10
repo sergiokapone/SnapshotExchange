@@ -234,7 +234,7 @@ async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[Photo]:
     :param db: AsyncSession: Pass the database session to the function
     :return: A list of all photos
     """
-    query = select(Photo).offset(skip).limit(limit)
+    query = select(Photo).order_by(Photo.id).offset(skip).limit(limit)
     result = await db.execute(query)
     photos = result.scalars().all()
     return photos

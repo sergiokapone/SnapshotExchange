@@ -38,7 +38,12 @@ async def search_by_tag(
     :return: List of photos
     :rtype: List[Photo]
     """
-    query = select(Photo).join(Tag, Photo.tags).filter(Tag.name.ilike(f"%{tag}%"))
+    query = (
+        select(Photo)
+        .order_by(Photo.id)
+        .join(Tag, Photo.tags)
+        .filter(Tag.name.ilike(f"%{tag}%"))
+    )
     if rating_low > 0 or rating_high < 999:
         query = query.filter(
             Photo.ratings.has(
@@ -84,7 +89,9 @@ async def search_by_description(
     :return: List of photos
     :rtype: List[Photo]
     """
-    query = select(Photo).filter(Photo.description.ilike(f"%{text}%"))
+    query = (
+        select(Photo).order_by(Photo.id).filter(Photo.description.ilike(f"%{text}%"))
+    )
     if rating_low > 0 or rating_high < 999:
         query = query.filter(
             Photo.ratings.has(
@@ -119,11 +126,15 @@ async def search_by_username(
     :rtype: list[Photo]
     """
 
-    query = select(User).filter(User.username.ilike(f"%{username}%")).options(selectinload(User.photos))
+    query = (
+        select(User)
+        .filter(User.username.ilike(f"%{username}%"))
+        .options(selectinload(User.photos))
+    )
     result = await db.execute(query)
     user = result.scalar()
 
-    return user.photos
+    return sorted(user.photos, key=lambda photo: photo.id)
 
 
 async def search_admin(

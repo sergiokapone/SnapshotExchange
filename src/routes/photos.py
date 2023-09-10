@@ -424,7 +424,7 @@ async def get_one_photo(
     dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     response_model=PhotosDb,
 )
-async def patch_pdate_photo(
+async def patch_update_photo(
     photo_id: int,
     new_photo_description: str,
     current_user: User = Depends(auth_service.get_authenticated_user),
