@@ -75,7 +75,7 @@ async def view_database(
     return templates.TemplateResponse("database.html", context)
 
 
-@router.get("/search", name="search_by_tag")
+@router.get("/search", name="search_by_tag", include_in_schema=False)
 async def search_by_tag(
     request: Request,
     query: str,
