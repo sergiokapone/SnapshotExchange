@@ -5,6 +5,7 @@ from fastapi import (
     Request,
     Cookie,
 )
+from fastapi.responses import RedirectResponse
 
 from fastapi.templating import Jinja2Templates
 
@@ -48,7 +49,6 @@ async def view_user_profile(
 
     user = await repository_users.get_user_profile(username, db)
     current_user = await auth_service.get_authenticated_user(access_token, db)
-    # current_user_email = current_user.email
 
     context = {
         "request": request,

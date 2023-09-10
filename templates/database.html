@@ -179,7 +179,10 @@
                     <span class="comment-text">{{ comment.text }}</span>
                     (by
                     <span class="comment-username"
-                      >{{ comment.user.username }}</span
+                      ><a
+                        href="{{ url_for('view_user_profile', username=comment.user.username) }}"
+                        >{{ comment.user.username }}</a
+                      ></span
                     >)
                   </li>
                   {% endfor %}
@@ -198,7 +201,7 @@
                   class="btn btn-danger delete-photo-btn"
                   data-photo-id="{{ photo.id }}"
                 >
-                  <i class="fas fa-trash"></i> Delete
+                  <i class="fas fa-trash"></i>
                 </button>
               </td>
             </tr>
