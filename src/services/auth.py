@@ -218,7 +218,6 @@ class Auth:
 
         try:
             token = request.cookies.get(COOKIE_KEY_NAME)
-            print(token)
             user = await self.get_authenticated_user(token, db)
             return user
         except Exception:

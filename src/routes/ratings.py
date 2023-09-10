@@ -5,9 +5,7 @@ from src.repository import ratings as repository_ratings
 
 from src.database.models import User, Role
 
-from src.schemas import (
-    RatingSchema,
-)
+from src.schemas import RatingSchema
 
 
 from src.services.auth import auth_service
@@ -47,11 +45,9 @@ async def created_rating(
 
     :rtype: RatingSchema
     """
-
     new_rating = await repository_ratings.create_rating(
         rating, photo_id, current_user, db
     )
-
     return new_rating
 
 
@@ -76,7 +72,7 @@ async def get_rating(photo_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/get_rating_admin/")
-async def get_rating_ADmin_Moder(
+async def get_rating_Admin_Moder(
     photo_id: int,
     current_user: User = Depends(auth_service.get_authenticated_user),
     db: AsyncSession = Depends(get_db),

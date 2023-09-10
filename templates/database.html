@@ -16,10 +16,12 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active"
+            <a
+              class="nav-link active"
+              target="_blank"
               href="{{ url_for('show_route_list') }}"
             >
-            <i class="fas fa-list"></i> API List
+              <i class="fas fa-list"></i> API List
               <span
                 class="spinner-border spinner-border-sm d-none"
                 role="status"
@@ -29,7 +31,11 @@
           </li>
 
           <li class="nav-item">
-            <a class="nav-link active" href="{{ current_base }}/docs" >
+            <a
+              class="nav-link active"
+              target="_blank"
+              href="{{ current_base }}/docs"
+            >
               <i class="fas fa-list"></i> Swagger
               <span
                 class="spinner-border spinner-border-sm d-none"
@@ -39,7 +45,11 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" href="{{ current_base }}/redoc" >
+            <a
+              class="nav-link active"
+              target="_blank"
+              href="{{ current_base }}/redoc"
+            >
               <i class="fas fa-list"></i> Redoc
               <span
                 class="spinner-border spinner-border-sm d-none"
@@ -49,8 +59,12 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" href="{{ url_for('chat') }}" >
-              <i class="fas fa-comments"></i>  Chat
+            <a
+              class="nav-link active"
+              target="_blank"
+              href="{{ url_for('chat') }}"
+            >
+              <i class="fas fa-comments"></i> Chat
               <span
                 class="spinner-border spinner-border-sm d-none"
                 role="status"
@@ -163,8 +177,11 @@
                   <li>
                     <span class="comment-id">{{ comment.id }}: </span>
                     <span class="comment-text">{{ comment.text }}</span>
-                    (by <span class="comment-username">{{ comment.user.username }}</span>)
-                </li>
+                    (by
+                    <span class="comment-username"
+                      >{{ comment.user.username }}</span
+                    >)
+                  </li>
                   {% endfor %}
                 </ul>
               </td>
@@ -310,7 +327,7 @@
             </a>
           </li>
           <li
-            class="page-item{% if photos|length < limit  %} disabled{% endif %}"
+            class="page-item{% if photos|length < limit %} disabled{% endif %}"
           >
             <a
               class="page-link"

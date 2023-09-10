@@ -410,7 +410,7 @@ async def get_URL_QR(photo_id: int, db: AsyncSession):
             db.refresh(qr)
         except Exception as e:
             await db.rollback()
-            print(e)
+            raise e
 
         os.remove(qr_code_file_path)
         return {"source_url": photo.url, "qr_code_url": qr.url}
