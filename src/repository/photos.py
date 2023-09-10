@@ -95,18 +95,18 @@ async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
     return None
 
 
-async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[str]:
-    query = (
-        select(Photo)
-        .where(photo_idusername=photo_id)
-        .options(selectinload(Photo.comments))
-    )
-    result = await db.execute(query)
-    comments = result.scalar()
+# async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[str]:
+#     query = (
+#         select(Photo)
+#         .where(Photo.id==photo_id)
+#         .options(selectinload(Photo.comments))
+#     )
+#     result = await db.execute(query)
+#     comments = result.scalar()
 
-    print("------------>", comments)
+#     print("------------>", comments)
 
-    return []
+#     return []
 
 
 # async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]:

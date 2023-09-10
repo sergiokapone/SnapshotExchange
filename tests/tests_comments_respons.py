@@ -22,30 +22,35 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         del self.session
 
     # async def test_create_comment(self):
-    #     content = "This is a test comment"
-    #     user = "testuser"
-    #     photo_id = 1
-    #     mock_db_session = MagicMock()
+    #         # Мокуємо об'єкт AsyncSession
+    #         mock_db = AsyncMock()
 
-    #     # Створюємо умовного користувача в базі даних
-    #     user_obj = User(id=1, username=user)
-    #     self.session.add(user_obj)
+    #         # Параметри для створення коментаря
+    #         content = "This is a test comment"
+    #         user_id = 1
+    #         photo_id = 1
 
-    #     # Створюємо умовну фотографію в базі даних
-    #     photo_obj = Photo(id=photo_id, url="test_url")
-    #     self.session.add(photo_obj)
+    #         expected_comment = Comment(
+    #             text=content,
+    #             user_id=user_id,
+    #             photo_id=photo_id
+    #         )
 
-    #     # Act
-    #     result = await create_comment(content, user, photo_id, self.session)
+    #         # Мокуємо методи db.add, db.commit і db.refresh
+    #         mock_db.add.return_value = None
+    #         mock_db.commit.return_value = None
+    #         mock_db.refresh.return_value = None
 
-    #     # Assert
-    #     self.assertEqual(result.text, content)
-    #     self.assertEqual(result.user, user)
-    #     self.assertEqual(result.photo_id, photo_id)
+    #         # Викликаємо функцію create_comment з мокованими параметрами
+    #         result = await create_comment(content, user_id, photo_id, mock_db)
 
-    #     mock_db_session.add.assert_called_once_with(result)
-    #     mock_db_session.commit.assert_called_once()
-    #     mock_db_session.refresh.assert_called_once_with(result)
+    #         # Перевіряємо, чи були викликані методи db.add, db.commit і db.refresh
+    #         mock_db.add.assert_called_once_with(expected_comment)
+    #         mock_db.commit.assert_called_once()
+    #         mock_db.refresh.assert_called_once_with(expected_comment)
+
+    #         # Перевіряємо, чи повернутий результат співпадає з очікуваним коментарем
+    #         self.assertEqual(result, expected_comment)
 
     async def test_get_comment(self):
         comment_id = 1

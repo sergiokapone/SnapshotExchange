@@ -49,7 +49,7 @@ OPERATION_FORBIDDEN = "Operation forbidden"
 ALREADY_LIKE = "You have already rated"
 YOUR_PHOTO = "This is your photo, you can't like it"
 FORBIDDEN = "Access denied. You don't have permission for this action."
-
+NOT_FOUND_PHOTO="Such a photo does not exist"
 DELETE_SUCCESSFUL = "You deleted successfully"
 PASWORD_RESET_SUCCESS = "Password reset successfully"
 

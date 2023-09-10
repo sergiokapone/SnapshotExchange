@@ -1,9 +1,9 @@
 import unittest
-from unittest.mock import AsyncMock,MagicMock
+from unittest.mock import AsyncMock,MagicMock,patch
 from sqlalchemy.ext.asyncio import AsyncSession
 import sys
 import os
-
+from fastapi import  status,HTTPException
 
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -25,22 +25,76 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
     def tearDown(self):
         del self.session
 
-    # async def test_create_rathings(self):
-    #     fake_user = User(id=1, username="fake_user")
-    #     fake_photo = Photo(id=1, user_id=1)
+    
+    # @patch('sqlalchemy.select')
+    # @patch('fastapi.HTTPException')
+    # async def test_create_rating(self, mock_http_exception, mock_select):
+    #     # Створюємо мок об'єкт бази даних та результат запиту
+    #     mock_select = MagicMock()
+    #     mock_select.return_value.scalar.return_value = None
+    #     mock_db = AsyncMock()
+    #     mock_select.return_value.scalar.return_value = None
 
-    #     # Створюємо мок для запиту до бази даних
-    #     mock_query_photo = AsyncMock()
-    #     mock_query_photo.scalar.return_value = fake_photo
+    #     # Параметри для тесту
+    #     rating = 5
+    #     photo_id = 1
+    #     user = User(id=2, username="test_user")
+        
+    #     # Мокуємо функції db.execute та db.commit
+    #     mock_db.execute.return_value = AsyncMock()
+    #     mock_db.commit.return_value = None
 
-    #     # Встановлюємо, що execute повертатиме результат з нашим моком
-    #     self.session.execute.return_value.scalar.return_value = mock_query_photo
+    #     # Викликаємо функцію
+    #     result = await create_rating(rating, photo_id, user, mock_db)
 
-    #     # Тепер ви можете викликати вашу функцію з цим моком для тестування
-    #     result = await create_rating(5, 1, fake_user, self.session)
+    #     # Перевірка, що функція взаємодіє з базою даних правильно
+    #     mock_select.assert_called_once_with(Photo)
+    #     mock_select.return_value.scalar.assert_called_once()
+    #     mock_db.execute.assert_called_once()
+    #     mock_db.commit.assert_called_once()
+    #     mock_db.refresh.assert_called_once()
 
-    #     # Перевірте результат вашого тесту
+    #     # Перевірка, що результат є очікуваним об'єктом Rating
     #     self.assertIsInstance(result, Rating)
+    #     self.assertEqual(result.rating, rating)
+    #     self.assertEqual(result.user_id, user.id)
+    #     self.assertEqual(result.photo_id, photo_id)
+
+    # @patch('sqlalchemy.select')
+    # @patch('fastapi.HTTPException')
+    # async def test_create_rating_already_exists(self, mock_http_exception, mock_select):
+    #     # Створюємо мок об'єкт бази даних та результат запиту, де вже існує рейтинг
+    #     mock_db = AsyncMock()
+    #     mock_select.return_value.scalar.return_value = Rating(rating=4, user_id=2, photo_id=1)
+
+    #     # Параметри для тесту
+    #     rating = 5
+    #     photo_id = 1
+    #     user = User(id=2, username="test_user")
+
+    #     # Викликаємо функцію та очікуємо HTTPException з відповідним повідомленням
+    #     with self.assertRaises(HTTPException) as context:
+    #         await create_rating(rating, photo_id, user, mock_db)
+    #     self.assertEqual(context.exception.status_code, status.HTTP_400_BAD_REQUEST)
+    #     self.assertEqual(context.exception.detail, ALREADY_LIKE)
+
+    # @patch('sqlalchemy.select')
+    # @patch('fastapi.HTTPException')
+    # async def test_create_rating_own_photo(self, mock_http_exception, mock_select):
+    #     # Створюємо мок об'єкт бази даних та результат запиту, де користувач є власником фото
+    #     mock_db = AsyncMock()
+    #     mock_select.return_value.scalar.return_value = Photo(id=1, user_id=2)
+
+    #     # Параметри для тесту
+    #     rating = 5
+    #     photo_id = 1
+    #     user = User(id=2, username="test_user")
+
+    #     # Викликаємо функцію та очікуємо HTTPException з відповідним повідомленням
+    #     with self.assertRaises(HTTPException) as context:
+    #         await create_rating(rating, photo_id, user, mock_db)
+    #     self.assertEqual(context.exception.status_code, status.HTTP_400_BAD_REQUEST)
+    #     self.assertEqual(context.exception.detail, YOUR_PHOTO)
 
 
     async def test_get_rating(self):
