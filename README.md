@@ -15,6 +15,8 @@ The project is available online at [https://snapshotexchange.onrender.com/views/
   * [Using Technologies](#using-technologies)
   * [Description](#description)
   * [Project Installation](#project-installation)
+    + [Local Installation](#local-installation)
+    + [DockerHub](#dockerhub)
   * [Implementation](#implementation)
     + [API routes](#api-routes)
     + [Server side rendering](#server-side-rendering)
@@ -42,29 +44,44 @@ Our app allows users to upload, edit and delete their photos, as well as interac
 
 ## Project Installation
 
+### Local Installation
 
 To manage project dependencies, `pipenv` is used.
 
-- Make sure you have `pipenv` installed
-- Clone the repository `git clone https://github.com/sergiokapone/SnapshotExchange.git`
-- To install the dependencies, use the `pipenv install` or `pipenv sync` command.
+* Make sure you have `pipenv` installed
+
+* Clone the repository `git clone https://github.com/sergiokapone/SnapshotExchange.git`
+
+* To install the dependencies, use the `pipenv install` or `pipenv sync` command.
 
 Detailed steps in your terminal a following:
 
 ```bash
-$ git clone https://github.com/sergiokapone/SnapshotExchange.git
-$ cd SnapshotExchange
-$ pipenv install
-$ python main.py
+git clone https://github.com/sergiokapone/SnapshotExchange.git
+cd SnapshotExchange
+pipenv install
+python main.py
+
+```
+
+### DockerHub
+
+Our project can also be found at [DockerHub](https://hub.docker.com/repository/docker/sergiokapone/snapshopexchange). To launch the application, you can 
+use the command:
+
+```bash
+docker run -p 8000:8000 sergiokapone/snapshopexchange
 ```
 
 ## Implementation
 
 Once the application is running *locally*, you can browse to run it on your local host using the following links:
 
-- To view detailed information on our project [http://localhost:8000/views/info](http://localhost:8000/views/info)
-- To view detailed information on our project in `JSON` format  [http://localhost:8000/](http://localhost:8000)
-- To test the connection to the database and server time information [http://localhost:8000/api/healthchecker](http://localhost:8000/api/healthchecker)
+* To view detailed information on our project [http://localhost:8000/views/info](http://localhost:8000/views/info)
+
+* To view detailed information on our project in `JSON` format  [http://localhost:8000/](http://localhost:8000)
+
+* To test the connection to the database and server time information [http://localhost:8000/api/healthchecker](http://localhost:8000/api/healthchecker)
 
 For comfortable viewing of `JSON` respone in your browser we recommend to install the extension for Google Chrome
 [JSON Viewer](https://chrome.google.com/webstore/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh/related?hl=ru) or
@@ -74,22 +91,23 @@ For comfortable viewing of `JSON` respone in your browser we recommend to instal
 
 We also tried to implement an Admin Dashboard for our application to conveniently manage and control its content, settings and users.
 
-- The Admin Dashboard is available at [http://localhost:8000/views/dashboard](http://localhost:8000/views/dashboard)
+* The Admin Dashboard is available at [http://localhost:8000/views/dashboard](http://localhost:8000/views/dashboard)
 
 ### API routes
 
 The main goal of application is primarily designed to implement a REST API, which plays a key role in ensuring efficient interaction between frontend developers (React, View, Angular) and our service.
 
 All documentation on interacting with our API is available at the following links:
-- To view swagger documentation [http://localhost:8000/docs](http://localhost:8000/docs)
-- To view redoc documentation [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
+* To view `swagger` documentation [http://localhost:8000/docs](http://localhost:8000/docs)
+
+* To view `redoc` documentation [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 ### Chat
 
 Also our app is equipped with a chat for short messaging via websocket. The chat is available at the link:
--  [http://localhost:8000/views/chat](http://localhost:8000/views/chat)
 
+* [http://localhost:8000/views/chat](http://localhost:8000/views/chat)
 
 ## Information for Developers
 

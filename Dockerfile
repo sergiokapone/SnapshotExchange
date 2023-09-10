@@ -9,17 +9,20 @@ RUN pip install pipenv
 WORKDIR /app
 COPY Pipfile* /app/
 
-# Установка зависимостей с помощью pipenv
-RUN pipenv install
-
 EXPOSE 8000
 
 # Копирование приложения
 COPY . /app
+
+# Установка зависимостей с помощью pipenv
+
+# Установка зависимостей с помощью pipenv
+RUN pipenv install --deploy --ignore-pipfile
 
 # Добавление переменной окружения PYTHONPATH
 # ENV PYTHONPATH "${PYTHONPATH}:/app/src"
 
 # Запуск приложения
 
-CMD ["sh", "-c", "pipenv run python3 main.py"]
+# CMD ["sh", "-c", "pipenv run python3 main.py"]
+CMD ["pipenv", "run", "python3", "main.py"]
