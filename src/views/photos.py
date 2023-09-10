@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, Query, Request, Cookie
 
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -75,7 +75,7 @@ async def view_database(
     return templates.TemplateResponse("database.html", context)
 
 
-@router.get("/search", name="search_by_tag")
+@router.get("/search", name="search_by_tag", include_in_schema=False)
 async def search_by_tag(
     request: Request,
     query: str,
@@ -119,7 +119,7 @@ async def search_by_tag(
         "request": request,
         "photos": detailed_info,
         "skip": 0,
-        "limit": len(photos)+1,
+        "limit": len(photos) + 1,
         "access_token": access_token,
     }
 

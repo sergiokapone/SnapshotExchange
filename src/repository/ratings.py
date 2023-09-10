@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
-from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE
+from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE, NO_PHOTO_BY_ID
 from src.database.models import User, Rating, Photo
 
 
@@ -20,9 +20,21 @@ async def create_rating(rating: int, photos_id: int, user: User, db: AsyncSessio
     :return: The created rating object.
     :rtype: Rating
     """
+
+    if not 0 < rating <= 5:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Rating must be in range (0; 5]",
+        )
+
     query = select(Photo).filter(Photo.id == photos_id)
-    photo = await db.execute(query)
-    photo = photo.scalar()
+    result = await db.execute(query)
+    photo = result.scalar()
+
+    if photo is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=NO_PHOTO_BY_ID
+        )
 
     if photo.user_id == user.id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=YOUR_PHOTO)

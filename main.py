@@ -11,7 +11,7 @@ from fastapi_limiter import FastAPILimiter
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
-from src.conf.messages import DB_CONFIG_ERROR, DB_CONNECT_ERROR, WELCOME_MESSAGE
+from src.conf.messages import DB_CONFIG_ERROR, DB_CONNECT_ERROR
 
 
 from src.database.connect_db import get_db
@@ -22,7 +22,6 @@ from src.routes.ratings import router as ratings_router
 from src.routes.photos import router as photos_router
 from src.routes.comments import router as comments_router
 from src.routes.search import router as search_router
-from src.conf.config import settings
 from src.conf.info_dict import project_info
 
 from src.views.dashboard import router as dashboard_views_router
@@ -32,7 +31,6 @@ from src.views.photos import router as photo_views_router
 from src.views.chat import router as chat_router
 
 
-from src.conf.config import settings
 from src.conf.config import init_async_redis
 
 
@@ -91,35 +89,34 @@ async def healthchecker(session: AsyncSession = Depends(get_db)):
         }
 
     except Exception as e:
-        print(e)
+        raise e
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=DB_CONNECT_ERROR,
         )
-        
 
-@app.get("/list", 
-         tags=["Root"])
+
+@app.get("/list", tags=["Root"])
 def get_all_urls_from_request(request: Request) -> list[dict]:
     routes = [
         {
-            "path": str(request.base_url)[:-1] + route.path, 
-            "name": route.name, 
+            "path": str(request.base_url)[:-1] + route.path,
+            "name": route.name,
             "method": route.methods,
             "description": route.description,
-        } 
+        }
         for route in request.app.routes
-        if hasattr(route, 'description') and route.description is not None
+        if hasattr(route, "description") and route.description is not None
     ]
     return routes
 
 
 app.include_router(auth_router, prefix="/api")
 app.include_router(users_router, prefix="/api")
-app.include_router(photos_router, prefix='/api')
-app.include_router(comments_router, prefix='/api')
-app.include_router(search_router, prefix='/api')
+app.include_router(photos_router, prefix="/api")
+app.include_router(comments_router, prefix="/api")
+app.include_router(search_router, prefix="/api")
 app.include_router(ratings_router, prefix="/api")
 
 app.include_router(dashboard_views_router, prefix="/views")
@@ -133,4 +130,3 @@ if __name__ == "__main__":
     HOST = "0.0.0.0"
     PORT = 8000
     uvicorn.run(app="main:app", host=HOST, port=PORT, reload=True)
-    

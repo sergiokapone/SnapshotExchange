@@ -435,4 +435,4 @@ async def reset_password(
         return {"message": PASWORD_RESET_SUCCESS}
     except Exception as e:
         await db.rollback()
-        print(e)
+        raise e

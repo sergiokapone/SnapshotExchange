@@ -27,7 +27,7 @@ async def create_user(body: UserSchema, db: AsyncSession) -> User:
         g = Gravatar(body.email)
         g.get_image()
     except Exception as e:
-        print(e)
+        raise e
 
     new_user = User(**body.model_dump())
     new_user.role = Role.user
