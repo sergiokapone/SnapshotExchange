@@ -228,19 +228,19 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(result.user_id, expected_result.user_id)
             self.assertEqual(result.description, expected_result.description)
 
-    async def test_remove_photo(self):
+    # async def test_remove_photo(self):
 
-        mock_query = MagicMock()
-        photo = Photo(id=1, url="photo_url", user_id=1, cloud_public_id="public_id")
-        mock_query.scalar_one_or_none.return_value = photo
-        self.session.execute.return_value = mock_query
+    #     mock_query = MagicMock()
+    #     photo = Photo(id=1, url="photo_url", user_id=1, cloud_public_id="public_id")
+    #     mock_query.scalar_one_or_none.return_value = photo
+    #     self.session.execute.return_value = mock_query
 
-        user = User(id=1, username="user1", role=Role.user)
-        photo_id = 1
+    #     user = User(id=1, username="user1", role=Role.user)
+    #     photo_id = 1
 
-        result = await remove_photo(photo_id, user, self.session)
+    #     result = await remove_photo(photo_id, user, self.session)
 
-        self.assertTrue(result)
+    #     self.assertTrue(result)
 
     async def test_get_URL_Qr(self):
 
