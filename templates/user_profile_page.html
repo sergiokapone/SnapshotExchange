@@ -1,46 +1,59 @@
 {% extends "base.html" %} {% block content %}
 <div class="container mt-5">
   <div class="row">
-    <div class="col-md-4">
-      <img
-        src="{{ user.avatar or '/static/images/avatar.jpg' }}"
-        class="img-fluid rounded-circle"
-        alt="User Avatar"
-      />
+    <div class="col-md-3">
+      <div class="card">
+        <img
+          src="{{ user.avatar or '/static/images/avatar.jpg' }}"
+          class="card-img-top rounded-circle"
+          alt="User Avatar"
+        />
+        <div class="card-body">
+          <h5 class="card-title">{{ user.username }}</h5>
+        </div>
+      </div>
     </div>
-    <div class="col-md-8">
-      <h1>User Profile</h1>
-
-      <div>
-        <p><strong>User ID:</strong> {{ user.id }}</p>
-        <p><strong>Username:</strong> {{ user.username }}</p>
-        <p>
-          <strong>Email:</strong>
-          <a href="mailto:{{ user.email }}">{{ user.email }}</a>
-        </p>
-        <p>
-          <strong>Description:</strong> {{ user.description or "No description
-          available" }}
-        </p>
-        <p><strong>Is active:</strong> {{ user.is_active }}</p>
-        <p><strong>Count of comments:</strong> {{ user.comments_count }}</p>
-        <p><strong>Count of posted photos:</strong> {{ user.photos_count }}</p>
-        <p><strong>Role:</strong> {{ user.role }}</p>
-        <p><strong>Created At:</strong> {{ user.created_at }}</p>
-        {% if current_user_email != user.email and user.role != "Administrator" %}
-        <button
-          type="button"
-          {% if user.is_active %}
-          class="btn btn-danger toggle-status-button"
-          {% else %}
-          class="btn btn-success toggle-status-button"
+    <div class="col-md-9">
+      <div class="card">
+        <div class="card-header bg-primary text-white">User Profile</div>
+        <div class="card-body">
+          <ul class="list-group">
+            <li class="list-group-item">
+              <strong>User ID:</strong> {{ user.id }}
+            </li>
+            <li class="list-group-item">
+              <strong>Email:</strong>
+              <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+            </li>
+            <li class="list-group-item">
+              <strong>Is active:</strong> {{ user.is_active }}
+            </li>
+            <li class="list-group-item">
+              <strong>Count of comments:</strong> {{ user.comments_count }}
+            </li>
+            <li class="list-group-item">
+              <strong>Count of posted photos:</strong> {{ user.photos_count }}
+            </li>
+            <li class="list-group-item">
+              <strong>Role:</strong> {{ user.role.value }}
+            </li>
+            <li class="list-group-item">
+              <strong>Created At:</strong> {{ user.created_at }}
+            </li>
+          </ul>
+          {% if current_user_email != user.email and user.role !=
+          "Administrator" %}
+          <button
+            type="button"
+            class="btn {% if user.is_active %} btn-danger{% else %} btn-success{% endif %} toggle-status-button mt-3"
+            data-email="{{ user.email }}"
+            data-status="{{ user.is_active }}"
+          >
+            {% if user.is_active %} Ban User {% else %} Activate User {% endif
+            %}
+          </button>
           {% endif %}
-          data-email="{{ user.email }}"
-          data-status="{{ user.is_active }}"
-        >
-          {% if user.is_active %} Ban User {% else %} Activate User {% endif %}
-        </button>
-        {% endif %}
+        </div>
       </div>
     </div>
   </div>

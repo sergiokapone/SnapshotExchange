@@ -87,72 +87,11 @@ async def get_photo_tags(photo_id: int, db: AsyncSession) -> list[str] | None:
     """
 
     query = select(Tag.name).join(Photo.tags).filter(Photo.id == photo_id)
-
     result = await db.execute(query)
     tags = result.scalars().all()
     if tags:
         return tags
     return None
-
-
-# async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[str]:
-#     query = (
-#         select(Photo)
-#         .where(Photo.id==photo_id)
-#         .options(selectinload(Photo.comments))
-#     )
-#     result = await db.execute(query)
-#     comments = result.scalar()
-
-#     print("------------>", comments)
-
-#     return []
-
-
-# async def get_photo_comments(photo_id: int, db: AsyncSession) -> list[dict]:
-#     """
-#     Get Photo Comments
-
-#     This function retrieves a list of comments associated with a specific photo by its ID.
-
-#     :param int photo_id: The ID of the photo for which to retrieve comments.
-#     :param db: The asynchronous database session.
-#     :type db: AsyncSession
-#     :return: A list of dictionaries containing comment text and the username of the commenter.
-#     :rtype: list[dict]
-#     :raises Exception: Raises an exception if there's an issue with database operations.
-
-#     **Example Usage:**
-
-#     .. code-block:: python
-
-#         photo_id = 123
-#         async with get_db() as db:
-#             comments = await get_photo_comments(photo_id, db)
-#             if comments:
-#                 for comment in comments:
-#                     print(f"Username: {comment['username']}")
-#                     print(f"Comment: {comment['text']}")
-#             else:
-#                 print("No comments found for the photo.")
-
-#     This function constructs a database query to retrieve comments associated with a specific photo. It returns a list of dictionaries, where each dictionary contains the comment text and the username of the commenter.
-
-#     """
-
-#     query = (
-#         select(Comment.text, User.username)
-#         .join(User)
-#         .filter(Comment.photo_id == photo_id)
-#     )
-
-#     # result = await db.execute(query)
-#     # comments = result.all()
-#     # if comments:
-#     #     return [
-#     #         {"text": comment.text, "username": comment.user_id} for comment in comments
-#     #     ]
-#     return []
 
 
 async def upload_photo(
@@ -295,7 +234,7 @@ async def get_photos(skip: int, limit: int, db: AsyncSession) -> list[Photo]:
     :param db: AsyncSession: Pass the database session to the function
     :return: A list of all photos
     """
-    query = select(Photo).offset(skip).limit(limit)
+    query = select(Photo).order_by(Photo.id).offset(skip).limit(limit)
     result = await db.execute(query)
     photos = result.scalars().all()
     return photos
@@ -317,7 +256,7 @@ async def get_photo_info(photo: Photo, db: AsyncSession):
     ratings = await repository_rating.get_rating(photos_id=photo.id, db=db)
 
     formatted_created_at = photo.created_at.strftime("%Y-%m-%d %H:%M:%S")
-    
+
     qr_code = await get_URL_QR(photo.id, db)
 
     return {
@@ -471,7 +410,7 @@ async def get_URL_QR(photo_id: int, db: AsyncSession):
             db.refresh(qr)
         except Exception as e:
             await db.rollback()
-            print(e)
+            raise e
 
         os.remove(qr_code_file_path)
         return {"source_url": photo.url, "qr_code_url": qr.url}

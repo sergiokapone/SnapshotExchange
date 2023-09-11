@@ -16,10 +16,12 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active"
+            <a
+              class="nav-link active"
+              target="_blank"
               href="{{ url_for('show_route_list') }}"
             >
-            <i class="fas fa-list"></i> API List
+              <i class="fas fa-list"></i> API List
               <span
                 class="spinner-border spinner-border-sm d-none"
                 role="status"
@@ -29,7 +31,11 @@
           </li>
 
           <li class="nav-item">
-            <a class="nav-link active" href="{{ current_base }}/docs" >
+            <a
+              class="nav-link active"
+              target="_blank"
+              href="{{ current_base }}/docs"
+            >
               <i class="fas fa-list"></i> Swagger
               <span
                 class="spinner-border spinner-border-sm d-none"
@@ -39,7 +45,11 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" href="{{ current_base }}/redoc" >
+            <a
+              class="nav-link active"
+              target="_blank"
+              href="{{ current_base }}/redoc"
+            >
               <i class="fas fa-list"></i> Redoc
               <span
                 class="spinner-border spinner-border-sm d-none"
@@ -49,8 +59,12 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" href="{{ url_for('chat') }}" >
-              <i class="fas fa-comments"></i>  Chat
+            <a
+              class="nav-link active"
+              target="_blank"
+              href="{{ url_for('chat') }}"
+            >
+              <i class="fas fa-comments"></i> Chat
               <span
                 class="spinner-border spinner-border-sm d-none"
                 role="status"
@@ -109,85 +123,175 @@
       </form>
 
       <!-- Table with Data -->
-      <div class="table-responsive">
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Image</th>
-              <th>QR</th>
-              <th>Description</th>
-              <th>Username</th>
-              <th>Tags</th>
-              <th>Comments</th>
-              <th>Rating</th>
-              <th>Created At</th>
-              <th>Operation</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for photo in photos %}
-            <tr>
-              <td>{{ photo.id }}</td>
-              <!-- Add a "modal-photo" class to handle the click -->
-              <td>
-                <img
-                  src="{{ photo.url }}"
-                  alt="Photo"
-                  class="modal-photo img-fluid rounded"
-                  data-description="{{ photo.description }}"
-                />
-              </td>
-              <td>
-                <img
-                  src="{{ photo.QR }}"
-                  alt="QR Code"
-                  class="modal-photo img-fluid rounded"
-                  data-description="{{ photo.description }}"
-                />
-              </td>
-              <td>{{ photo.description }}</td>
-              <td>
-                <a
-                  href="{{ url_for('view_user_profile', username=photo.username) }}"
-                  >{{ photo.username }}</a
-                >
-              </td>
-              <td>
-                {% for tag in photo.tags %} {{ tag }} {% if not loop.last %}, {%
-                endif %} {% endfor %}
-              </td>
-              <td>
-                <ul>
-                  {% for comment in photo.comments %}
-                  <li>
-                    <span class="comment-id">{{ comment.id }}: </span>
-                    <span class="comment-text">{{ comment.text }}</span>
-                    (by <span class="comment-username">{{ comment.user.username }}</span>)
-                </li>
-                  {% endfor %}
-                </ul>
-              </td>
-              <td>
-                <div class="rating">
-                  {% for _ in range(photo.rating) %}
-                  <i class="fas fa-star" style="color: orange"></i>
-                  {% endfor %}
+      <div
+        class="ps-container ps-theme-default ps-active-y"
+        id="chat-content"
+        style="overflow-y: scroll !important; height: 400px !important"
+      >
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Image</th>
+                <th>QR</th>
+                <th>Description</th>
+                <th>Username</th>
+                <th>Tags</th>
+                <th>Comments</th>
+                <th>Rating</th>
+                <th>Created At</th>
+                <th>Operation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for photo in photos %}
+              <tr>
+                <td>{{ photo.id }}</td>
+                <!-- Add a "modal-photo" class to handle the click -->
+                <td>
+                  <img
+                    src="{{ photo.url }}"
+                    alt="Photo"
+                    class="modal-photo img-fluid rounded"
+                    data-description="{{ photo.description }}"
+                  />
+                </td>
+                <td>
+                  <img
+                    src="{{ photo.QR }}"
+                    alt="QR Code"
+                    class="modal-photo img-fluid rounded"
+                    data-description="{{ photo.description }}"
+                  />
+                </td>
+                <td>
+                  {% if photo.username == current_username%}
+                  <button
+                    class="update-description-btn"
+                    data-photo-id="{{ photo.id }}"
+                    style="
+                      border: none;
+                      background: none;
+                      padding: 0;
+                      margin: 0;
+                      font-size: inherit;
+                      font-family: inherit;
+                      color: inherit;
+                    "
+                  >
+                    <i
+                      class="fas fa-pencil-alt"
+                      style="color: blue; border: none"
+                    ></i>
+                  </button>
+                  {% endif %} {{ photo.description }}
+                </td>
+                <td>
+                  <a
+                    href="{{ url_for('view_user_profile', username=photo.username) }}"
+                    >{{ photo.username }}</a
+                  >
+                </td>
+                <td>
+                  {% for tag in photo.tags %} {{ tag }} {% if not loop.last %},
+                  {% endif %} {% endfor %}
+                </td>
+                <td>
+                  <ul>
+                    {% for comment in photo.comments %}
+                    <li>
+                      <span class="comment-id">{{ comment.id }}: </span>
+                      <span class="comment-text">{{ comment.text }}</span>
+                      (by
+                      <span class="comment-username"
+                        ><a
+                          href="{{ url_for('view_user_profile', username=comment.user.username) }}"
+                          >{{ comment.user.username }}</a
+                        ></span
+                      >)
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </td>
+                <td>
+                  <div class="rating">
+                    {% for _ in range(photo.rating) %}
+                    <i class="fas fa-star" style="color: orange"></i>
+                    {% endfor %}
+                  </div>
+                </td>
+                <td>{{ photo.created_at }}</td>
+                <td>
+                  <button
+                    class="btn btn-danger delete-photo-btn"
+                    data-photo-id="{{ photo.id }}"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Modal window for updating the description -->
+      <div
+        class="modal fade"
+        id="updateDescriptionModal"
+        tabindex="-1"
+        aria-labelledby="updateDescriptionModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="updateDescriptionModalLabel">
+                Update Description
+              </h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <!-- Form for updating the description -->
+              <form id="updateDescriptionForm">
+                <div class="form-group">
+                  <label for="newDescription">New Description:</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="newDescription"
+                    placeholder="Enter new description"
+                    required
+                  />
                 </div>
-              </td>
-              <td>{{ photo.created_at }}</td>
-              <td>
-                <button
-                  class="btn btn-danger delete-photo-btn"
-                  data-photo-id="{{ photo.id }}"
-                >
-                  <i class="fas fa-trash"></i> Delete
-                </button>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                id="saveDescriptionBtn"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Modal window for displaying a photo -->
@@ -310,7 +414,7 @@
             </a>
           </li>
           <li
-            class="page-item{% if photos|length < limit  %} disabled{% endif %}"
+            class="page-item{% if photos|length < limit %} disabled{% endif %}"
           >
             <a
               class="page-link"

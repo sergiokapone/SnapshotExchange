@@ -53,8 +53,8 @@ async def send_email(email: EmailStr, username: str, host: str):
 
         fm = FastMail(conf)
         await fm.send_message(message, template_name="example_email.html")
-    except ConnectionErrors as err:
-        print(err)
+    except ConnectionErrors as e:
+        raise e
 
 
 async def reset_password_by_email(
@@ -79,5 +79,5 @@ async def reset_password_by_email(
 
         fm = FastMail(conf)
         await fm.send_message(message, template_name="reset_password.html")
-    except ConnectionErrors as err:
-        print(err)
+    except ConnectionErrors as e:
+        raise e

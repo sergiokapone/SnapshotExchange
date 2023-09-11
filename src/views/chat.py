@@ -44,6 +44,6 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_text()
             for connection in active_connections:
-                await connection.send_text(f"Message text was: {data}")
+                await connection.send_text(data)
     except WebSocketDisconnect:
         active_connections.remove(websocket)
