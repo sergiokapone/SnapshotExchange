@@ -21,11 +21,11 @@ from src.repository import users
 
 class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
 
-    async def asyncSetUp(self):
+    def asyncSetUp(self):
         self.client = TestClient(app)
         self.session = AsyncMock(spec=AsyncSession())
 
-    async def asyncTearDown(self):
+    def asyncTearDown(self):
         pass
 
 

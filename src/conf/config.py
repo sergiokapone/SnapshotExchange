@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     cloudinary_api_key: str = "1234567890"
     cloudinary_api_secret: str = "secret"
 
-    class Config:
+    class ConfigDict:
         extra = "ignore"
         env_file = ".env"
         extra = 'ignore'
