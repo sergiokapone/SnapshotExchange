@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field, ConfigDict, validator
+from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_validator
 from src.database.models import Role
 
 
@@ -46,7 +46,7 @@ class RatingSchema(BaseModel):
     rating: int
     photo_id: int
 
-    @validator("rating")
+    @field_validator("rating")
     def validate_rating(cls, value):
         if not 0 < value <= 5:
             raise ValueError("Rating must be in range (0; 5]")
