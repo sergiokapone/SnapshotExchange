@@ -7,27 +7,43 @@ from datetime import datetime
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.database.models import User,Role,BlacklistToken
-from src.schemas import UserSchema,UserProfileSchema
-from src.repository.users import get_user_by_email, edit_my_profile, create_user, update_token,get_users,get_user_profile,get_user_by_reset_token,get_user_by_user_id,get_user_by_username,confirm_email,ban_user,make_user_role,add_to_blacklist,is_blacklisted_token
+from src.database.models import User, Role
+from src.schemas import UserSchema, UserProfileSchema
+from src.repository.users import (
+    get_user_by_email,
+    create_user,
+    update_token,
+    get_users,
+    get_user_profile,
+    get_user_by_reset_token,
+    get_user_by_user_id,
+    get_user_by_username,
+    confirm_email,
+    ban_user,
+    make_user_role,
+    add_to_blacklist,
+)
+
 
 class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
-
     def setUp(self):
-
         self.session = AsyncMock(spec=AsyncSession)
-        self.body_data= UserSchema(
-            username= "Corwin",
-            email= "tests@gmail.com",
-            password= "testpassword1",)
-        self.new_user=User(id=3,username="Corwin",
-    email="tests@gmail.com",
-    created_at=datetime.now(),
-    avatar='https://res.cloudinary.com/dqjbmzhfy/image/upload/c_fill,h_250,w_250/v1/Avatars/YEAH_ME',
-    is_active=False,
-    refresh_token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNhbXlyYXkxOTkyQGdtYWlsLmNvbSIsImlhdCI6MTY5Mzg1NTIxMCwiZXhwIjoxNjk0NDYwMDEwLCJzY29wZSI6InJlZnJlc2hfdG9rZW4ifQ.YzY8Qp0PBgqx4x2Gc_DY4hZ84xCSXygcP0jDnTWsCaA'
-    )
-        
+        self.body_data = UserSchema(
+            username="Corwin",
+            email="tests@gmail.com",
+            password="testpassword1",
+        )
+        self.new_user = User(
+            id=3,
+            username="Corwin",
+            role=Role.user,
+            email="tests@gmail.com",
+            created_at=datetime.now(),
+            avatar="https://res.cloudinary.com/dqjbmzhfy/image/upload/c_fill,h_250,w_250/v1/Avatars/YEAH_ME",
+            is_active=False,
+            refresh_token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNhbXlyYXkxOTkyQGdtYWlsLmNvbSIsImlhdCI6MTY5Mzg1NTIxMCwiZXhwIjoxNjk0NDYwMDEwLCJzY29wZSI6InJlZnJlc2hfdG9rZW4ifQ.YzY8Qp0PBgqx4x2Gc_DY4hZ84xCSXygcP0jDnTWsCaA",
+        )
+
     def tearDown(self):
         del self.session
 
@@ -44,11 +60,12 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(new_user.email, "tests@gmail.com")
         self.assertEqual(new_user.role, Role.admin)
 
-        body_data= UserSchema(
-            username= "Corwin2",
-            email= "tessts@gmail.com",
-            password= "testpassword1",)
-        
+        body_data = UserSchema(
+            username="Corwin2",
+            email="tessts@gmail.com",
+            password="testpassword1",
+        )
+
         mock_result = MagicMock()
         mock_result.scalars.return_value.all.return_value = [new_user]
         self.session.execute.return_value = mock_result
@@ -56,7 +73,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         second_user = await create_user(body_data, self.session)
 
         self.assertIsInstance(second_user, User)
-        
+
         self.assertEqual(second_user.username, "Corwin2")
         self.assertEqual(second_user.email, "tessts@gmail.com")
         self.assertEqual(second_user.role, Role.user)
@@ -72,34 +89,56 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         mock_result.scalar_one_or_none.return_value = new_user
         self.session.execute.return_value = mock_result
 
-        result = await get_user_by_email(self.body_data.email,self.session)
+        result = await get_user_by_email(self.body_data.email, self.session)
 
         self.assertEqual(result.username, "Corwin")
         self.assertEqual(result.email, "tests@gmail.com")
         self.assertEqual(result.role, Role.admin)
 
     # async def test_edit_my_profile(self):
-    #     mock_result = MagicMock()
-    #     mock_result.scalars.return_value.all.return_value = []
-    #     self.session.execute.return_value = mock_result
-    #     new_user = await create_user(self.body_data, self.session)
+    #     mock_db = AsyncMock(spec=AsyncSession())
+    #     mock_file = MagicMock()
+    #     new_description = "New description"
+    #     new_username = "new_username"
+    #     user_id = 1
+    #     mock_user=MagicMock()
+    #     mock_user = User(
+    #         id=user_id,
+    #         username="old_username",
+    #         description="Old description",
+    #         avatar="old_avatar_url",
+    #     )
+    #     mock_user.scalar_one_or_none.return_value= mock_user
+    #     mock_db.execute.return_value = mock_user
 
-    #     mock_result = MagicMock()
-    #     mock_result.scalar_one_or_none.return_value = new_user
-    #     self.session.execute.return_value = mock_result
-    #     file=MagicMock()
-    #     file.filename = "example.jpg"
-    #     file.content_type = "image/jpeg"
-    #     file.read.return_value = b"fake_image_data"
-    #     file_bytes = b"fake_image_data"
-    #     new_des='YEess'
-    #     new_username='Marlyn'
+    #     init_cloudinary = MagicMock()
 
-    #     result = await edit_my_profile(file_bytes,new_des,new_username,new_user,self.session)
+    #     cloudinary_upload = MagicMock()
+    #     cloudinary_url = "new_avatar_url"
+    #     cloudinary_upload.return_value = {"url": cloudinary_url}
 
+    #     # Виклик функції edit_my_profile з мокованими параметрами
+    #     result = await edit_my_profile(
+    #         mock_file, new_description, new_username, mock_user, mock_db
+    #     )
+
+    #     # Перевірка, що функція взаємодіє з базою даних та Cloudinary правильно
+    #     mock_db.execute.assert_called_once()
+    #     mock_db.commit.assert_called_once()
+    #     mock_db.refresh.assert_called_once_with(mock_user)
+    #     init_cloudinary.assert_called_once()
+    #     cloudinary_upload.assert_called_once_with(
+    #         mock_file.file,
+    #         public_id=f"Avatars/{new_username}",
+    #         overwrite=True,
+    #         invalidate=True,
+    #     )
+
+    #     # Перевірка, що дані користувача були оновлені правильно
+    #     self.assertEqual(result.id, user_id)
     #     self.assertEqual(result.username, new_username)
-    #     self.assertEqual(result.description, new_des)
-
+    #     self.assertEqual(result.description, new_description)
+    #     self.assertEqual(result.avatar, cloudinary_url)
 
     async def test_get_users(self):
         mock_result = MagicMock()
@@ -111,7 +150,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         mock_result.scalars.return_value.all.return_value = [new_user]
         self.session.execute.return_value = mock_result
 
-        result = await get_users(0,10,self.session)
+        result = await get_users(0, 10, self.session)
 
         self.assertIsInstance(result, list)
 
@@ -119,35 +158,37 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result[0].email, new_user.email)
 
     async def test_get_user_profile(self):
-
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await get_user_profile(self.new_user.username,self.session)
+        result = await get_user_profile(self.new_user.username, self.session)
 
         self.assertIsInstance(result, UserProfileSchema)
 
         self.assertEqual(result.username, self.new_user.username)
         self.assertEqual(result.email, self.new_user.email)
+        self.assertEqual(result.photos_count, 1)
+        self.assertEqual(result.comments_count, 1)
 
     async def test_get_user_by_reset_token(self):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await get_user_by_reset_token(self.new_user.refresh_token,self.session)
+        result = await get_user_by_reset_token(
+            self.new_user.refresh_token, self.session
+        )
 
         self.assertEqual(result.username, self.new_user.username)
         self.assertEqual(result.email, self.new_user.email)
 
     async def test_get_user_by_user_id(self):
-
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await get_user_by_user_id(3,self.session)
+        result = await get_user_by_user_id(3, self.session)
 
         self.assertEqual(result.username, self.new_user.username)
         self.assertEqual(result.email, self.new_user.email)
@@ -157,7 +198,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await get_user_by_username("Corwin",self.session)
+        result = await get_user_by_username("Corwin", self.session)
 
         self.assertEqual(result.username, self.new_user.username)
         self.assertEqual(result.email, self.new_user.email)
@@ -167,69 +208,54 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await confirm_email("tests@gmail.com",self.session)
+        await confirm_email("tests@gmail.com", self.session)
 
         self.assertTrue(self.new_user.confirmed)
-
 
     async def test_ban_user(self):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await ban_user("tests@gmail.com",self.session)
+        await ban_user("tests@gmail.com", self.session)
 
         self.assertFalse(self.new_user.is_active)
-
 
     async def test_make_user_role(self):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await make_user_role("tests@gmail.com",Role.moder,self.session)
+        await make_user_role("tests@gmail.com", Role.moder, self.session)
 
         self.assertEqual(self.new_user.role, Role.moder)
 
+    async def test_add_to_blacklist(self):
+        mock_db = MagicMock(spec=AsyncSession())
+        token = "sample_token"
 
-    # async def test_add_to_blacklist(self):
-    #     token_to_blacklist = "your_test_token"
-    #     mock_db_session = MagicMock()
+        await add_to_blacklist(token, mock_db)
 
-    #     mock_execute = MagicMock()
-    #     mock_db_session.execute = mock_execute
-
-
-    #     mock_result = MagicMock()
-    #     mock_execute.return_value = mock_result
-    #     mock_result.scalar_one_or_none.return_value = None  
-
-
-    #     await add_to_blacklist(token_to_blacklist, self.session)
-
-
-    #     blacklist_query = mock_execute.select(BlacklistToken).filter(BlacklistToken.token == token_to_blacklist)
-    #     result = mock_execute.execute(blacklist_query)
-    #     blacklisted_token = result.scalar_one_or_none()
-
-
-    #     self.assertIsNotNone(blacklisted_token)
-    #     self.assertEqual(blacklisted_token.token, token_to_blacklist)
-    #     self.assertIsInstance(blacklisted_token.blacklisted_on, datetime)
-
+        mock_db.add.assert_called_once()
+        mock_db.commit.assert_called_once()
+        mock_db.refresh.assert_called_once()
 
     # async def test_is_blacklisted_token(self):
-    #     mock_result = MagicMock()
-    #     mock_result.scalar_one_or_none.return_value = self.new_user
-    #     self.session.execute.return_value = mock_result
-    #     result = await create_user(body,self.session)
+    #         # Створення мокованого об'єкта бази даних
+    #         mock_db = AsyncSession()
 
-    #     self.assertEqual(result.username, body.username)
-    #     self.assertEqual(result.email, body.email)
+    #         # Припустимо, що ми маємо чорний список з одним токеном "blacklisted_token"
+    #         blacklisted_token = "blacklisted_token"
 
+    #         # Перевірка токена, який знаходиться у блеклісті
+    #         result = await is_blacklisted_token(blacklisted_token, mock_db)
+    #         self.assertTrue(result)  # Повинно повернути True
 
-    
-   
+    #         # Перевірка токена, який не знаходиться у блеклісті
+    #         non_blacklisted_token = "non_blacklisted_token"
+    #         result = await is_blacklisted_token(non_blacklisted_token, mock_db)
+    #         self.assertFalse(result)  # Повинно повернути False
+
     async def test_update_token(self):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = self.new_user
@@ -240,10 +266,6 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(new_token, self.new_user.refresh_token)
 
-
-
-
-    
 
 if __name__ == "__main__":
     unittest.main()

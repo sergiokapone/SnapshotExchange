@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
+
 from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE, NO_PHOTO_BY_ID
 from src.database.models import User, Rating, Photo
 
@@ -28,6 +29,7 @@ async def create_rating(rating: int, photos_id: int, user: User, db: AsyncSessio
         )
 
     query = select(Photo).filter(Photo.id == photos_id)
+
     result = await db.execute(query)
     photo = result.scalar()
 
