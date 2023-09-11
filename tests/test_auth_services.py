@@ -1,23 +1,19 @@
 import unittest
-from unittest.mock import AsyncMock,MagicMock,patch
-from sqlalchemy.ext.asyncio import AsyncSession
+from unittest.mock import AsyncMock, MagicMock, patch
 import sys
-import pickle
-import os  
+import os
 from fastapi import HTTPException, status
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fastapi import HTTPException
-from datetime import datetime, timedelta
-from src.database.models import Rating,Photo,User,Tag
-from src.schemas import UserSchema
+from src.database.models import User
 from src.services.auth import Auth
 
 
 class TestAuth(unittest.IsolatedAsyncioTestCase):
-    
     def setUp(self):
         self.auth = Auth()
-        
+
     def tearDown(self):
         self.auth._redis_cache = None
 
@@ -47,14 +43,19 @@ class TestAuth(unittest.IsolatedAsyncioTestCase):
         email_token = self.auth.create_email_token(data)
         self.assertTrue(email_token)
 
-    @patch('src.services.auth.jwt.decode')
+    @patch("src.services.auth.jwt.decode")
     async def test_decode_token_valid(self, mock_decode):
         token = "valid_token"
-        mock_decode.return_value = {"scope": "refresh_token", "email": "test@example.com"}
+        mock_decode.return_value = {
+            "scope": "refresh_token",
+            "email": "test@example.com",
+        }
 
         decoded_email = await self.auth.decode_token(token)
 
-        mock_decode.assert_called_once_with(token, self.auth.SECRET_KEY, algorithms=[self.auth.ALGORITHM])
+        mock_decode.assert_called_once_with(
+            token, self.auth.SECRET_KEY, algorithms=[self.auth.ALGORITHM]
+        )
 
         self.assertEqual(decoded_email, "test@example.com")
 
@@ -77,7 +78,6 @@ class TestAuth(unittest.IsolatedAsyncioTestCase):
 
         self.auth.get_authenticated_user.assert_called_once_with(access_token, db)
 
-
         self.assertIsInstance(result, User)
         self.assertEqual(result.id, user.id)
         self.assertEqual(result.username, user.username)
@@ -86,75 +86,22 @@ class TestAuth(unittest.IsolatedAsyncioTestCase):
         request = MagicMock()
         db = AsyncMock()
 
-
         request.cookies.get.return_value = None
 
-        self.auth.get_authenticated_user = AsyncMock(side_effect=HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No access token provided"))
+        self.auth.get_authenticated_user = AsyncMock(
+            side_effect=HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="No access token provided",
+            )
+        )
 
         with self.assertRaises(HTTPException) as context:
             await self.auth.allow_rout(request, db)
 
-
         self.auth.get_authenticated_user.assert_called_once_with(None, db)
-
 
         self.assertEqual(context.exception.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(context.exception.detail, "No access token provided")
-
-    # async def test_get_authenticated_user_from_cache(self):
-    #     # Підготовка моків
-    #     email = "test@example.com"
-    #     token = "valid_token"
-        
-    #     # Створіть підклас Auth з атрибутом redis_cache
-    #     class TestAuth(Auth):
-    #         redis_cache = MagicMock()
-
-    #     auth = TestAuth()  # Ініціалізуйте свій об'єкт Auth
-
-    #     # Створіть мок-об'єкт для Auth.redis_cache
-    #     mock_redis_cache = auth.redis_cache
-    #     mock_redis_cache.get.return_value = pickle.dumps({"email": email})
-
-    #     # Викличемо функцію для перевірки з кешу
-    #     user = await auth.get_authenticated_user(token)
-
-    #     # Перевірка, що кеш був використаний
-    #     mock_redis_cache.get.assert_called_once_with(f"user:{email}")
-
-    #     # Перевірка, що user має правильний email
-    #     self.assertEqual(user["email"], email)
-
-    # async def test_get_authenticated_user_from_db(self):
-    #     # Підготовка моків
-    #     email = "test@example.com"
-    #     token = "valid_token"
-        
-    #     # Створіть підклас Auth з атрибутом redis_cache
-    #     class TestAuth(Auth):
-    #         redis_cache = MagicMock()
-
-    #     auth = TestAuth()  # Ініціалізуйте свій об'єкт Auth
-
-    #     # Створіть мок-об'єкт для Auth.redis_cache
-    #     mock_redis_cache = auth.redis_cache
-    #     mock_redis_cache.get.return_value = None
-
-    #     # Створіть мок-об'єкт для repository_users.get_user_by_email
-    #     mock_get_user_by_email = MagicMock()
-    #     mock_get_user_by_email.return_value = {"email": email}
-
-    #     # Викличемо функцію для перевірки з бази даних
-    #     user = await auth.get_authenticated_user(token)
-
-    #     # Перевірка, що кеш не був використаний
-    #     mock_redis_cache.get.assert_called_once_with(f"user:{email}")
-
-    #     # Перевірка, що get_user_by_email був викликаний
-    #     mock_get_user_by_email.assert_called_once_with(email)
-
-    #     # Перевірка, що user має правильний email
-    #     self.assertEqual(user["email"], email)
 
     async def test_get_authenticated_user_invalid_token(self):
         invalid_token = "invalid_token"
@@ -170,11 +117,16 @@ class TestAuth(unittest.IsolatedAsyncioTestCase):
             await self.auth.get_email_from_token(invalid_token)
 
     async def test_get_email_from_valid_token(self):
-        data = {"sub": "test@example.com", "scope": "email_token", "email": "test@example.com"}
+        data = {
+            "sub": "test@example.com",
+            "scope": "email_token",
+            "email": "test@example.com",
+        }
         token = self.auth.create_email_token(data)
 
         email = await self.auth.get_email_from_token(token)
         self.assertEqual(email, "test@example.com")
+
 
 if __name__ == "__main__":
     unittest.main()

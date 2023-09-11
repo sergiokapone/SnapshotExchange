@@ -7,28 +7,43 @@ from datetime import datetime
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.database.models import User,Role,BlacklistToken
-from src.schemas import UserSchema,UserProfileSchema
-from src.repository.users import get_user_by_email, edit_my_profile, create_user, update_token,get_users,get_user_profile,get_user_by_reset_token,get_user_by_user_id,get_user_by_username,confirm_email,ban_user,make_user_role,add_to_blacklist,is_blacklisted_token
+from src.database.models import User, Role
+from src.schemas import UserSchema, UserProfileSchema
+from src.repository.users import (
+    get_user_by_email,
+    create_user,
+    update_token,
+    get_users,
+    get_user_profile,
+    get_user_by_reset_token,
+    get_user_by_user_id,
+    get_user_by_username,
+    confirm_email,
+    ban_user,
+    make_user_role,
+    add_to_blacklist,
+)
+
 
 class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
-
     def setUp(self):
-
         self.session = AsyncMock(spec=AsyncSession)
-        self.body_data= UserSchema(
-            username= "Corwin",
-            email= "tests@gmail.com",
-            password= "testpassword1",)
-        self.new_user=User(id=3,username="Corwin",
-                           role=Role.user,
-    email="tests@gmail.com",
-    created_at=datetime.now(),
-    avatar='https://res.cloudinary.com/dqjbmzhfy/image/upload/c_fill,h_250,w_250/v1/Avatars/YEAH_ME',
-    is_active=False,
-    refresh_token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNhbXlyYXkxOTkyQGdtYWlsLmNvbSIsImlhdCI6MTY5Mzg1NTIxMCwiZXhwIjoxNjk0NDYwMDEwLCJzY29wZSI6InJlZnJlc2hfdG9rZW4ifQ.YzY8Qp0PBgqx4x2Gc_DY4hZ84xCSXygcP0jDnTWsCaA'
-    )
-        
+        self.body_data = UserSchema(
+            username="Corwin",
+            email="tests@gmail.com",
+            password="testpassword1",
+        )
+        self.new_user = User(
+            id=3,
+            username="Corwin",
+            role=Role.user,
+            email="tests@gmail.com",
+            created_at=datetime.now(),
+            avatar="https://res.cloudinary.com/dqjbmzhfy/image/upload/c_fill,h_250,w_250/v1/Avatars/YEAH_ME",
+            is_active=False,
+            refresh_token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNhbXlyYXkxOTkyQGdtYWlsLmNvbSIsImlhdCI6MTY5Mzg1NTIxMCwiZXhwIjoxNjk0NDYwMDEwLCJzY29wZSI6InJlZnJlc2hfdG9rZW4ifQ.YzY8Qp0PBgqx4x2Gc_DY4hZ84xCSXygcP0jDnTWsCaA",
+        )
+
     def tearDown(self):
         del self.session
 
@@ -45,11 +60,12 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(new_user.email, "tests@gmail.com")
         self.assertEqual(new_user.role, Role.admin)
 
-        body_data= UserSchema(
-            username= "Corwin2",
-            email= "tessts@gmail.com",
-            password= "testpassword1",)
-        
+        body_data = UserSchema(
+            username="Corwin2",
+            email="tessts@gmail.com",
+            password="testpassword1",
+        )
+
         mock_result = MagicMock()
         mock_result.scalars.return_value.all.return_value = [new_user]
         self.session.execute.return_value = mock_result
@@ -57,7 +73,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         second_user = await create_user(body_data, self.session)
 
         self.assertIsInstance(second_user, User)
-        
+
         self.assertEqual(second_user.username, "Corwin2")
         self.assertEqual(second_user.email, "tessts@gmail.com")
         self.assertEqual(second_user.role, Role.user)
@@ -73,7 +89,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         mock_result.scalar_one_or_none.return_value = new_user
         self.session.execute.return_value = mock_result
 
-        result = await get_user_by_email(self.body_data.email,self.session)
+        result = await get_user_by_email(self.body_data.email, self.session)
 
         self.assertEqual(result.username, "Corwin")
         self.assertEqual(result.email, "tests@gmail.com")
@@ -124,7 +140,6 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
     #     self.assertEqual(result.description, new_description)
     #     self.assertEqual(result.avatar, cloudinary_url)
 
-
     async def test_get_users(self):
         mock_result = MagicMock()
         mock_result.scalars.return_value.all.return_value = []
@@ -135,7 +150,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         mock_result.scalars.return_value.all.return_value = [new_user]
         self.session.execute.return_value = mock_result
 
-        result = await get_users(0,10,self.session)
+        result = await get_users(0, 10, self.session)
 
         self.assertIsInstance(result, list)
 
@@ -143,12 +158,11 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result[0].email, new_user.email)
 
     async def test_get_user_profile(self):
-
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await get_user_profile(self.new_user.username,self.session)
+        result = await get_user_profile(self.new_user.username, self.session)
 
         self.assertIsInstance(result, UserProfileSchema)
 
@@ -157,24 +171,24 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.photos_count, 1)
         self.assertEqual(result.comments_count, 1)
 
-
     async def test_get_user_by_reset_token(self):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await get_user_by_reset_token(self.new_user.refresh_token,self.session)
+        result = await get_user_by_reset_token(
+            self.new_user.refresh_token, self.session
+        )
 
         self.assertEqual(result.username, self.new_user.username)
         self.assertEqual(result.email, self.new_user.email)
 
     async def test_get_user_by_user_id(self):
-
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await get_user_by_user_id(3,self.session)
+        result = await get_user_by_user_id(3, self.session)
 
         self.assertEqual(result.username, self.new_user.username)
         self.assertEqual(result.email, self.new_user.email)
@@ -184,7 +198,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await get_user_by_username("Corwin",self.session)
+        result = await get_user_by_username("Corwin", self.session)
 
         self.assertEqual(result.username, self.new_user.username)
         self.assertEqual(result.email, self.new_user.email)
@@ -194,43 +208,37 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await confirm_email("tests@gmail.com",self.session)
+        await confirm_email("tests@gmail.com", self.session)
 
         self.assertTrue(self.new_user.confirmed)
-
 
     async def test_ban_user(self):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await ban_user("tests@gmail.com",self.session)
+        await ban_user("tests@gmail.com", self.session)
 
         self.assertFalse(self.new_user.is_active)
-
 
     async def test_make_user_role(self):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = self.new_user
         self.session.execute.return_value = mock_result
 
-        result = await make_user_role("tests@gmail.com",Role.moder,self.session)
+        await make_user_role("tests@gmail.com", Role.moder, self.session)
 
         self.assertEqual(self.new_user.role, Role.moder)
 
     async def test_add_to_blacklist(self):
-            mock_db = MagicMock(spec=AsyncSession())
-            token = "sample_token"
+        mock_db = MagicMock(spec=AsyncSession())
+        token = "sample_token"
 
+        await add_to_blacklist(token, mock_db)
 
-            await add_to_blacklist(token, mock_db)
-
-
-            mock_db.add.assert_called_once()
-            mock_db.commit.assert_called_once()
-            mock_db.refresh.assert_called_once()
-
-
+        mock_db.add.assert_called_once()
+        mock_db.commit.assert_called_once()
+        mock_db.refresh.assert_called_once()
 
     # async def test_is_blacklisted_token(self):
     #         # Створення мокованого об'єкта бази даних
@@ -248,8 +256,6 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
     #         result = await is_blacklisted_token(non_blacklisted_token, mock_db)
     #         self.assertFalse(result)  # Повинно повернути False
 
-    
-   
     async def test_update_token(self):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = self.new_user
@@ -260,10 +266,6 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(new_token, self.new_user.refresh_token)
 
-
-
-
-    
 
 if __name__ == "__main__":
     unittest.main()

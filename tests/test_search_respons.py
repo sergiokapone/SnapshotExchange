@@ -1,21 +1,19 @@
 import unittest
-from unittest.mock import AsyncMock,MagicMock
+from unittest.mock import AsyncMock, MagicMock
 from sqlalchemy.ext.asyncio import AsyncSession
 import sys
-import os  
+import os
 from datetime import date
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.database.models import Rating,Photo,User,Tag
-from src.schemas import UserSchema
-from src.repository.search import search_admin,search_by_tag,search_by_description,search_by_username
+from src.repository.search import search_by_tag, search_by_description
 
 
 class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
-
     def setUp(self):
         self.session = AsyncMock(spec=AsyncSession())
-        
+
     def tearDown(self):
         del self.session
 
@@ -32,9 +30,11 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         start_date = date(2023, 1, 1)
         end_date = date(2023, 12, 31)
 
-        result = await search_by_tag(tag, rating_low, rating_high, start_date, end_date, db)
+        result = await search_by_tag(
+            tag, rating_low, rating_high, start_date, end_date, db
+        )
 
-        self.assertEqual(len(result), 0)  
+        self.assertEqual(len(result), 0)
 
     async def test_search_by_description(self):
         db = AsyncMock()
@@ -43,20 +43,19 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         query.scalar.return_value = ["description"]
         db.execute.return_value = query
 
-
         text = "description"
         rating_low = 3.0
         rating_high = 5.0
         start_date = date(2023, 1, 1)
         end_date = date(2023, 12, 31)
 
-        result = await search_by_description(text, rating_low, rating_high, start_date, end_date, db)
+        result = await search_by_description(
+            text, rating_low, rating_high, start_date, end_date, db
+        )
 
-
-        self.assertEqual(len(result), 0)  
+        self.assertEqual(len(result), 0)
 
     # async def test_search_by_username(self):
-
 
     #     fake_user = User(username="testuser", photos=[Photo(id=1), Photo(id=2)])
     #     fake_result = MagicMock()
@@ -72,8 +71,6 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
     #     # Перевірка результату
     #     self.assertEqual(result, fake_user)
 
-
-
     # async def test_search_photos_admin(self):
     #     tag_name = "nature"
     #     user_id = 1
@@ -81,7 +78,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
     #     rating_high = 5.0
     #     start_date = date(2023, 1, 1)
     #     end_date = date(2023, 12, 31)
-        
+
     #     tag = Tag(name=tag_name)
     #     photo1 = Photo(description="Nature photo 1", ratings=Rating(rating=4.0), user_id=user_id, created_at=start_date)
     #     photo2 = Photo(description="Nature photo 2", ratings=Rating(rating=5.0), user_id=user_id, created_at=start_date)
@@ -94,7 +91,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
     #     fake_results = [photo1, photo2, photo3]
 
     #     mock_user_query = MagicMock()
-    #     self.session.scalar.return_value = None  
+    #     self.session.scalar.return_value = None
     #     self.session.execute.return_value = mock_user_query
 
     #     mock_photos_query = MagicMock()
@@ -110,6 +107,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
     #     self.assertEqual(result[1].ratings.rating, 5.0)
     #     self.assertEqual(result[2].description, "Nature photo 3")
     #     self.assertEqual(result[2].ratings.rating, 2.0)
+
 
 if __name__ == "__main__":
     unittest.main()

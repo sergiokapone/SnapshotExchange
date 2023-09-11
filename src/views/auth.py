@@ -8,7 +8,6 @@ from fastapi.security import (
 )
 
 from fastapi.templating import Jinja2Templates
-from fastapi.requests import Request
 
 templates = Jinja2Templates(directory="templates")
 

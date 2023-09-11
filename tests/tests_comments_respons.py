@@ -1,26 +1,22 @@
 import unittest
-from unittest.mock import AsyncMock,MagicMock,patch
+from unittest.mock import AsyncMock
 from sqlalchemy.ext.asyncio import AsyncSession
 import sys
 import os
-from sqlalchemy.future import select
 
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.database.models import Rating,Photo,User,Comment,QR_code,Tag,Role
-from src.schemas import UserSchema,PhotosDb
-from src.repository.comments import create_comment,get_comment,update_comment,delete_comment,get_photo_comments,get_user_comments
+from src.database.models import Comment
+from src.repository.comments import get_comment, update_comment, delete_comment
 
 
 class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
-
     def setUp(self):
         self.session = AsyncMock(spec=AsyncSession())
-        
+
     def tearDown(self):
         del self.session
-
 
     async def test_get_comment(self):
         comment_id = 1
@@ -28,9 +24,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         mock_comment = Comment(id=comment_id, text=comment_text)
         self.session.get.return_value = mock_comment
 
-
         result = await get_comment(comment_id, self.session)
-
 
         self.assertEqual(result, mock_comment)
         self.session.get.assert_called_once_with(Comment, comment_id)
@@ -38,7 +32,9 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
     async def test_update_comment(self):
         comment_id = 1
         new_comment_text = "Updated comment text"
-        mock_comment = Comment(id=comment_id, text="Original comment text", update_status=False)
+        mock_comment = Comment(
+            id=comment_id, text="Original comment text", update_status=False
+        )
         self.session.get.return_value = mock_comment
 
         result = await update_comment(new_comment_text, comment_id, self.session)
@@ -59,6 +55,6 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         self.session.delete.assert_called_once_with(mock_comment)
         self.session.commit.assert_called_once()
 
-    
+
 if __name__ == "__main__":
     unittest.main()
