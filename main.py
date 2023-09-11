@@ -1,4 +1,3 @@
-from fastapi.encoders import jsonable_encoder
 import uvicorn
 from datetime import datetime
 
@@ -67,9 +66,8 @@ async def startup():
     tags=["Root"],
     # dependencies=[Depends(RateLimiter(times=2, seconds=5))]
 )
-@app.get("/")
 async def root():
-    return jsonable_encoder(project_info, exclude={"problematic_field"})
+    return project_info
 
 
 @app.get("/api/healthchecker", tags=["Root"])
