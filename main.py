@@ -22,7 +22,6 @@ from src.routes.ratings import router as ratings_router
 from src.routes.photos import router as photos_router
 from src.routes.comments import router as comments_router
 from src.routes.search import router as search_router
-from src.conf.info_dict import project_info
 
 from src.views.dashboard import router as dashboard_views_router
 from src.views.auth import router as auth_views_router
@@ -68,7 +67,36 @@ async def startup():
     # dependencies=[Depends(RateLimiter(times=2, seconds=5))]
 )
 async def root():
-    return project_info
+    return {
+        "name": "Snapshot Exchange REST API!",
+        "version": "Version 1.0",
+        "description": "This API provides access to Snapshot Exchange services.",
+        "authors": [
+            {
+                "name": "Sergiy Ponomarenko (aka sergiokapone)",
+                "github": "https://github.com/sergiokapone",
+                "additional_info": "Team Lead of Project",
+            },
+            {
+                "name": "Sergiy Stepanov",
+                "github": "https://github.com/S-Stepanov-1",
+                "additional_info": "Scrum Master",
+            },
+            {
+                "name": "Ilya Vasylevskyi",
+                "github": "https://github.com/BonesetterB",
+                "additional_info": "Contributor",
+            },
+            {
+                "name": "Oleksandr Tarasov",
+                "github": "https://github.com/Taras55001",
+                "additional_info": "Contributor",
+            },
+        ],
+        "license": "This API is distributed under the MIT License.",
+        "site": "https://snapshotexchange.onrender.com/docs",
+        "repository": "https://github.com/sergiokapone/SnapshotExchange",
+    }
 
 
 @app.get("/api/healthchecker", tags=["Root"])
