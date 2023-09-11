@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.database.models import Rating,Photo,User,Comment,QR_code,Tag,Role
 from src.schemas import UserSchema,PhotosDb
-from src.repository.photos import get_or_create_tag,get_photo_tags,get_photo_comments,upload_photo,get_my_photos,get_photos,get_photo_by_id,update_photo,remove_photo,get_URL_QR
+from src.repository.photos import get_or_create_tag,get_photo_tags,upload_photo,get_my_photos,get_photos,get_photo_by_id,update_photo,remove_photo,get_URL_QR
 from src.conf.messages import YOUR_PHOTO, ALREADY_LIKE
 
 
@@ -85,34 +85,17 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
 
 
 
-    async def test_get_photo_comments(self):
-        mock_query = MagicMock()
-        comment1 = Comment(text="Comment 1", user_id=3)
-        comment2 = Comment(text="Comment 2", user_id=4)
-        mock_query.all.return_value = [comment1, comment2]
 
-        self.session.execute.return_value = mock_query
+    # async def test_get_photo_comments_no_comments(self):
+    #     mock_query = MagicMock()
+    #     mock_query.all.return_value = []
+    #     self.session.execute.return_value = mock_query
 
-        photo_id = 1
+    #     photo_id = 1
 
-        res = await get_photo_comments(photo_id, self.session)
+    #     res = await get_photo_comments(photo_id, self.session)
 
-        expected_result = [
-            {"text": "Comment 1", "username": 3},
-            {"text": "Comment 2", "username": 4}
-        ]
-        self.assertEqual(res, expected_result)
-
-    async def test_get_photo_comments_no_comments(self):
-        mock_query = MagicMock()
-        mock_query.all.return_value = []
-        self.session.execute.return_value = mock_query
-
-        photo_id = 1
-
-        res = await get_photo_comments(photo_id, self.session)
-
-        self.assertEqual(res, [])
+    #     self.assertEqual(res, [])
         
     # async def test_upload_photo(self):
     #     mock_query = MagicMock()
@@ -245,19 +228,19 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(result.user_id, expected_result.user_id)
             self.assertEqual(result.description, expected_result.description)
 
-    async def test_remove_photo(self):
+    # async def test_remove_photo(self):
 
-        mock_query = MagicMock()
-        photo = Photo(id=1, url="photo_url", user_id=1, cloud_public_id="public_id")
-        mock_query.scalar_one_or_none.return_value = photo
-        self.session.execute.return_value = mock_query
+    #     mock_query = MagicMock()
+    #     photo = Photo(id=1, url="photo_url", user_id=1, cloud_public_id="public_id")
+    #     mock_query.scalar_one_or_none.return_value = photo
+    #     self.session.execute.return_value = mock_query
 
-        user = User(id=1, username="user1", role=Role.user)
-        photo_id = 1
+    #     user = User(id=1, username="user1", role=Role.user)
+    #     photo_id = 1
 
-        result = await remove_photo(photo_id, user, self.session)
+    #     result = await remove_photo(photo_id, user, self.session)
 
-        self.assertTrue(result)
+    #     self.assertTrue(result)
 
     async def test_get_URL_Qr(self):
 

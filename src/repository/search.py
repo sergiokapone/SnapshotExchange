@@ -192,4 +192,5 @@ async def search_admin(
 
     photos_by_user = await db.execute(query)
     photos = photos_by_user.scalars().all()
+    
     return photos

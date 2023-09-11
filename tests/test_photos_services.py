@@ -10,7 +10,7 @@ from src.services.photos import validate_crop_mode, validate_gravity_mode
 
 
 
-class TestValidationFunctions(unittest.TestCase):
+class TestValidationFunctions(unittest.IsolatedAsyncioTestCase):
 
     def test_valid_crop_mode(self):
         crop_mode = "fill"
