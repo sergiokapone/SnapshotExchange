@@ -8,7 +8,6 @@ from fastapi import (
     status,
 )
 
-from fastapi.encoders import jsonable_encoder
 from fastapi_limiter.depends import RateLimiter
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -492,7 +491,7 @@ async def patch_update_photo(
     )
 
     if updated_photo:
-        return jsonable_encoder(updated_photo)
+        return updated_photo
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NO_PHOTO_BY_ID)
 
