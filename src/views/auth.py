@@ -10,27 +10,6 @@ from fastapi.security import (
 from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
 
-
-### Import from SQLAlchemy ###
-
-
-### Import from Pydentic ###
-
-
-### Import from Configurations ###
-
-
-### Import from Database ###
-
-
-### Import from Schemas ###
-
-
-### Import from Services ###
-
-### Import from Repository ###
-
-
 templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(prefix="/auth", tags=["Authentication View"])
