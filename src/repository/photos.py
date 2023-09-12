@@ -334,9 +334,11 @@ async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
     query = select(Photo).filter(Photo.id == photo_id)
     result = await db.execute(query)
     photo = result.scalar_one_or_none()
+    print(photo)
 
-    if not photo:
+    if not photo :
         return False
+    
 
     if user.role == Role.admin or photo.user_id == user.id:
         # deleting from cloudinary

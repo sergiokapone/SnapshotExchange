@@ -1,27 +1,43 @@
 import unittest
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock,patch
 from sqlalchemy.ext.asyncio import AsyncSession
 import sys
 import os
-
+from typing import List, Union
+from fastapi import HTTPException, status
+from datetime import datetime
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.database.models import Photo, User, QR_code, Tag
+from src.conf.config import init_cloudinary
+from src.services.photos import validate_crop_mode
+
+from src.database.models import Photo, User, QR_code, Tag,Comment,Rating,Role
 from src.repository.photos import (
     get_or_create_tag,
     get_photo_tags,
+    get_photo_info,
     get_my_photos,
     get_photos,
     get_photo_by_id,
     update_photo,
     get_URL_QR,
+    upload_photo,
+    remove_photo,
 )
 
 
 class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.session = AsyncMock(spec=AsyncSession())
-        self.user = User(
+        self.user  = User(
+            id=1,
+            username="Corwin",
+            email="tests@gmail.com",
+            password="testpassword1",
+            confirmed=True,
+            role=Role.user
+        )
+        self.current_user  = User(
             id=1,
             username="Corwin",
             email="tests@gmail.com",
@@ -29,10 +45,70 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
             confirmed=True,
         )
 
-        self.session.execute.return_value.scalar.return_value = Photo(user_id=2)
+
+
+        self.photo_file = AsyncMock()
+        self.photo_description = "A beautiful landscape"
+        self.db_session = AsyncMock(spec=AsyncSession)
+        self.width = 800
+        self.height = 600
+        self.crop_mode = "pad"
+        self.rounding = 10
+        self.background_color = "white"
+        self.rotation_angle = 90
+        self.tags = ["nature", "scenic"]
+
+        self.photo = Photo(
+            id=1,
+            url="photo_url",
+            description="A beautiful landscape",
+            user=self.user,
+            created_at=datetime(2023, 9, 7, 12, 0, 0),
+            tags=[Tag(name="nature"), Tag(name="scenic")],
+            
+        )
+        self.photo2 = Photo(
+            id=1,
+            url="photo_url",
+            description="A beautiful landscape",
+            user=self.user,
+            created_at=datetime(2023, 9, 7, 12, 0, 0),
+            tags=[Tag(name="nature"), Tag(name="scenic")],
+            user_id=self.user.id
+            
+        )
 
     def tearDown(self):
         del self.session
+
+    
+    @patch("src.repository.photos.get_URL_QR")
+    @patch("src.repository.ratings.get_rating")
+    async def test_get_photo_info(self, mock_get_rating, mock_get_URL_QR):
+        mock_query = MagicMock()
+        # Підготовка моків та їх поверненням значень
+        mock_get_rating.return_value = 4.5
+        mock_get_URL_QR.return_value = {"qr_code_url": "qr_url"}
+        mock_query.scalar_one.return_value = self.photo
+        self.session.execute.return_value = mock_query
+        # self.session.execute.return_value.scalar_one.return_value = self.photo
+
+
+        result = await get_photo_info(self.photo, self.session)
+
+        expected_result = {
+            "id": 1,
+            "url": "photo_url",
+            "QR": "qr_url",
+            "description": "A beautiful landscape",
+            "username": "Corwin",
+            "created_at": "2023-09-07 12:00:00",
+            "comments": [],
+            "tags": ["nature", "scenic"],
+            "rating": 4.5,
+        }
+
+        self.assertEqual(result, expected_result)
 
     async def test_get_or_create_tag(self):
         mock_query = MagicMock()
@@ -75,6 +151,30 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         res = await get_photo_tags(photo_id, self.session)
 
         self.assertEqual(res, None)
+
+    @patch("src.services.photos.validate_crop_mode", return_value=False)
+    async def test_upload_photo_invalid_crop_mode(self, mock_validate_crop_mode):
+        # Перевіряємо, як функція веде себе, коли crop_mode неправильний
+        # Тут викликана функція validate_crop_mode буде завжди повертати False
+
+        # Викликаємо функцію upload_photo з неправильним crop_mode
+        with self.assertRaises(HTTPException) as context:
+            await upload_photo(
+                self.current_user,
+                self.photo_file,
+                self.photo_description,
+                self.db_session,
+                self.width,
+                self.height,
+                "invalid_crop_mode",  # Неправильний crop_mode
+                self.rounding,
+                self.background_color,
+                self.rotation_angle,
+                self.tags,
+            )
+
+        # Перевіряємо, що функція спрацювала з помилкою HTTPException
+        self.assertEqual(context.exception.status_code, status.HTTP_400_BAD_REQUEST)
 
     async def test_get_my_photos(self):
         mock_query = MagicMock()
@@ -184,6 +284,58 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         expected_result = {"source_url": photo.url, "qr_code_url": qr.url}
         self.assertEqual(result, expected_result)
 
+    @patch("src.conf.config.init_cloudinary")
+    @patch("cloudinary.uploader.destroy")
+    async def test_remove_photo_success(self, mock_destroy, mock_init_cloudinary):
+        # Підготовка моків
+        db_mock = AsyncMock()
+        photo_id = self.photo2.id
+        user_id = self.user
+
+
+        mock_query = MagicMock()
+        db_mock.scalar_one_or_none.return_value = self.photo2
+        db_mock.execute.return_value=mock_query
+
+        # Налаштування моків та повернення значень
+        db_mock.execute.return_value.scalar_one_or_none.return_value=mock_query
+
+
+        # Виклик функції remove_photo
+        result = await remove_photo(photo_id, user_id, db_mock)
+
+        # Перевірка, чи видаляється фото з Cloudinary
+        mock_init_cloudinary.assert_called_once()
+        mock_destroy.assert_called_once_with("photo_url")
+
+        # Перевірка, чи видаляються пов'язані рейтинги
+        db_mock.execute.assert_called_once()
+        db_mock.execute.assert_called_with(
+            Rating.__table__.delete().where(Rating.photo_id == photo_id)
+        )
+
+        # Перевірка, чи видаляється сама фотографія з бази даних
+        db_mock.delete.assert_called_once_with(self.photo2)
+        db_mock.commit.assert_called_once()
+
+        # Перевірка, чи функція повертає True (успішне видалення)
+        self.assertTrue(result)
+
+    async def test_remove_photo_not_found(self):
+
+        db_mock = AsyncMock()
+        photo_id = 50
+        user_id = self.user
+
+
+        mock_query = MagicMock()
+        mock_query.scalar_one_or_none.return_value = None
+        db_mock.execute.return_value=mock_query
+
+        result = await remove_photo(photo_id, user_id, db_mock)
+
+
+        self.assertFalse(result)
 
 if __name__ == "__main__":
     unittest.main()
