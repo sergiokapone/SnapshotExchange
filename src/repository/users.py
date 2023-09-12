@@ -301,6 +301,7 @@ async def make_user_role(email: str, role: Role, db: AsyncSession) -> None:
     :param db: Session: Pass the database session to the function
     :return: None
     """
+    
     user = await get_user_by_email(email, db)
     user.role = role
     try:
@@ -343,7 +344,7 @@ async def is_blacklisted_token(token: str, db: AsyncSession) -> bool:
     :return: True if the token is blacklisted, False otherwise.
     :rtype: bool
     """
-
+    
     result = await db.execute(
         select(BlacklistToken).filter(BlacklistToken.token == token)
     )

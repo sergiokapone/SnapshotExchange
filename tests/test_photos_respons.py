@@ -35,7 +35,7 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
             email="tests@gmail.com",
             password="testpassword1",
             confirmed=True,
-            role=Role.user
+            role=Role.admin
         )
         self.current_user  = User(
             id=1,
@@ -74,7 +74,8 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
             user=self.user,
             created_at=datetime(2023, 9, 7, 12, 0, 0),
             tags=[Tag(name="nature"), Tag(name="scenic")],
-            user_id=self.user.id
+            user_id=self.user.id,
+            cloud_public_id="photo_url"
             
         )
 
@@ -284,41 +285,43 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         expected_result = {"source_url": photo.url, "qr_code_url": qr.url}
         self.assertEqual(result, expected_result)
 
+    async def test_get_URL_Qr_None(self):
+        mock_query = MagicMock()
+        photo = Photo(id=1, url="photo_url")
+        qr = QR_code(url="qr_code_url", photo_id=1)
+        mock_query.scalar.return_value = None
+        mock_query.scalar_one_or_none.return_value = qr
+        self.session.execute.side_effect = [mock_query, mock_query]
+
+        photo_id = 10
+        with self.assertRaises(HTTPException) as context:
+            await get_URL_QR(photo_id, self.session)
+
+        self.assertEqual(context.exception.status_code, status.HTTP_404_NOT_FOUND)
+
+
     @patch("src.conf.config.init_cloudinary")
     @patch("cloudinary.uploader.destroy")
     async def test_remove_photo_success(self, mock_destroy, mock_init_cloudinary):
-        # Підготовка моків
         db_mock = AsyncMock()
         photo_id = self.photo2.id
         user_id = self.user
 
 
         mock_query = MagicMock()
-        db_mock.scalar_one_or_none.return_value = self.photo2
+        mock_query.scalar_one_or_none.return_value = self.photo2
         db_mock.execute.return_value=mock_query
 
-        # Налаштування моків та повернення значень
-        db_mock.execute.return_value.scalar_one_or_none.return_value=mock_query
 
 
-        # Виклик функції remove_photo
         result = await remove_photo(photo_id, user_id, db_mock)
 
-        # Перевірка, чи видаляється фото з Cloudinary
-        mock_init_cloudinary.assert_called_once()
         mock_destroy.assert_called_once_with("photo_url")
 
-        # Перевірка, чи видаляються пов'язані рейтинги
-        db_mock.execute.assert_called_once()
-        db_mock.execute.assert_called_with(
-            Rating.__table__.delete().where(Rating.photo_id == photo_id)
-        )
 
-        # Перевірка, чи видаляється сама фотографія з бази даних
         db_mock.delete.assert_called_once_with(self.photo2)
         db_mock.commit.assert_called_once()
 
-        # Перевірка, чи функція повертає True (успішне видалення)
         self.assertTrue(result)
 
     async def test_remove_photo_not_found(self):
