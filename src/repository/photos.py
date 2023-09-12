@@ -102,7 +102,7 @@ async def upload_photo(
     width: int | None,
     height: int | None,
     crop_mode: str | None,
-    rounding,
+    rounding: int | None,
     background_color,
     rotation_angle: int | None,
     tags: List[str] = [],
@@ -164,7 +164,7 @@ async def upload_photo(
             "width": width,
             "height": height,
             "crop": crop_mode,
-            "rounding": rounding,
+            "radius": rounding,
             "background": background_color,
             "angle": rotation_angle,
         }
