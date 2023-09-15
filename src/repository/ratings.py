@@ -31,7 +31,7 @@ async def create_rating(rating: int, photos_id: int, user: User, db: AsyncSessio
     query = select(Photo).filter(Photo.id == photos_id)
 
     result = await db.execute(query)
-    photo = result.scalar()
+    photo = result.scalar_one_or_none()
 
     if photo is None:
         raise HTTPException(
@@ -47,6 +47,7 @@ async def create_rating(rating: int, photos_id: int, user: User, db: AsyncSessio
     )
     result = await db.execute(query)
     exsist_photo = result.scalar_one_or_none()
+
     if exsist_photo is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=ALREADY_LIKE
@@ -54,9 +55,9 @@ async def create_rating(rating: int, photos_id: int, user: User, db: AsyncSessio
 
     new_rating = Rating(rating=rating, user_id=user.id, photo_id=photos_id)
     try:
-        db.add(new_rating)
+        await db.add(new_rating)
         await db.commit()
-        db.refresh(new_rating)
+        await db.refresh(new_rating)
     except Exception as e:
         raise e
 
