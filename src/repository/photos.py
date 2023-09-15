@@ -335,11 +335,11 @@ async def remove_photo(photo_id: int, user: User, db: AsyncSession) -> bool:
     result = await db.execute(query)
     photo = result.scalar_one_or_none()
 
-    if not photo:
+    if not photo :
         return False
+    
 
     if user.role == Role.admin or photo.user_id == user.id:
-        # deleting from cloudinary
         init_cloudinary()
         cloudinary.uploader.destroy(photo.cloud_public_id)
 
@@ -374,7 +374,7 @@ async def get_URL_QR(photo_id: int, db: AsyncSession):
     photo = result.scalar()
 
     if photo is None:
-        raise HTTPException(status_code=404)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     query = select(QR_code).filter(QR_code.photo_id == photo_id)
     result = await db.execute(query)

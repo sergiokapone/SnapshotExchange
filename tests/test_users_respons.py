@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock,patch
 from sqlalchemy.ext.asyncio import AsyncSession
 import sys
 import os
@@ -7,7 +7,7 @@ from datetime import datetime
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.database.models import User, Role
+from src.database.models import User, Role,BlacklistToken
 from src.schemas import UserSchema, UserProfileSchema
 from src.repository.users import (
     get_user_by_email,
@@ -22,6 +22,8 @@ from src.repository.users import (
     ban_user,
     make_user_role,
     add_to_blacklist,
+    edit_my_profile,
+    is_blacklisted_token
 )
 
 
@@ -95,50 +97,42 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.email, "tests@gmail.com")
         self.assertEqual(result.role, Role.admin)
 
-    # async def test_edit_my_profile(self):
-    #     mock_db = AsyncMock(spec=AsyncSession())
-    #     mock_file = MagicMock()
-    #     new_description = "New description"
-    #     new_username = "new_username"
-    #     user_id = 1
-    #     mock_user=MagicMock()
-    #     mock_user = User(
-    #         id=user_id,
-    #         username="old_username",
-    #         description="Old description",
-    #         avatar="old_avatar_url",
-    #     )
-    #     mock_user.scalar_one_or_none.return_value= mock_user
-    #     mock_db.execute.return_value = mock_user
+    @patch("src.conf.config.init_cloudinary")
+    @patch("cloudinary.uploader.upload")
+    async def test_edit_my_profile(self,mock_upload, mock_init_cloudinary):
+        mock_db = AsyncMock(spec=AsyncSession())
+        mock_file = MagicMock()
+        new_description = "New description"
+        new_username = "new_username"
+        user_id = 1
+        mock_user_1=MagicMock()
+        mock_user = User(
+            id=user_id,
+            username="old_username",
+            description="Old description",
+            avatar="old_avatar_url",
+        )
+        mock_user_1.scalar_one_or_none.return_value= mock_user
+        mock_db.execute.return_value = mock_user_1
 
-    #     init_cloudinary = MagicMock()
+        init_cloudinary = MagicMock()
 
-    #     cloudinary_upload = MagicMock()
-    #     cloudinary_url = "new_avatar_url"
-    #     cloudinary_upload.return_value = {"url": cloudinary_url}
+        cloudinary_upload = MagicMock()
+        cloudinary_url = "https://res.cloudinary.com/name/image/upload/c_fill,h_250,w_250/v1/Avatars/new_username"
+        cloudinary_upload.return_value = {"url": cloudinary_url}
 
-    #     # Виклик функції edit_my_profile з мокованими параметрами
-    #     result = await edit_my_profile(
-    #         mock_file, new_description, new_username, mock_user, mock_db
-    #     )
+        result = await edit_my_profile(
+            mock_file, new_description, new_username, mock_user, mock_db
+        )
 
-    #     # Перевірка, що функція взаємодіє з базою даних та Cloudinary правильно
-    #     mock_db.execute.assert_called_once()
-    #     mock_db.commit.assert_called_once()
-    #     mock_db.refresh.assert_called_once_with(mock_user)
-    #     init_cloudinary.assert_called_once()
-    #     cloudinary_upload.assert_called_once_with(
-    #         mock_file.file,
-    #         public_id=f"Avatars/{new_username}",
-    #         overwrite=True,
-    #         invalidate=True,
-    #     )
+        mock_db.execute.assert_called_once()
+        mock_db.commit.assert_called_once()
+        mock_db.refresh.assert_called_once_with(mock_user)
 
-    #     # Перевірка, що дані користувача були оновлені правильно
-    #     self.assertEqual(result.id, user_id)
-    #     self.assertEqual(result.username, new_username)
-    #     self.assertEqual(result.description, new_description)
-    #     self.assertEqual(result.avatar, cloudinary_url)
+        self.assertEqual(result.id, user_id)
+        self.assertEqual(result.username, new_username)
+        self.assertEqual(result.description, new_description)
+        self.assertEqual(result.avatar, cloudinary_url)
 
     async def test_get_users(self):
         mock_result = MagicMock()
@@ -240,21 +234,25 @@ class TestAsyncMethod(unittest.IsolatedAsyncioTestCase):
         mock_db.commit.assert_called_once()
         mock_db.refresh.assert_called_once()
 
-    # async def test_is_blacklisted_token(self):
-    #         # Створення мокованого об'єкта бази даних
-    #         mock_db = AsyncSession()
+    async def test_is_blacklisted_token(self):
 
-    #         # Припустимо, що ми маємо чорний список з одним токеном "blacklisted_token"
-    #         blacklisted_token = "blacklisted_token"
 
-    #         # Перевірка токена, який знаходиться у блеклісті
-    #         result = await is_blacklisted_token(blacklisted_token, mock_db)
-    #         self.assertTrue(result)  # Повинно повернути True
+        token = 'token'  # Токен для перевірки на чорний список
+        blacklisted_token = BlacklistToken(token=token, blacklisted_on=datetime.now())
 
-    #         # Перевірка токена, який не знаходиться у блеклісті
-    #         non_blacklisted_token = "non_blacklisted_token"
-    #         result = await is_blacklisted_token(non_blacklisted_token, mock_db)
-    #         self.assertFalse(result)  # Повинно повернути False
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = blacklisted_token
+        self.session.execute.return_value = mock_result
+
+        result = await is_blacklisted_token(token, self.session)
+        self.assertTrue(result)  
+
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = None
+        self.session.execute.return_value = mock_result
+        non_blacklisted_token = "non_blacklisted_token"
+        result = await is_blacklisted_token(non_blacklisted_token, self.session)
+        self.assertFalse(result)
 
     async def test_update_token(self):
         mock_result = MagicMock()
